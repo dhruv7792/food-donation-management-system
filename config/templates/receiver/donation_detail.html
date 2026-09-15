@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Food Donation Details | FoodShare{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+
+        <a
+            href="{% url 'receiver_donations' %}"
+            class="text-success text-decoration-none"
+        >
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Available Food
+        </a>
+
+    </div>
+
+
+    <div id="receiverDonationMessage"></div>
+
+
+    <div id="receiverDonationDetail">
+
+        <div class="text-center py-5">
+
+            <div class="spinner-border text-success"></div>
+
+            <p class="text-muted mt-3">
+                Loading donation details...
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/donation.js' %}"></script>
+
+<script src="{% static 'js/request.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof loadReceiverDonationDetail === "function") {
+        loadReceiverDonationDetail();
+    }
+
+});
+</script>
+
+{% endblock %}

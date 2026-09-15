@@ -1,0 +1,548 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Us | FoodShare{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        padding: 100px 0;
+        background: #f5faf7;
+    }
+
+    .about-hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        color: #126c42;
+    }
+
+    .about-hero p {
+        color: #6c757d;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        max-width: 700px;
+    }
+
+    .section-padding {
+        padding: 85px 0;
+    }
+
+    /* ================================
+       STORY IMAGE
+       ================================ */
+
+    .about-image {
+        width: 100%;
+        height: 500px;
+        overflow: hidden;
+        border-radius: 28px;
+        position: relative;
+        background: #dff0e6;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.10);
+    }
+
+    .about-community-image {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 0.6s ease;
+    }
+
+    .about-image:hover .about-community-image {
+        transform: scale(1.05);
+    }
+
+    /* Image overlay */
+    .about-image::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to top,
+            rgba(0, 0, 0, 0.35),
+            transparent 55%
+        );
+        pointer-events: none;
+    }
+
+    /* Image badge */
+    .image-badge {
+        position: absolute;
+        left: 25px;
+        bottom: 25px;
+        z-index: 2;
+
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        padding: 13px 20px;
+        border-radius: 50px;
+
+        background: rgba(255, 255, 255, 0.94);
+        color: #126c42;
+
+        font-weight: 700;
+        font-size: 14px;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(10px);
+    }
+
+    .image-badge i {
+        color: #198754;
+    }
+
+    /* ================================
+       CONTENT
+       ================================ */
+
+    .about-content h2 {
+        font-size: clamp(2rem, 4vw, 3.2rem);
+        font-weight: 800;
+        margin-bottom: 25px;
+        color: #17251e;
+        line-height: 1.15;
+    }
+
+    .about-content p {
+        color: #6c757d;
+        line-height: 1.8;
+        font-size: 16px;
+        margin-bottom: 18px;
+    }
+
+    /* ================================
+       MISSION
+       ================================ */
+
+    .mission-card {
+        padding: 35px;
+        height: 100%;
+        border-radius: 20px;
+        background: #f5faf7;
+        border: 1px solid #dff0e6;
+        transition: all 0.3s ease;
+    }
+
+    .mission-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 35px rgba(25, 135, 84, 0.10);
+    }
+
+    .mission-icon {
+        width: 60px;
+        height: 60px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 15px;
+        background: #198754;
+        color: white;
+
+        font-size: 25px;
+        margin-bottom: 20px;
+    }
+
+    .mission-card h4 {
+        font-weight: 700;
+        color: #17251e;
+    }
+
+    .mission-card p {
+        color: #6c757d;
+        line-height: 1.7;
+    }
+
+    /* ================================
+       VALUES
+       ================================ */
+
+    .values-section {
+        background: #f8f9fa;
+    }
+
+    .value-card {
+        text-align: center;
+        padding: 35px 25px;
+
+        background: white;
+        border-radius: 20px;
+
+        height: 100%;
+
+        box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+
+        transition: all 0.3s ease;
+    }
+
+    .value-card:hover {
+        transform: translateY(-7px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, .09);
+    }
+
+    .value-icon {
+        font-size: 32px;
+        color: #198754;
+        margin-bottom: 15px;
+    }
+
+    .value-card h5 {
+        font-weight: 700;
+    }
+
+    .value-card p {
+        color: #6c757d;
+        margin: 0;
+        line-height: 1.7;
+    }
+
+    /* ================================
+       DARK MODE
+       ================================ */
+
+    [data-theme="dark"] .about-hero {
+        background: #101a15;
+    }
+
+    [data-theme="dark"] .about-hero h1 {
+        color: #66d19e;
+    }
+
+    [data-theme="dark"] .about-content h2 {
+        color: #f2f7f4;
+    }
+
+    [data-theme="dark"] .about-content p,
+    [data-theme="dark"] .about-hero p,
+    [data-theme="dark"] .mission-card p,
+    [data-theme="dark"] .value-card p {
+        color: #aab9b1;
+    }
+
+    [data-theme="dark"] .mission-card {
+        background: #142019;
+        border-color: #263d31;
+    }
+
+    [data-theme="dark"] .mission-card h4 {
+        color: #f2f7f4;
+    }
+
+    [data-theme="dark"] .values-section {
+        background: #0c1511;
+    }
+
+    [data-theme="dark"] .value-card {
+        background: #142019;
+    }
+
+    [data-theme="dark"] .image-badge {
+        background: rgba(20, 32, 25, 0.94);
+        color: #70dca5;
+    }
+
+    /* ================================
+       RESPONSIVE
+       ================================ */
+
+    @media (max-width: 991px) {
+
+        .about-hero {
+            padding: 75px 0;
+        }
+
+        .about-image {
+            height: 450px;
+        }
+    }
+
+    @media (max-width: 576px) {
+
+        .about-hero {
+            padding: 60px 0;
+        }
+
+        .section-padding {
+            padding: 60px 0;
+        }
+
+        .about-image {
+            height: 350px;
+            border-radius: 20px;
+        }
+
+        .image-badge {
+            left: 15px;
+            bottom: 15px;
+            padding: 10px 15px;
+            font-size: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<!-- ================================
+     HERO
+     ================================ -->
+
+<section class="about-hero">
+
+    <div class="container">
+
+        <span class="badge text-bg-success mb-3">
+            About FoodShare
+        </span>
+
+        <h1>
+            Turning Surplus Food
+            Into Shared Value
+        </h1>
+
+        <p class="mt-4">
+            FoodShare is a community-focused platform designed
+            to connect people and organizations with surplus food
+            to those who can benefit from it.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ================================
+     OUR STORY
+     ================================ -->
+
+<section class="section-padding">
+
+    <div class="container">
+
+        <div class="row align-items-center g-5">
+
+            <!-- IMAGE -->
+            <div class="col-lg-6">
+
+                <div class="about-image">
+
+                    <img
+                        src="{% static 'images/community-food.png' %}"
+                        alt="Community sharing donated food"
+                        class="about-community-image">
+
+                    <div class="image-badge">
+                        <i class="bi bi-heart-fill"></i>
+                        <span>Food. People. Community.</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTENT -->
+            <div class="col-lg-6">
+
+                <div class="about-content">
+
+                    <span class="badge text-bg-success mb-3">
+                        Our Purpose
+                    </span>
+
+                    <h2>
+                        Building a More Connected
+                        Food Community
+                    </h2>
+
+                    <p>
+                        Every day, usable food can become surplus
+                        for households, restaurants, events,
+                        organizations and businesses.
+                    </p>
+
+                    <p>
+                        FoodShare provides a digital platform where
+                        donors can share available food and receivers
+                        can discover and request suitable donations.
+                    </p>
+
+                    <p>
+                        The goal is to make the donation process
+                        organized, transparent and easier to manage.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================================
+     MISSION & VISION
+     ================================ -->
+
+<section class="section-padding">
+
+    <div class="container">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+
+                <div class="mission-card">
+
+                    <div class="mission-icon">
+                        <i class="bi bi-bullseye"></i>
+                    </div>
+
+                    <h4>
+                        Our Mission
+                    </h4>
+
+                    <p>
+                        To provide a reliable digital platform that
+                        makes surplus food donation easier, faster
+                        and more organized.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <div class="mission-card">
+
+                    <div class="mission-icon">
+                        <i class="bi bi-eye"></i>
+                    </div>
+
+                    <h4>
+                        Our Vision
+                    </h4>
+
+                    <p>
+                        To help build communities where edible surplus
+                        food is shared responsibly instead of being
+                        unnecessarily wasted.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================================
+     VALUES
+     ================================ -->
+
+<section class="values-section section-padding">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <span class="badge text-bg-success mb-3">
+                Our Values
+            </span>
+
+            <h2 class="fw-bold">
+                What Guides Us
+            </h2>
+
+        </div>
+
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+
+                <div class="value-card">
+
+                    <div class="value-icon">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+
+                    <h5>
+                        Community
+                    </h5>
+
+                    <p>
+                        Connecting people through meaningful
+                        food-sharing opportunities.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="value-card">
+
+                    <div class="value-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+
+                    <h5>
+                        Responsibility
+                    </h5>
+
+                    <p>
+                        Encouraging responsible handling and
+                        distribution of surplus food.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="value-card">
+
+                    <div class="value-icon">
+                        <i class="bi bi-recycle"></i>
+                    </div>
+
+                    <h5>
+                        Sustainability
+                    </h5>
+
+                    <p>
+                        Supporting efforts to reduce unnecessary
+                        food waste and its environmental impact.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

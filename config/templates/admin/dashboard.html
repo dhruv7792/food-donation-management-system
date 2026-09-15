@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Dashboard | FoodShare{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Admin Dashboard</h2>
+            <p class="text-muted mb-0">
+                Monitor the FoodShare donation system.
+            </p>
+        </div>
+
+        <a href="{% url 'admin_reports' %}" class="btn btn-success">
+            <i class="bi bi-bar-chart me-2"></i>
+            View Reports
+        </a>
+    </div>
+
+    <div id="adminDashboardMessage"></div>
+
+    <!-- Statistics -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Users</p>
+                    <h3 class="fw-bold" id="adminTotalUsers">0</h3>
+                    <span class="text-primary">
+                        <i class="bi bi-people me-1"></i>
+                        Registered users
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Donations</p>
+                    <h3 class="fw-bold" id="adminTotalDonations">0</h3>
+                    <span class="text-success">
+                        <i class="bi bi-box-seam me-1"></i>
+                        Food donations
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Requests</p>
+                    <h3 class="fw-bold" id="adminTotalRequests">0</h3>
+                    <span class="text-warning">
+                        <i class="bi bi-send me-1"></i>
+                        Food requests
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Completed</p>
+                    <h3 class="fw-bold text-success"
+                        id="adminCompletedRequests">
+                        0
+                    </h3>
+                    <span class="text-success">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Successful deliveries
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Charts -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white border-0">
+                    <h5 class="fw-bold mb-0">
+                        Donation Activity
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <canvas id="donationActivityChart"
+                            height="120">
+                    </canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white border-0">
+                    <h5 class="fw-bold mb-0">
+                        User Distribution
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <canvas id="userDistributionChart">
+                    </canvas>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Quick Actions -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0">
+            <h5 class="fw-bold mb-0">
+                Quick Actions
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <a href="{% url 'admin_users' %}"
+                       class="btn btn-outline-primary w-100 py-3">
+                        <i class="bi bi-people d-block fs-4 mb-2"></i>
+                        Manage Users
+                    </a>
+                </div>
+
+                <div class="col-md-3">
+                    <a href="{% url 'admin_donations' %}"
+                       class="btn btn-outline-success w-100 py-3">
+                        <i class="bi bi-box-seam d-block fs-4 mb-2"></i>
+                        Manage Donations
+                    </a>
+                </div>
+
+                <div class="col-md-3">
+                    <a href="{% url 'admin_requests' %}"
+                       class="btn btn-outline-warning w-100 py-3">
+                        <i class="bi bi-send d-block fs-4 mb-2"></i>
+                        Manage Requests
+                    </a>
+                </div>
+
+                <div class="col-md-3">
+                    <a href="{% url 'admin_reports' %}"
+                       class="btn btn-outline-dark w-100 py-3">
+                        <i class="bi bi-file-earmark-bar-graph d-block fs-4 mb-2"></i>
+                        Reports
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof loadAdminDashboard === "function") {
+        loadAdminDashboard();
+    }
+
+});
+</script>
+
+{% endblock %}

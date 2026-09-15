@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Donations | FoodShare{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold mb-1">
+            Donations
+        </h2>
+
+        <p class="text-muted">
+            Monitor and manage all food donations.
+        </p>
+
+    </div>
+
+
+    <div id="adminDonationsMessage"></div>
+
+
+    <!-- Filters -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-lg-5">
+
+                    <label class="form-label fw-semibold">
+                        Search
+                    </label>
+
+                    <input
+                        type="search"
+                        class="form-control"
+                        id="adminDonationSearch"
+                        placeholder="Search food or donor..."
+                    >
+
+                </div>
+
+
+                <div class="col-md-4 col-lg-2">
+
+                    <label class="form-label fw-semibold">
+                        Category
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="adminDonationCategory"
+                    >
+
+                        <option value="">
+                            All
+                        </option>
+
+                        <option value="prepared">
+                            Prepared Food
+                        </option>
+
+                        <option value="grains">
+                            Grains
+                        </option>
+
+                        <option value="vegetables">
+                            Vegetables
+                        </option>
+
+                        <option value="fruits">
+                            Fruits
+                        </option>
+
+                        <option value="bakery">
+                            Bakery
+                        </option>
+
+                        <option value="packaged">
+                            Packaged Food
+                        </option>
+
+                        <option value="other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-4 col-lg-2">
+
+                    <label class="form-label fw-semibold">
+                        Status
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="adminDonationStatus"
+                    >
+
+                        <option value="">
+                            All
+                        </option>
+
+                        <option value="available">
+                            Available
+                        </option>
+
+                        <option value="requested">
+                            Requested
+                        </option>
+
+                        <option value="completed">
+                            Completed
+                        </option>
+
+                        <option value="expired">
+                            Expired
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-4 col-lg-3">
+
+                    <label class="form-label fw-semibold">
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="adminDonationDate"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Donations Table -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Food</th>
+                            <th>Donor</th>
+                            <th>Quantity</th>
+                            <th>Category</th>
+                            <th>Expiry</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="adminDonationsTable">
+
+                        <tr>
+
+                            <td colspan="8"
+                                class="text-center py-5 text-muted">
+
+                                <div class="spinner-border
+                                            spinner-border-sm
+                                            text-success">
+                                </div>
+
+                                Loading donations...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="d-flex justify-content-between
+                        align-items-center mt-3">
+
+                <small class="text-muted"
+                       id="donationsPaginationInfo">
+                    Showing 0 donations
+                </small>
+
+                <nav>
+                    <ul class="pagination mb-0"
+                        id="donationsPagination">
+                    </ul>
+                </nav>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/donation.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof initializeAdminDonations === "function") {
+        initializeAdminDonations();
+    }
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Receiver Profile | FoodShare{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+            My Profile
+        </h2>
+
+        <p class="text-muted">
+            Manage your receiver account information.
+        </p>
+
+    </div>
+
+
+    <div id="profileMessage"></div>
+
+
+    <div class="row g-4">
+
+        <!-- Profile Card -->
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body text-center p-4">
+
+                    <div
+                        class="rounded-circle bg-success-subtle
+                               text-success d-flex align-items-center
+                               justify-content-center mx-auto mb-3"
+                        style="width:100px;height:100px;font-size:40px;"
+                    >
+                        <i class="bi bi-person"></i>
+                    </div>
+
+                    <h4 class="fw-bold"
+                        id="profileName">
+                        Receiver
+                    </h4>
+
+                    <p class="text-muted"
+                       id="profileEmail">
+                        —
+                    </p>
+
+                    <span class="badge text-bg-primary">
+                        Receiver
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Profile Form -->
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h5 class="fw-bold mb-4">
+                        Personal Information
+                    </h5>
+
+
+                    <form id="receiverProfileForm">
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    First Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="firstName"
+                                    name="first_name"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    Last Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="lastName"
+                                    name="last_name"
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    readonly
+                                >
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    Phone Number
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    class="form-control"
+                                    id="phone"
+                                    name="phone_no"
+                                >
+
+                            </div>
+
+
+                            <div class="col-12 mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    Address
+                                </label>
+
+                                <textarea
+                                    class="form-control"
+                                    id="address"
+                                    name="address"
+                                    rows="3"
+                                ></textarea>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-success"
+                            id="saveReceiverProfileBtn"
+                        >
+                            <i class="bi bi-check-lg me-2"></i>
+                            Save Changes
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+const RECEIVER_API_BASE = "/api/v1";
+
+function getReceiverToken() {
+    return localStorage.getItem("access_token");
+}
+
+
+async function loadReceiverProfile() {
+
+    const token = getReceiverToken();
+
+    if (!token) {
+        window.location.href = "{% url 'login' %}";
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${RECEIVER_API_BASE}/auth/profile/`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to load profile.");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("firstName").value =
+            data.first_name || "";
+
+        document.getElementById("lastName").value =
+            data.last_name || "";
+
+        document.getElementById("email").value =
+            data.email || "";
+
+        document.getElementById("phone").value =
+            data.phone_no || "";
+
+        document.getElementById("address").value =
+            data.address || "";
+
+        document.getElementById("profileEmail").textContent =
+            data.email || "—";
+
+        document.getElementById("profileName").textContent =
+            `${data.first_name || ""} ${data.last_name || ""}`.trim()
+            || "Receiver";
+
+    } catch (error) {
+
+        showReceiverProfileMessage(
+            error.message,
+            "danger"
+        );
+
+    }
+}
+
+
+document.getElementById("receiverProfileForm")
+.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const token = getReceiverToken();
+
+    const button =
+        document.getElementById("saveReceiverProfileBtn");
+
+    button.disabled = true;
+
+    const payload = {
+
+        first_name:
+            document.getElementById("firstName").value.trim(),
+
+        last_name:
+            document.getElementById("lastName").value.trim(),
+
+        phone_no:
+            document.getElementById("phone").value.trim(),
+
+        address:
+            document.getElementById("address").value.trim()
+    };
+
+
+    try {
+
+        const response = await fetch(
+            `${RECEIVER_API_BASE}/auth/profile/`,
+            {
+                method: "PATCH",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Profile update failed."
+            );
+        }
+
+        showReceiverProfileMessage(
+            "Profile updated successfully.",
+            "success"
+        );
+
+        await loadReceiverProfile();
+
+    } catch (error) {
+
+        showReceiverProfileMessage(
+            error.message,
+            "danger"
+        );
+
+    } finally {
+
+        button.disabled = false;
+
+    }
+
+});
+
+
+function showReceiverProfileMessage(message, type) {
+
+    document.getElementById("profileMessage").innerHTML = `
+        <div class="alert alert-${type}">
+            ${message}
+        </div>
+    `;
+
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadReceiverProfile
+);
+</script>
+
+{% endblock %}

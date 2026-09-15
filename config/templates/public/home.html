@@ -1,0 +1,834 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}FoodShare | Share Food, Reduce Waste{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+/* =========================================================
+   HERO SECTION
+========================================================= */
+
+.hero-section {
+    min-height: 650px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+
+    background-image:
+        linear-gradient(
+            90deg,
+            rgba(0, 77, 45, 0.95) 0%,
+            rgba(18, 108, 66, 0.82) 40%,
+            rgba(18, 108, 66, 0.42) 68%,
+            rgba(18, 108, 66, 0.12) 100%
+        ),
+        url("{% static 'images/food-donation-hero.png' %}");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: white;
+}
+
+.hero-content {
+    max-width: 680px;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 16px;
+    border-radius: 50px;
+
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.30);
+
+    margin-bottom: 20px;
+
+    backdrop-filter: blur(5px);
+}
+
+.hero-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.08;
+    font-weight: 800;
+    margin-bottom: 22px;
+}
+
+.hero-text {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,.92);
+    margin-bottom: 30px;
+    max-width: 650px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.hero-buttons .btn {
+    padding: 13px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+.stats-section {
+    margin-top: -55px;
+    position: relative;
+    z-index: 2;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+
+    box-shadow: 0 10px 35px rgba(0,0,0,.08);
+
+    height: 100%;
+}
+
+.stat-icon {
+    width: 55px;
+    height: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: auto auto 12px;
+
+    border-radius: 14px;
+
+    background: #eaf7ef;
+    color: #198754;
+
+    font-size: 24px;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #198754;
+}
+
+.stat-label {
+    color: #6c757d;
+}
+
+
+/* =========================================================
+   GENERAL SECTION
+========================================================= */
+
+.section-padding {
+    padding: 90px 0;
+}
+
+.section-heading {
+    max-width: 700px;
+    margin: 0 auto 50px;
+    text-align: center;
+}
+
+.section-heading .badge {
+    margin-bottom: 12px;
+}
+
+.section-heading h2 {
+    font-weight: 800;
+    font-size: 2.4rem;
+    margin-bottom: 15px;
+}
+
+.section-heading p {
+    color: #6c757d;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   FEATURES
+========================================================= */
+
+.feature-card {
+    height: 100%;
+    padding: 30px;
+
+    border: 1px solid #e9ecef;
+    border-radius: 18px;
+
+    transition: .25s ease;
+
+    background: #fff;
+}
+
+.feature-card:hover {
+    transform: translateY(-6px);
+
+    box-shadow: 0 15px 35px rgba(0,0,0,.08);
+
+    border-color: #b8dfc8;
+}
+
+.feature-icon {
+    width: 65px;
+    height: 65px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: #eaf7ef;
+    color: #198754;
+
+    font-size: 28px;
+
+    margin-bottom: 20px;
+}
+
+.feature-card h4 {
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.feature-card p {
+    color: #6c757d;
+    line-height: 1.7;
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   HOW IT WORKS
+========================================================= */
+
+.how-section {
+    background: #f5faf7;
+}
+
+.step-card {
+    text-align: center;
+    position: relative;
+    padding: 20px;
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #198754;
+    color: white;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.step-card h5 {
+    font-weight: 700;
+}
+
+.step-card p {
+    color: #6c757d;
+}
+
+
+/* =========================================================
+   CTA
+========================================================= */
+
+.cta-section {
+    padding: 80px 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #126c42,
+            #198754
+        );
+
+    color: white;
+}
+
+.cta-section h2 {
+    font-weight: 800;
+    font-size: 2.5rem;
+}
+
+.cta-section p {
+    color: rgba(255,255,255,.85);
+
+    max-width: 650px;
+
+    margin: 15px auto 30px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 991px) {
+
+    .hero-section {
+        min-height: 620px;
+
+        background-position: center;
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 7vw, 4rem);
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .hero-section {
+        min-height: 620px;
+
+        background-image:
+            linear-gradient(
+                180deg,
+                rgba(0,77,45,.88),
+                rgba(18,108,66,.72)
+            ),
+            url("{% static 'images/food-donation-hero.jpg' %}");
+
+        background-position: center;
+    }
+
+    .hero-content {
+        max-width: 100%;
+    }
+
+    .hero-title {
+        font-size: clamp(2.3rem, 10vw, 3.5rem);
+    }
+
+    .hero-text {
+        font-size: 1rem;
+    }
+
+    .hero-buttons {
+        width: 100%;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+    }
+
+    .stats-section {
+        margin-top: 25px;
+    }
+
+    .section-padding {
+        padding: 60px 0;
+    }
+
+    .section-heading h2 {
+        font-size: 2rem;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .hero-section {
+        min-height: 600px;
+    }
+
+    .hero-title {
+        font-size: 2.4rem;
+    }
+
+    .hero-badge {
+        font-size: .9rem;
+    }
+
+    .stat-card {
+        padding: 20px 12px;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    .stat-label {
+        font-size: .9rem;
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="hero-section">
+
+    <div class="container">
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+
+                <i class="bi bi-heart-fill"></i>
+
+                Together Against Food Waste
+
+            </div>
+
+
+            <h1 class="hero-title">
+
+                Share Food.
+
+                <br>
+
+                Reduce Waste.
+
+                <br>
+
+                Help People.
+
+            </h1>
+
+
+            <p class="hero-text">
+
+                FoodShare connects food donors with people and
+                organizations who need food. Turn surplus food
+                into meaningful support for your community.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a
+                    href="{% url 'register' %}"
+                    class="btn btn-light"
+                >
+
+                    <i class="bi bi-person-plus me-2"></i>
+
+                    Get Started
+
+                </a>
+
+
+                <a
+                    href="{% url 'about' %}"
+                    class="btn btn-outline-light"
+                >
+
+                    Learn More
+
+                    <i class="bi bi-arrow-right ms-2"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     STATISTICS
+========================================================= -->
+
+<section class="stats-section">
+
+    <div class="container">
+
+        <div class="row g-4">
+
+
+            <div class="col-6 col-lg-3">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+
+                    <div class="stat-number">
+                        1,000+
+                    </div>
+
+                    <div class="stat-label">
+                        Food Donations
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-6 col-lg-3">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <div class="stat-number">
+                        500+
+                    </div>
+
+                    <div class="stat-label">
+                        Community Members
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-6 col-lg-3">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+
+                    <div class="stat-number">
+                        5,000+
+                    </div>
+
+                    <div class="stat-label">
+                        Meals Shared
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-6 col-lg-3">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i class="bi bi-recycle"></i>
+                    </div>
+
+                    <div class="stat-number">
+                        2,500+
+                    </div>
+
+                    <div class="stat-label">
+                        Kg Food Saved
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FEATURES
+========================================================= -->
+
+<section class="section-padding">
+
+    <div class="container">
+
+
+        <div class="section-heading">
+
+            <span class="badge text-bg-success">
+                Why FoodShare?
+            </span>
+
+            <h2>
+                Making Food Donation Simple
+            </h2>
+
+            <p>
+                Our platform makes it easier for communities to
+                distribute surplus food safely and efficiently.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+
+                    <h4>
+                        Easy Food Donation
+                    </h4>
+
+                    <p>
+                        Donors can quickly publish available food,
+                        quantity, expiry information and pickup details.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+
+                    <h4>
+                        Find Available Food
+                    </h4>
+
+                    <p>
+                        Receivers can browse available donations,
+                        search by category and find suitable food.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-4">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+
+                    <h4>
+                        Simple Pickup
+                    </h4>
+
+                    <p>
+                        Track requests and coordinate food pickups
+                        through a clear and organized workflow.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     HOW IT WORKS
+========================================================= -->
+
+<section class="how-section section-padding">
+
+    <div class="container">
+
+
+        <div class="section-heading">
+
+            <span class="badge text-bg-success">
+                How It Works
+            </span>
+
+            <h2>
+                Three Simple Steps
+            </h2>
+
+            <p>
+                From surplus food to someone who needs it.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <div class="col-md-4">
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        1
+                    </div>
+
+                    <h5>
+                        Donate
+                    </h5>
+
+                    <p>
+                        Register as a donor and publish your
+                        available surplus food.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        2
+                    </div>
+
+                    <h5>
+                        Request
+                    </h5>
+
+                    <p>
+                        Receivers browse available food and
+                        submit a request.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="step-card">
+
+                    <div class="step-number">
+                        3
+                    </div>
+
+                    <h5>
+                        Collect
+                    </h5>
+
+                    <p>
+                        Coordinate the pickup and make sure
+                        the food reaches someone in need.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     CALL TO ACTION
+========================================================= -->
+
+<section class="cta-section">
+
+    <div class="container text-center">
+
+        <h2>
+            Be Part of the Solution
+        </h2>
+
+        <p>
+            Whether you have surplus food or need support,
+            FoodShare gives your community a simple way to
+            connect and reduce food waste.
+        </p>
+
+
+        <a
+            href="{% url 'register' %}"
+            class="btn btn-light btn-lg px-4"
+        >
+
+            Create Your Account
+
+            <i class="bi bi-arrow-right ms-2"></i>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

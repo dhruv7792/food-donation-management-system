@@ -1,0 +1,860 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | FoodShare</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --green: #198754;
+            --dark-green: #11683f;
+            --light-green: #eef9f3;
+            --text: #17251e;
+            --muted: #718078;
+            --border: #dce5df;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #f4fbf7, #eaf7ef);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 86px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.97);
+            border-bottom: 1px solid #edf1ee;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-container {
+            width: min(1180px, calc(100% - 50px));
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            text-decoration: none;
+            font-size: 25px;
+            font-weight: 800;
+            color: #16241d;
+        }
+
+        .logo span {
+            color: var(--green);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-link {
+            color: #617067;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 8px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--green);
+        }
+
+        .theme-btn {
+            border: 1px solid #e0e7e2;
+            background: white;
+            border-radius: 30px;
+            padding: 10px 18px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .login-btn {
+            border: 1px solid var(--green);
+            background: white;
+            color: var(--green);
+            border-radius: 8px;
+            padding: 11px 25px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .signup-btn {
+            border: 1px solid var(--green);
+            background: var(--green);
+            color: white;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        /* ================= MAIN ================= */
+
+        .page {
+            min-height: calc(100vh - 86px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 55px 25px;
+        }
+
+        .login-wrapper {
+            width: min(1000px, 100%);
+            min-height: 570px;
+            background: white;
+            border-radius: 22px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 46% 54%;
+            box-shadow: 0 20px 60px rgba(30, 75, 50, 0.12);
+        }
+
+        /* ================= LEFT PANEL ================= */
+
+        .welcome-panel {
+            background: linear-gradient(
+                145deg,
+                #269a63,
+                #117746
+            );
+            color: white;
+            padding: 55px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-panel::before {
+            content: "";
+            width: 250px;
+            height: 250px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 50%;
+            position: absolute;
+            top: -100px;
+            right: -100px;
+        }
+
+        .welcome-panel::after {
+            content: "";
+            width: 300px;
+            height: 300px;
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 50%;
+            position: absolute;
+            bottom: -170px;
+            left: -150px;
+        }
+
+        .recycle-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.13);
+            border: 1px solid rgba(255,255,255,0.20);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin-bottom: 32px;
+        }
+
+        .welcome-panel h1 {
+            font-size: 47px;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            font-weight: 800;
+        }
+
+        .welcome-panel p {
+            max-width: 330px;
+            font-size: 17px;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.91);
+        }
+
+        .feature {
+            margin-top: 35px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ================= FORM PANEL ================= */
+
+        .form-panel {
+            padding: 60px 65px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            margin-bottom: 35px;
+        }
+
+        .form-header h2 {
+            font-size: 38px;
+            line-height: 1.1;
+            margin-bottom: 14px;
+            color: #17221c;
+        }
+
+        .form-header p {
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 330px;
+        }
+
+        /* Django messages */
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            background: #fff3cd;
+            color: #664d03;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        /* ================= FORM ================= */
+
+        .form-group {
+            margin-bottom: 21px;
+        }
+
+        .form-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 9px;
+        }
+
+        label {
+            font-size: 15px;
+            font-weight: 700;
+            color: #26342d;
+        }
+
+        .forgot {
+            font-size: 13px;
+            color: var(--green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .forgot:hover {
+            text-decoration: underline;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input {
+            width: 100%;
+            height: 52px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0 16px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+            color: #25332c;
+            background: white;
+        }
+
+        .input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.10);
+        }
+
+        .input::placeholder {
+            color: #a2aca7;
+        }
+
+        .password-input {
+            padding-right: 50px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 18px;
+            color: #78857e;
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 3px 0 25px;
+            color: #66736c;
+            font-size: 14px;
+        }
+
+        .remember-row input {
+            width: 17px;
+            height: 17px;
+            accent-color: var(--green);
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            height: 53px;
+            border: none;
+            border-radius: 10px;
+            background: var(--green);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0;
+            color: #a1aaa5;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            height: 1px;
+            flex: 1;
+            background: #e6ebe8;
+        }
+
+        .register-text {
+            text-align: center;
+            color: #68756e;
+            font-size: 14px;
+        }
+
+        .register-text a {
+            color: var(--green);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        /* ================= DARK MODE ================= */
+
+        body.dark {
+            background: #101815;
+        }
+
+        body.dark .navbar {
+            background: #17211d;
+            border-color: #27332e;
+        }
+
+        body.dark .logo,
+        body.dark .nav-link {
+            color: #e8f0eb;
+        }
+
+        body.dark .theme-btn {
+            background: #202c26;
+            border-color: #34423a;
+            color: white;
+        }
+
+        body.dark .login-wrapper {
+            background: #1b2520;
+        }
+
+        body.dark .form-panel {
+            background: #1b2520;
+        }
+
+        body.dark .form-header h2,
+        body.dark label {
+            color: #f1f6f3;
+        }
+
+        body.dark .form-header p,
+        body.dark .register-text {
+            color: #aebbb4;
+        }
+
+        body.dark .input {
+            background: #202c26;
+            border-color: #39473f;
+            color: white;
+        }
+
+        body.dark .input::placeholder {
+            color: #849189;
+        }
+
+        body.dark .remember-row {
+            color: #adb9b2;
+        }
+
+        /* ================= TABLET ================= */
+
+        @media (max-width: 850px) {
+
+            .navbar {
+                height: auto;
+                min-height: 75px;
+            }
+
+            .nav-container {
+                width: calc(100% - 30px);
+            }
+
+            .nav-link {
+                display: none;
+            }
+
+            .nav-right {
+                gap: 8px;
+            }
+
+            .theme-btn {
+                padding: 9px 13px;
+            }
+
+            .login-btn,
+            .signup-btn {
+                padding: 10px 14px;
+            }
+
+            .page {
+                padding: 35px 18px;
+            }
+
+            .login-wrapper {
+                grid-template-columns: 42% 58%;
+                min-height: 540px;
+            }
+
+            .welcome-panel {
+                padding: 40px 30px;
+            }
+
+            .welcome-panel h1 {
+                font-size: 38px;
+            }
+
+            .welcome-panel p {
+                font-size: 15px;
+            }
+
+            .form-panel {
+                padding: 45px 35px;
+            }
+
+            .form-header h2 {
+                font-size: 34px;
+            }
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 650px) {
+
+            .navbar {
+                min-height: 70px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .theme-btn {
+                font-size: 13px;
+                padding: 8px 11px;
+            }
+
+            .login-btn,
+            .signup-btn {
+                display: none;
+            }
+
+            .page {
+                padding: 25px 15px;
+                align-items: flex-start;
+            }
+
+            .login-wrapper {
+                grid-template-columns: 1fr;
+                border-radius: 18px;
+            }
+
+            .welcome-panel {
+                padding: 35px 30px;
+                min-height: 300px;
+            }
+
+            .recycle-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+
+            .welcome-panel h1 {
+                font-size: 32px;
+                margin-bottom: 15px;
+            }
+
+            .welcome-panel p {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .feature {
+                margin-top: 20px;
+            }
+
+            .form-panel {
+                padding: 38px 25px;
+            }
+
+            .form-header {
+                margin-bottom: 28px;
+            }
+
+            .form-header h2 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+
+    <div class="nav-container">
+
+        <a href="/" class="logo">
+            Food<span>Share</span>
+        </a>
+
+        <nav class="nav-right">
+
+            <a href="/" class="nav-link">Home</a>
+            <a href="#" class="nav-link">About</a>
+            <a href="#" class="nav-link">Contact</a>
+
+            <button type="button" class="theme-btn" id="themeBtn">
+                🌙 <span id="themeText">Dark</span>
+            </button>
+
+            <a href="{% url 'login' %}" class="login-btn">
+                Login
+            </a>
+
+            <a href="{% url 'register' %}" class="signup-btn">
+                Get Started
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+<!-- ================= LOGIN PAGE ================= -->
+
+<main class="page">
+
+    <div class="login-wrapper">
+
+        <!-- LEFT SIDE -->
+
+        <section class="welcome-panel">
+
+            <div class="recycle-icon">
+                ♻
+            </div>
+
+            <h1>
+                Welcome<br>
+                Back!
+            </h1>
+
+            <p>
+                Connect with our food donation community
+                and help reduce food waste while supporting
+                people in need.
+            </p>
+
+            <div class="feature">
+                <div class="feature-icon">🍲</div>
+                <span>Donate surplus food</span>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">🤝</div>
+                <span>Help people in need</span>
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT SIDE -->
+
+        <section class="form-panel">
+
+            <div class="form-header">
+
+                <h2>Sign In</h2>
+
+                <p>
+                    Enter your account details to continue.
+                </p>
+
+            </div>
+
+
+            <!-- Django Messages -->
+
+            {% if messages %}
+            <div class="messages">
+
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+
+            </div>
+            {% endif %}
+
+
+            <!-- LOGIN FORM -->
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <div class="form-label-row">
+                        <label for="email">
+                            Email Address
+                        </label>
+                    </div>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="input"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <div class="form-label-row">
+
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <a href="{% url 'forgot_password' %}" class="forgot">
+                            Forgot Password?
+                        </a>
+
+                    </div>
+
+                    <div class="input-wrapper">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="input password-input"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="show-password"
+                            id="showPassword"
+                            aria-label="Show password"
+                        >
+                            👁
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REMEMBER -->
+
+                <div class="remember-row">
+
+                    <input
+                        type="checkbox"
+                        id="remember"
+                        name="remember"
+                    >
+
+                    <label for="remember">
+                        Remember me
+                    </label>
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <button type="submit" class="submit-btn">
+                    Sign In
+                </button>
+
+            </form>
+
+
+            <div class="divider">
+                OR
+            </div>
+
+
+            <div class="register-text">
+
+                Don't have an account?
+
+                <a href="{% url 'register' %}">
+                    Create an account
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    /* ================= PASSWORD SHOW / HIDE ================= */
+
+    const password = document.getElementById("password");
+    const showPassword = document.getElementById("showPassword");
+
+    showPassword.addEventListener("click", function () {
+
+        if (password.type === "password") {
+
+            password.type = "text";
+            showPassword.textContent = "🙈";
+
+        } else {
+
+            password.type = "password";
+            showPassword.textContent = "👁";
+
+        }
+
+    });
+
+
+    /* ================= DARK MODE ================= */
+
+    const themeBtn = document.getElementById("themeBtn");
+    const themeText = document.getElementById("themeText");
+
+    themeBtn.addEventListener("click", function () {
+
+        document.body.classList.toggle("dark");
+
+        if (document.body.classList.contains("dark")) {
+
+            themeText.textContent = "Light";
+            themeBtn.innerHTML = "☀️ <span>Light</span>";
+
+        } else {
+
+            themeText.textContent = "Dark";
+            themeBtn.innerHTML = "🌙 <span>Dark</span>";
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

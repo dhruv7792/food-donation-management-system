@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Available Food | FoodShare{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold mb-1">
+            Available Food
+        </h2>
+
+        <p class="text-muted">
+            Browse food donations available in your area.
+        </p>
+
+    </div>
+
+
+    <div id="donationMessage"></div>
+
+
+    <!-- Search & Filters -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-lg-5">
+
+                    <label class="form-label fw-semibold">
+                        Search Food
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <input
+                            type="search"
+                            class="form-control"
+                            id="receiverSearch"
+                            placeholder="Search food..."
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4 col-lg-3">
+
+                    <label class="form-label fw-semibold">
+                        Category
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="receiverCategory"
+                    >
+
+                        <option value="">
+                            All Categories
+                        </option>
+
+                        <option value="prepared">
+                            Prepared Food
+                        </option>
+
+                        <option value="grains">
+                            Grains
+                        </option>
+
+                        <option value="vegetables">
+                            Vegetables
+                        </option>
+
+                        <option value="fruits">
+                            Fruits
+                        </option>
+
+                        <option value="bakery">
+                            Bakery
+                        </option>
+
+                        <option value="packaged">
+                            Packaged Food
+                        </option>
+
+                        <option value="other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-4 col-lg-2">
+
+                    <label class="form-label fw-semibold">
+                        Sort
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="receiverSort"
+                    >
+
+                        <option value="newest">
+                            Newest
+                        </option>
+
+                        <option value="expiry">
+                            Expiring Soon
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-4 col-lg-2 d-flex align-items-end">
+
+                    <button
+                        class="btn btn-outline-secondary w-100"
+                        id="clearReceiverFilters"
+                    >
+                        <i class="bi bi-x-circle me-1"></i>
+                        Clear
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Donations -->
+
+    <div class="row g-4"
+         id="receiverDonationsContainer">
+
+        <div class="col-12 text-center py-5 text-muted">
+
+            <div class="spinner-border text-success">
+            </div>
+
+            <p class="mt-3">
+                Loading available donations...
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Pagination -->
+
+    <div class="d-flex justify-content-between
+                align-items-center mt-4">
+
+        <small class="text-muted"
+               id="receiverPaginationInfo">
+            Showing 0 donations
+        </small>
+
+        <nav>
+            <ul
+                class="pagination"
+                id="receiverPagination"
+            ></ul>
+        </nav>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/donation.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof initializeReceiverDonations === "function") {
+        initializeReceiverDonations();
+    }
+
+});
+</script>
+
+{% endblock %}

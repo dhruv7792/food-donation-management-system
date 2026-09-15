@@ -1,0 +1,202 @@
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 70px 0;
+        text-align: center;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE DESIGN
+   ========================================================= */
+
+/* =========================
+   LARGE TABLETS
+   ========================= */
+
+@media (max-width: 992px) {
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .dashboard-sidebar {
+        width: 220px;
+    }
+
+    .dashboard-content {
+        margin-left: 220px;
+        width: calc(100% - 220px);
+        padding: 25px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* =========================
+   TABLETS
+   ========================= */
+
+@media (max-width: 768px) {
+
+    .hero-section {
+        min-height: 500px;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 2.1rem;
+    }
+
+    .hero-text {
+        font-size: 1rem;
+    }
+
+    .section {
+        padding: 55px 0;
+    }
+
+    /* Sidebar */
+
+    .dashboard-sidebar {
+        width: 70px;
+    }
+
+    .sidebar-brand {
+        text-align: center;
+        padding: 20px 5px;
+        font-size: 0;
+    }
+
+    .sidebar-brand i {
+        font-size: 20px;
+    }
+
+    .sidebar-menu a {
+        justify-content: center;
+        padding: 13px 5px;
+    }
+
+    .sidebar-menu a span {
+        display: none;
+    }
+
+    .sidebar-menu i {
+        font-size: 18px;
+    }
+
+    .dashboard-content {
+        margin-left: 70px;
+        width: calc(100% - 70px);
+        padding: 20px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+
+    .auth-card {
+        padding: 25px;
+    }
+
+    .table {
+        min-width: 700px;
+    }
+}
+
+/* =========================
+   MOBILE
+   ========================= */
+
+@media (max-width: 576px) {
+
+    .hero-title {
+        font-size: 1.8rem;
+    }
+
+    .hero-section {
+        min-height: 450px;
+    }
+
+    .section-title {
+        font-size: 1.6rem;
+    }
+
+    .dashboard-sidebar {
+        width: 0;
+        transform: translateX(-100%);
+        transition: var(--transition);
+    }
+
+    .dashboard-sidebar.open {
+        width: 250px;
+        transform: translateX(0);
+    }
+
+    .dashboard-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 15px;
+    }
+
+    .stat-card {
+        padding: 18px;
+    }
+
+    .dashboard-card {
+        padding: 18px;
+    }
+
+    .filter-bar {
+        padding: 15px;
+    }
+
+    .auth-card {
+        padding: 20px;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+    }
+
+    .donation-image {
+        height: 190px;
+    }
+}
+
+/* =========================
+   EXTRA SMALL
+   ========================= */
+
+@media (max-width: 400px) {
+
+    .hero-title {
+        font-size: 1.55rem;
+    }
+
+    .dashboard-title {
+        font-size: 1.3rem;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 17px;
+    }
+}

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Donor Dashboard | FoodShare{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Donor Dashboard
+            </h2>
+
+            <p class="text-muted mb-0">
+                Welcome back, <span id="donorName">Donor</span>
+            </p>
+        </div>
+
+        <a href="{% url 'donor_create_donation' %}"
+           class="btn btn-success">
+            <i class="bi bi-plus-lg me-2"></i>
+            Create Donation
+        </a>
+
+    </div>
+
+
+    <!-- Statistics -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+                            <p class="text-muted mb-1">
+                                Total Donations
+                            </p>
+
+                            <h3 class="fw-bold mb-0"
+                                id="totalDonations">
+                                0
+                            </h3>
+                        </div>
+
+                        <div class="fs-2 text-success">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+                            <p class="text-muted mb-1">
+                                Available
+                            </p>
+
+                            <h3 class="fw-bold mb-0"
+                                id="availableDonations">
+                                0
+                            </h3>
+                        </div>
+
+                        <div class="fs-2 text-primary">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+                            <p class="text-muted mb-1">
+                                Requested
+                            </p>
+
+                            <h3 class="fw-bold mb-0"
+                                id="requestedDonations">
+                                0
+                            </h3>
+                        </div>
+
+                        <div class="fs-2 text-warning">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between">
+
+                        <div>
+                            <p class="text-muted mb-1">
+                                Completed
+                            </p>
+
+                            <h3 class="fw-bold mb-0"
+                                id="completedDonations">
+                                0
+                            </h3>
+                        </div>
+
+                        <div class="fs-2 text-success">
+                            <i class="bi bi-heart-fill"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Recent Donations -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0 py-3">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <h5 class="fw-bold mb-0">
+                    Recent Donations
+                </h5>
+
+                <a href="{% url 'donor_donation_list' %}"
+                   class="text-success text-decoration-none">
+                    View All
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div id="dashboardMessage"></div>
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead>
+
+                        <tr>
+                            <th>Food</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th></th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="recentDonations">
+
+                        <tr>
+                            <td colspan="6"
+                                class="text-center text-muted py-5">
+
+                                <div class="spinner-border spinner-border-sm text-success">
+                                </div>
+
+                                Loading donations...
+
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof loadDonorDashboard === "function") {
+        loadDonorDashboard();
+    }
+});
+</script>
+
+{% endblock %}

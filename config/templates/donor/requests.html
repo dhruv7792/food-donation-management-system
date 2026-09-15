@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Donation Requests | FoodShare{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold mb-1">
+            Donation Requests
+        </h2>
+
+        <p class="text-muted">
+            Review requests received for your food donations.
+        </p>
+
+    </div>
+
+
+    <div id="requestMessage"></div>
+
+
+    <!-- Request Statistics -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-sm-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Requests
+                    </small>
+
+                    <h3
+                        class="fw-bold mt-2"
+                        id="totalRequests"
+                    >
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Pending
+                    </small>
+
+                    <h3
+                        class="fw-bold mt-2 text-warning"
+                        id="pendingRequests"
+                    >
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Approved
+                    </small>
+
+                    <h3
+                        class="fw-bold mt-2 text-success"
+                        id="approvedRequests"
+                    >
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Rejected
+                    </small>
+
+                    <h3
+                        class="fw-bold mt-2 text-danger"
+                        id="rejectedRequests"
+                    >
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Requests -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0 py-3">
+
+            <div class="d-flex justify-content-between
+                        align-items-center">
+
+                <h5 class="fw-bold mb-0">
+                    Incoming Requests
+                </h5>
+
+                <select
+                    class="form-select"
+                    id="requestStatusFilter"
+                    style="max-width:180px;"
+                >
+
+                    <option value="">
+                        All Requests
+                    </option>
+
+                    <option value="pending">
+                        Pending
+                    </option>
+
+                    <option value="approved">
+                        Approved
+                    </option>
+
+                    <option value="rejected">
+                        Rejected
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Receiver</th>
+                            <th>Donation</th>
+                            <th>Quantity</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="requestTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="text-center py-5 text-muted"
+                            >
+
+                                <div
+                                    class="spinner-border spinner-border-sm text-success">
+                                </div>
+
+                                Loading requests...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/request.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof initializeDonorRequests === "function") {
+        initializeDonorRequests();
+    }
+
+});
+</script>
+
+{% endblock %}

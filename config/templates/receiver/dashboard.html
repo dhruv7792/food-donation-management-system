@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Receiver Dashboard | FoodShare{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Receiver Dashboard</h2>
+            <p class="text-muted mb-0">
+                Welcome back, <span id="receiverName">Receiver</span>
+            </p>
+        </div>
+
+        <a href="{% url 'receiver_donations' %}"
+           class="btn btn-success">
+            <i class="bi bi-search me-2"></i>
+            Find Food
+        </a>
+    </div>
+
+
+    <div id="dashboardMessage"></div>
+
+
+    <!-- Statistics -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Available Donations
+                    </p>
+
+                    <h3 class="fw-bold"
+                        id="availableDonations">
+                        0
+                    </h3>
+
+                    <span class="text-success">
+                        <i class="bi bi-box-seam me-1"></i>
+                        Available food
+                    </span>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        My Requests
+                    </p>
+
+                    <h3 class="fw-bold"
+                        id="totalRequests">
+                        0
+                    </h3>
+
+                    <span class="text-primary">
+                        <i class="bi bi-send me-1"></i>
+                        Total requests
+                    </span>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Pending Requests
+                    </p>
+
+                    <h3 class="fw-bold text-warning"
+                        id="pendingRequests">
+                        0
+                    </h3>
+
+                    <span class="text-warning">
+                        <i class="bi bi-hourglass-split me-1"></i>
+                        Awaiting response
+                    </span>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Completed
+                    </p>
+
+                    <h3 class="fw-bold text-success"
+                        id="completedRequests">
+                        0
+                    </h3>
+
+                    <span class="text-success">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Food received
+                    </span>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Available Food -->
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0 py-3">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <h5 class="fw-bold mb-0">
+                    Available Food
+                </h5>
+
+                <a href="{% url 'receiver_donations' %}"
+                   class="text-success text-decoration-none">
+                    View All
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="row g-4"
+                 id="availableFoodContainer">
+
+                <div class="col-12 text-center py-5 text-muted">
+
+                    <div class="spinner-border spinner-border-sm text-success">
+                    </div>
+
+                    Loading available food...
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof loadReceiverDashboard === "function") {
+        loadReceiverDashboard();
+    }
+
+});
+</script>
+
+{% endblock %}

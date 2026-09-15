@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reports & Analytics | FoodShare{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between
+                align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+                Reports & Analytics
+            </h2>
+
+            <p class="text-muted mb-0">
+                Analyze food donations, requests and system activity.
+            </p>
+
+        </div>
+
+
+        <button
+            type="button"
+            class="btn btn-outline-success"
+            id="exportReportBtn"
+        >
+            <i class="bi bi-download me-2"></i>
+            Export Report
+        </button>
+
+    </div>
+
+
+    <div id="adminReportsMessage"></div>
+
+
+    <!-- Date Filter -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-4">
+
+                    <label class="form-label fw-semibold">
+                        From
+                    </label>
+
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="reportStartDate"
+                    >
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <label class="form-label fw-semibold">
+                        To
+                    </label>
+
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="reportEndDate"
+                    >
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    <button
+                        class="btn btn-success w-100"
+                        id="generateReportBtn"
+                    >
+                        <i class="bi bi-bar-chart me-2"></i>
+                        Generate Report
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- KPI -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Total Donations
+                    </p>
+
+                    <h3 class="fw-bold"
+                        id="reportDonations">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Food Distributed
+                    </p>
+
+                    <h3 class="fw-bold text-success"
+                        id="reportDistributed">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Requests Completed
+                    </p>
+
+                    <h3 class="fw-bold text-primary"
+                        id="reportCompleted">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-xl-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Success Rate
+                    </p>
+
+                    <h3 class="fw-bold text-success"
+                        id="reportSuccessRate">
+                        0%
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Charts -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white border-0">
+
+                    <h5 class="fw-bold mb-0">
+                        Donations Over Time
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <canvas
+                        id="donationsOverTimeChart"
+                        height="120">
+                    </canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-4">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-header bg-white border-0">
+
+                    <h5 class="fw-bold mb-0">
+                        Donation Categories
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <canvas
+                        id="donationCategoryChart">
+                    </canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Report Summary -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white border-0">
+
+            <h5 class="fw-bold mb-0">
+                Report Summary
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead>
+
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                            <th>Percentage</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="reportSummaryTable">
+
+                        <tr>
+                            <td>Total Donations</td>
+                            <td id="summaryDonations">0</td>
+                            <td>100%</td>
+                        </tr>
+
+                        <tr>
+                            <td>Approved Requests</td>
+                            <td id="summaryApproved">0</td>
+                            <td id="summaryApprovedPercent">0%</td>
+                        </tr>
+
+                        <tr>
+                            <td>Completed Requests</td>
+                            <td id="summaryCompleted">0</td>
+                            <td id="summaryCompletedPercent">0%</td>
+                        </tr>
+
+                        <tr>
+                            <td>Rejected Requests</td>
+                            <td id="summaryRejected">0</td>
+                            <td id="summaryRejectedPercent">0%</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof initializeAdminReports === "function") {
+        initializeAdminReports();
+    }
+
+});
+</script>
+
+{% endblock %}

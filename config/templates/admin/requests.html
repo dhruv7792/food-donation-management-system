@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Manage Requests | FoodShare{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold mb-1">
+            Food Requests
+        </h2>
+
+        <p class="text-muted">
+            Monitor requests submitted by receivers.
+        </p>
+
+    </div>
+
+
+    <div id="adminRequestsMessage"></div>
+
+
+    <!-- Request Statistics -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-sm-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Total
+                    </p>
+
+                    <h3 class="fw-bold"
+                        id="adminRequestsTotal">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Pending
+                    </p>
+
+                    <h3 class="fw-bold text-warning"
+                        id="adminRequestsPending">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Approved
+                    </p>
+
+                    <h3 class="fw-bold text-success"
+                        id="adminRequestsApproved">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-sm-6 col-lg-3">
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <p class="text-muted mb-1">
+                        Rejected
+                    </p>
+
+                    <h3 class="fw-bold text-danger"
+                        id="adminRequestsRejected">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Filters -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-lg-5">
+
+                    <label class="form-label fw-semibold">
+                        Search
+                    </label>
+
+                    <input
+                        type="search"
+                        class="form-control"
+                        id="adminRequestSearch"
+                        placeholder="Search receiver or food..."
+                    >
+
+                </div>
+
+
+                <div class="col-md-4 col-lg-3">
+
+                    <label class="form-label fw-semibold">
+                        Status
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="adminRequestStatus"
+                    >
+
+                        <option value="">
+                            All
+                        </option>
+
+                        <option value="pending">
+                            Pending
+                        </option>
+
+                        <option value="approved">
+                            Approved
+                        </option>
+
+                        <option value="rejected">
+                            Rejected
+                        </option>
+
+                        <option value="cancelled">
+                            Cancelled
+                        </option>
+
+                        <option value="completed">
+                            Completed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-4 col-lg-4">
+
+                    <label class="form-label fw-semibold">
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="adminRequestDate"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Requests -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Receiver</th>
+                            <th>Food</th>
+                            <th>Quantity</th>
+                            <th>Donor</th>
+                            <th>Status</th>
+                            <th>Requested</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="adminRequestsTable">
+
+                        <tr>
+
+                            <td colspan="7"
+                                class="text-center py-5 text-muted">
+
+                                <div class="spinner-border
+                                            spinner-border-sm
+                                            text-success">
+                                </div>
+
+                                Loading requests...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="d-flex justify-content-between
+                        align-items-center mt-3">
+
+                <small class="text-muted"
+                       id="requestsPaginationInfo">
+                    Showing 0 requests
+                </small>
+
+                <nav>
+
+                    <ul class="pagination mb-0"
+                        id="requestsPagination">
+                    </ul>
+
+                </nav>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/request.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    if (typeof initializeAdminRequests === "function") {
+        initializeAdminRequests();
+    }
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,299 @@
+.sidebar {
+    width: 250px;
+}
+
+.dashboard-card {
+    border-radius: 16px;
+    transition: 0.3s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+}
+
+.status-badge {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+}
+
+/* =========================================================
+   DASHBOARD STYLES
+   ========================================================= */
+
+.dashboard-wrapper {
+    min-height: calc(100vh - 70px);
+    display: flex;
+}
+
+/* =========================
+   SIDEBAR
+   ========================= */
+
+.dashboard-sidebar {
+    width: 250px;
+    min-height: calc(100vh - 70px);
+    background: #212529;
+    color: #ffffff;
+    position: fixed;
+    left: 0;
+    top: 70px;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 900;
+}
+
+.sidebar-brand {
+    padding: 25px 20px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 15px 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin: 3px 10px;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: #ced4da;
+    border-radius: 7px;
+    transition: var(--transition);
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu a.active {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.sidebar-menu i {
+    width: 20px;
+    text-align: center;
+}
+
+/* =========================
+   MAIN CONTENT
+   ========================= */
+
+.dashboard-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 30px;
+}
+
+/* =========================
+   PAGE HEADER
+   ========================= */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.dashboard-subtitle {
+    color: var(--gray);
+    margin-top: 5px;
+}
+
+/* =========================
+   STAT CARDS
+   ========================= */
+
+.stat-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+    height: 100%;
+    border-left: 4px solid var(--primary);
+}
+
+.stat-card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-title {
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+}
+
+/* =========================
+   RECENT ACTIVITY
+   ========================= */
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+/* =========================
+   DASHBOARD CARDS
+   ========================= */
+
+.dashboard-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    margin-bottom: 25px;
+}
+
+.dashboard-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+/* =========================
+   DONATION IMAGE
+   ========================= */
+
+.donation-image {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* =========================
+   FILTER BAR
+   ========================= */
+
+.filter-bar {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    margin-bottom: 25px;
+}
+
+.filter-bar .form-control,
+.filter-bar .form-select {
+    min-height: 42px;
+}
+
+/* =========================
+   CHART CONTAINER
+   ========================= */
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+}
+
+/* =========================
+   ADMIN
+   ========================= */
+
+.admin-stat {
+    border-left-width: 4px;
+    border-left-style: solid;
+}
+
+.admin-table-wrapper {
+    overflow-x: auto;
+}
+
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.quick-action:hover {
+    transform: translateY(-3px);
+}
+
+.quick-action-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    background: var(--primary-light);
+    color: var(--primary);
+}
