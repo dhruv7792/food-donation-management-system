@@ -1,14 +1,8 @@
-from rest_framework.routers import DefaultRouter
+
+from rest_framework.routers import SimpleRouter
 from .views import DonationViewSet
 
-
-router = DefaultRouter()
-
-router.register(
-    "donations",
-    DonationViewSet,
-    basename="donation",
-)
-
+router = SimpleRouter()
+router.register(r"", DonationViewSet, basename="donation")
 
 urlpatterns = router.urls

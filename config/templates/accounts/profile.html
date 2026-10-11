@@ -1,0 +1,120 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile | FoodShare{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="mb-4">
+                        <h2 class="fw-bold">My Profile</h2>
+                        <p class="text-muted">
+                            Complete your details to help the FoodShare community.
+                        </p>
+                    </div>
+
+                    <div id="profileMessage"
+                         class="alert d-none"
+                         role="alert"></div>
+
+                    <form id="profileForm">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="organization_name"
+                                   class="form-label">
+                                Organization name
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="organization_name"
+                                   name="organization_name"
+                                   maxlength="150">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">
+                                Address
+                            </label>
+                            <textarea class="form-control"
+                                      id="address"
+                                      name="address"
+                                      rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="city" class="form-label">
+                                    City
+                                </label>
+                                <input class="form-control"
+                                       id="city" name="city">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="state" class="form-label">
+                                    State
+                                </label>
+                                <input class="form-control"
+                                       id="state" name="state">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="pincode" class="form-label">
+                                    Pincode
+                                </label>
+                                <input class="form-control"
+                                       id="pincode" name="pincode"
+                                       maxlength="10">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="profile_image"
+                                   class="form-label">
+                                Profile image (optional)
+                            </label>
+                            <input type="file"
+                                   class="form-control"
+                                   id="profile_image"
+                                   name="profile_image"
+                                   accept="image/*">
+                            <div class="form-text">
+                                Choose an image from your device.
+                            </div>
+                            <img id="imagePreview"
+                                 class="img-thumbnail mt-3 d-none"
+                                 alt="Profile image preview"
+                                 style="max-width: 150px;">
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-success px-4"
+                                    id="saveProfileButton"
+                                    type="submit">
+                                Save Profile
+                            </button>
+                            <a href="/donor/"
+                               class="btn btn-outline-secondary">
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}

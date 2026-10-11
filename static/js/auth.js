@@ -1,1109 +1,1059 @@
-console.log('Auth JS loaded');
-
-/**
- * FoodShare Authentication
+/*
+ * FoodShare - Authentication JavaScript
  *
  * Handles:
- * - Login
- * - Registration
- * - Forgot Password
- * - JWT token storage
- * - Form validation
- * - Password visibility
- * - Password strength
- * - Profile image preview
+ * 1. Registration
+ * 2. Login
+ * 3. Password show/hide
+ * 4. Password strength
+ * 5. Password match
+ * 6. Role selection
+ * 7. Profile image preview
  */
 
-"use strict";
+document.addEventListener("DOMContentLoaded", function () {
 
+    // =========================================================
+    // COMMON HELPERS
+    // =========================================================
 
-/* =========================================================
-   API CONFIGURATION
-========================================================= */
+    function showMessage(element, message, type = "danger") {
+        if (!element) return;
 
-const AUTH_API = {
-    login: "/api/v1/auth/login/",
-    register: "/api/v1/auth/register/",
-    logout: "/api/v1/auth/logout/",
-    me: "/api/v1/auth/me/",
-    passwordReset: "/api/v1/auth/password-reset/"
-};
-
-
-/* =========================================================
-   TOKEN MANAGEMENT
-========================================================= */
-
-const TokenManager = {
-
-    getStorage() {
-        const remember = localStorage.getItem("remember_me");
-
-        return remember === "true"
-            ? localStorage
-            : sessionStorage;
-    },
-
-    save(accessToken, refreshToken, remember = false) {
-
-        localStorage.setItem(
-            "remember_me",
-            remember ? "true" : "false"
-        );
-
-        const storage = remember
-            ? localStorage
-            : sessionStorage;
-
-        storage.setItem("access_token", accessToken);
-
-        if (refreshToken) {
-            storage.setItem("refresh_token", refreshToken);
-        }
-    },
-
-    getAccessToken() {
-
-        return (
-            localStorage.getItem("access_token") ||
-            sessionStorage.getItem("access_token")
-        );
-    },
-
-    getRefreshToken() {
-
-        return (
-            localStorage.getItem("refresh_token") ||
-            sessionStorage.getItem("refresh_token")
-        );
-    },
-
-    clear() {
-
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("remember_me");
-
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("refresh_token");
-    },
-
-    isAuthenticated() {
-
-        return Boolean(this.getAccessToken());
-    }
-};
-
-
-/* =========================================================
-   API REQUEST HELPER
-========================================================= */
-
-async function apiRequest(
-    url,
-    options = {}
-) {
-
-    const token = TokenManager.getAccessToken();
-
-    const headers = {
-        "Accept": "application/json",
-        ...options.headers
-    };
-
-    /*
-     * Do not manually set Content-Type when
-     * sending FormData.
-     */
-    if (!(options.body instanceof FormData)) {
-        headers["Content-Type"] = "application/json";
+        element.className = `alert alert-${type}`;
+        element.textContent = message;
+        element.classList.remove("d-none");
     }
 
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+    function hideMessage(element) {
+        if (!element) return;
+
+        element.className = "alert d-none";
+        element.textContent = "";
     }
 
-    const response = await fetch(url, {
-        ...options,
-        headers
-    });
-
-    let data = {};
-
-    try {
-        data = await response.json();
-    } catch (error) {
-        data = {};
-    }
-
-    if (!response.ok) {
-
-        const error = new Error(
-            data.detail ||
-            data.message ||
-            "Something went wrong."
-        );
-
-        error.status = response.status;
-        error.data = data;
-
-        throw error;
-    }
-
-    return data;
-}
-
-
-/* =========================================================
-   ERROR MESSAGE FORMATTER
-========================================================= */
-
-function getApiErrorMessage(error) {
-
-    if (!error) {
-        return "Something went wrong.";
-    }
-
-    if (error.data) {
-
-        const data = error.data;
-
-        if (typeof data === "string") {
-            return data;
+    function formatErrors(result) {
+        if (!result) {
+            return "Something went wrong.";
         }
 
-        if (data.detail) {
-            return data.detail;
+        if (typeof result === "string") {
+            return result;
         }
 
-        if (data.message) {
-            return data.message;
+        if (result.message && !result.errors) {
+            return result.message;
         }
 
+        const errors = result.errors || result;
         const messages = [];
 
-        Object.keys(data).forEach(key => {
-
-            const value = data[key];
+        Object.keys(errors).forEach(function (field) {
+            let value = errors[field];
 
             if (Array.isArray(value)) {
-                messages.push(`${key}: ${value.join(", ")}`);
-            } else if (typeof value === "string") {
-                messages.push(`${key}: ${value}`);
+                value = value.join(", ");
+            } else if (typeof value === "object" && value !== null) {
+                value = JSON.stringify(value);
             }
 
+            messages.push(`${field}: ${value}`);
         });
 
-        if (messages.length > 0) {
-            return messages.join("<br>");
-        }
+        return messages.length
+            ? messages.join(" | ")
+            : (result.message || "Request failed.");
     }
 
-    return error.message || "Something went wrong.";
-}
+
+    // =========================================================
+    // REGISTER PAGE
+    // =========================================================
+
+    const registerForm = document.getElementById("registerForm");
+
+    if (registerForm) {
+
+        const registerAlert =
+            document.getElementById("registerAlert");
+
+        const registerButton =
+            document.getElementById("registerButton");
+
+        const registerButtonText =
+            document.getElementById("registerButtonText");
+
+        const registerSpinner =
+            document.getElementById("registerSpinner");
+
+        const donorRoleCard =
+            document.getElementById("donorRoleCard");
+
+        const receiverRoleCard =
+            document.getElementById("receiverRoleCard");
+
+        const roleInputs =
+            document.querySelectorAll('input[name="role"]');
+
+        const passwordInput =
+            document.getElementById("registerPassword");
+
+        const confirmPasswordInput =
+            document.getElementById("confirmPassword");
+
+        const togglePassword =
+            document.getElementById("toggleRegisterPassword");
+
+        const toggleConfirmPassword =
+            document.getElementById("toggleConfirmPassword");
+
+        const passwordStrengthBar =
+            document.getElementById("passwordStrengthBar");
+
+        const passwordStrengthText =
+            document.getElementById("passwordStrengthText");
+
+        const passwordMatchMessage =
+            document.getElementById("passwordMatchMessage");
+
+        const profileImage =
+            document.getElementById("profileImage");
+
+        const profilePreview =
+            document.getElementById("profilePreview");
 
 
-/* =========================================================
-   ALERT HELPER
-========================================================= */
+        // =====================================================
+        // ROLE SELECTION
+        // =====================================================
 
-function showAlert(
-    elementId,
-    message,
-    type = "danger"
-) {
+        roleInputs.forEach(function (input) {
 
-    const alert = document.getElementById(elementId);
+            input.addEventListener("change", function () {
 
-    if (!alert) {
-        return;
-    }
+                if (this.value === "DONOR") {
 
-    alert.className = `alert alert-${type}`;
-    alert.innerHTML = message;
-    alert.classList.remove("d-none");
+                    if (donorRoleCard) {
+                        donorRoleCard.classList.add("active");
+                    }
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
+                    if (receiverRoleCard) {
+                        receiverRoleCard.classList.remove("active");
+                    }
 
+                } else {
 
-function hideAlert(elementId) {
+                    if (receiverRoleCard) {
+                        receiverRoleCard.classList.add("active");
+                    }
 
-    const alert = document.getElementById(elementId);
-
-    if (!alert) {
-        return;
-    }
-
-    alert.classList.add("d-none");
-}
-
-
-/* =========================================================
-   BUTTON LOADING
-========================================================= */
-
-function setButtonLoading(
-    buttonId,
-    textId,
-    spinnerId,
-    loading,
-    loadingText = "Please wait..."
-) {
-
-    const button = document.getElementById(buttonId);
-    const text = document.getElementById(textId);
-    const spinner = document.getElementById(spinnerId);
-
-    if (!button) {
-        return;
-    }
-
-    button.disabled = loading;
-
-    if (text) {
-        text.textContent = loading
-            ? loadingText
-            : text.dataset.originalText || text.textContent;
-    }
-
-    if (spinner) {
-        spinner.classList.toggle("d-none", !loading);
-    }
-}
-
-
-/* =========================================================
-   PASSWORD VISIBILITY
-========================================================= */
-
-function setupPasswordToggle(
-    buttonId,
-    inputId
-) {
-
-    const button = document.getElementById(buttonId);
-    const input = document.getElementById(inputId);
-
-    if (!button || !input) {
-        return;
-    }
-
-    button.addEventListener("click", () => {
-
-        const icon = button.querySelector("i");
-
-        if (input.type === "password") {
-
-            input.type = "text";
-
-            if (icon) {
-                icon.className = "bi bi-eye-slash";
-            }
-
-        } else {
-
-            input.type = "password";
-
-            if (icon) {
-                icon.className = "bi bi-eye";
-            }
-        }
-    });
-}
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-function initializeLogin() {
-
-    const form = document.getElementById("loginForm");
-
-    if (!form) {
-        return;
-    }
-
-    setupPasswordToggle(
-        "toggleLoginPassword",
-        "loginPassword"
-    );
-
-    form.addEventListener("submit", async event => {
-
-        event.preventDefault();
-
-        hideAlert("loginAlert");
-
-        if (!form.checkValidity()) {
-
-            form.classList.add("was-validated");
-
-            return;
-        }
-
-        const email =
-            document.getElementById("loginEmail").value.trim();
-
-        const password =
-            document.getElementById("loginPassword").value;
-
-        const remember =
-            document.getElementById("rememberMe").checked;
-
-        setButtonLoading(
-            "loginButton",
-            "loginButtonText",
-            "loginSpinner",
-            true,
-            "Signing In..."
-        );
-
-        try {
-
-            const data = await apiRequest(
-                AUTH_API.login,
-                {
-                    method: "POST",
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
+                    if (donorRoleCard) {
+                        donorRoleCard.classList.remove("active");
+                    }
                 }
-            );
-
-            const accessToken =
-                data.access ||
-                data.access_token ||
-                data.token;
-
-            const refreshToken =
-                data.refresh ||
-                data.refresh_token;
-
-            if (!accessToken) {
-
-                throw new Error(
-                    "Login succeeded but no access token was returned."
-                );
-            }
-
-            TokenManager.save(
-                accessToken,
-                refreshToken,
-                remember
-            );
-
-            /*
-             * Fetch current user so we can determine
-             * the correct dashboard.
-             */
-            let user = null;
-
-            try {
-                user = await apiRequest(AUTH_API.me);
-            } catch (error) {
-                console.warn(
-                    "Unable to fetch user profile:",
-                    error
-                );
-            }
-
-            showAlert(
-                "loginAlert",
-                "Login successful. Redirecting...",
-                "success"
-            );
-
-            setTimeout(() => {
-
-                redirectAfterLogin(user);
-
-            }, 700);
-
-        } catch (error) {
-
-            console.error("Login error:", error);
-
-            showAlert(
-                "loginAlert",
-                getApiErrorMessage(error),
-                "danger"
-            );
-
-        } finally {
-
-            setButtonLoading(
-                "loginButton",
-                "loginButtonText",
-                "loginSpinner",
-                false
-            );
-        }
-    });
-}
-
-
-/* =========================================================
-   ROLE REDIRECTION
-========================================================= */
-
-function redirectAfterLogin(user) {
-
-    if (!user) {
-
-        window.location.href = "/";
-
-        return;
-    }
-
-    const role =
-        String(
-            user.role ||
-            user.user_type ||
-            user.account_type ||
-            ""
-        ).toUpperCase();
-
-    if (
-        role === "ADMIN" ||
-        user.is_staff === true ||
-        user.is_superuser === true
-    ) {
-
-        window.location.href = "/admin/dashboard/";
-
-        return;
-    }
-
-    if (role === "DONOR") {
-
-        window.location.href = "/donor/dashboard/";
-
-        return;
-    }
-
-    if (role === "RECEIVER") {
-
-        window.location.href = "/receiver/dashboard/";
-
-        return;
-    }
-
-    window.location.href = "/";
-}
-
-
-/* =========================================================
-   REGISTER
-========================================================= */
-
-function initializeRegister() {
-
-    const form = document.getElementById("registerForm");
-
-    if (!form) {
-        return;
-    }
-
-    setupPasswordToggle(
-        "toggleRegisterPassword",
-        "registerPassword"
-    );
-
-    setupPasswordToggle(
-        "toggleConfirmPassword",
-        "confirmPassword"
-    );
-
-
-    /* -----------------------------------------
-       Role Selection
-    ----------------------------------------- */
-
-    const roleCards = document.querySelectorAll(".role-card");
-
-    roleCards.forEach(card => {
-
-        card.addEventListener("click", () => {
-
-            roleCards.forEach(item => {
-                item.classList.remove("active");
             });
-
-            card.classList.add("active");
-
-            const radio =
-                card.querySelector('input[type="radio"]');
-
-            if (radio) {
-                radio.checked = true;
-            }
         });
-    });
 
 
-    /* -----------------------------------------
-       Password Strength
-    ----------------------------------------- */
+        // =====================================================
+        // PASSWORD SHOW / HIDE
+        // =====================================================
 
-    const password =
-        document.getElementById("registerPassword");
+        function setupPasswordToggle(button, input) {
 
-    if (password) {
-
-        password.addEventListener(
-            "input",
-            updatePasswordStrength
-        );
-    }
-
-
-    /* -----------------------------------------
-       Password Match
-    ----------------------------------------- */
-
-    const confirmPassword =
-        document.getElementById("confirmPassword");
-
-    if (confirmPassword) {
-
-        confirmPassword.addEventListener(
-            "input",
-            checkPasswordMatch
-        );
-    }
-
-
-    /* -----------------------------------------
-       Image Preview
-    ----------------------------------------- */
-
-    const profileImage =
-        document.getElementById("profileImage");
-
-    if (profileImage) {
-
-        profileImage.addEventListener(
-            "change",
-            previewProfileImage
-        );
-    }
-
-
-    /* -----------------------------------------
-       Submit
-    ----------------------------------------- */
-
-    form.addEventListener(
-        "submit",
-        handleRegister
-    );
-}
-
-
-/* =========================================================
-   PASSWORD STRENGTH
-========================================================= */
-
-function updatePasswordStrength() {
-
-    const password =
-        document.getElementById("registerPassword");
-
-    const bar =
-        document.getElementById("passwordStrengthBar");
-
-    const text =
-        document.getElementById("passwordStrengthText");
-
-    if (!password || !bar || !text) {
-        return;
-    }
-
-    const value = password.value;
-
-    let score = 0;
-
-    if (value.length >= 8) {
-        score++;
-    }
-
-    if (/[A-Z]/.test(value)) {
-        score++;
-    }
-
-    if (/[a-z]/.test(value)) {
-        score++;
-    }
-
-    if (/[0-9]/.test(value)) {
-        score++;
-    }
-
-    if (/[^A-Za-z0-9]/.test(value)) {
-        score++;
-    }
-
-    const percentage =
-        Math.min(score / 5 * 100, 100);
-
-    bar.style.width = `${percentage}%`;
-
-    if (score <= 1) {
-
-        text.textContent = "Weak password";
-        bar.style.backgroundColor = "#dc3545";
-
-    } else if (score <= 3) {
-
-        text.textContent = "Medium password";
-        bar.style.backgroundColor = "#ffc107";
-
-    } else {
-
-        text.textContent = "Strong password";
-        bar.style.backgroundColor = "#198754";
-    }
-}
-
-
-/* =========================================================
-   PASSWORD MATCH
-========================================================= */
-
-function checkPasswordMatch() {
-
-    const password =
-        document.getElementById("registerPassword");
-
-    const confirm =
-        document.getElementById("confirmPassword");
-
-    const message =
-        document.getElementById("passwordMatchMessage");
-
-    if (!password || !confirm || !message) {
-        return;
-    }
-
-    if (!confirm.value) {
-
-        message.textContent = "";
-
-        return;
-    }
-
-    if (password.value === confirm.value) {
-
-        message.textContent = "Passwords match.";
-        message.className =
-            "small mt-1 text-success";
-
-        confirm.classList.remove("is-invalid");
-        confirm.classList.add("is-valid");
-
-    } else {
-
-        message.textContent =
-            "Passwords do not match.";
-
-        message.className =
-            "small mt-1 text-danger";
-
-        confirm.classList.remove("is-valid");
-        confirm.classList.add("is-invalid");
-    }
-}
-
-
-/* =========================================================
-   PROFILE IMAGE PREVIEW
-========================================================= */
-
-function previewProfileImage(event) {
-
-    const file = event.target.files[0];
-
-    const preview =
-        document.getElementById("profilePreview");
-
-    if (!file || !preview) {
-        return;
-    }
-
-    const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp"
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-
-        event.target.value = "";
-
-        showAlert(
-            "registerAlert",
-            "Please select a JPG, PNG or WEBP image.",
-            "danger"
-        );
-
-        return;
-    }
-
-    const maxSize =
-        5 * 1024 * 1024;
-
-    if (file.size > maxSize) {
-
-        event.target.value = "";
-
-        showAlert(
-            "registerAlert",
-            "Profile image must be smaller than 5 MB.",
-            "danger"
-        );
-
-        return;
-    }
-
-    const reader =
-        new FileReader();
-
-    reader.onload = function(e) {
-
-        preview.src = e.target.result;
-
-        preview.style.display = "block";
-    };
-
-    reader.readAsDataURL(file);
-}
-
-
-/* =========================================================
-   REGISTER SUBMISSION
-========================================================= */
-
-async function handleRegister(event) {
-
-    event.preventDefault();
-
-    const form = event.target;
-
-    hideAlert("registerAlert");
-
-    if (!form.checkValidity()) {
-
-        form.classList.add("was-validated");
-
-        return;
-    }
-
-    const password =
-        document.getElementById("registerPassword").value;
-
-    const confirmPassword =
-        document.getElementById("confirmPassword").value;
-
-    if (password !== confirmPassword) {
-
-        showAlert(
-            "registerAlert",
-            "Passwords do not match.",
-            "danger"
-        );
-
-        return;
-    }
-
-    if (password.length < 8) {
-
-        showAlert(
-            "registerAlert",
-            "Password must contain at least 8 characters.",
-            "danger"
-        );
-
-        return;
-    }
-
-
-    const formData =
-        new FormData(form);
-
-    /*
-     * password_confirm is generally frontend-only.
-     * Remove it unless your serializer explicitly expects it.
-     */
-    formData.delete("password_confirm");
-
-
-    setButtonLoading(
-        "registerButton",
-        "registerButtonText",
-        "registerSpinner",
-        true,
-        "Creating Account..."
-    );
-
-
-    try {
-
-        const data = await apiRequest(
-            AUTH_API.register,
-            {
-                method: "POST",
-                body: formData
+            if (!button || !input) {
+                return;
             }
+
+            button.addEventListener("click", function () {
+
+                const isVisible =
+                    input.type === "text";
+
+                input.type =
+                    isVisible ? "password" : "text";
+
+                this.innerHTML = isVisible
+                    ? '<i class="bi bi-eye"></i>'
+                    : '<i class="bi bi-eye-slash"></i>';
+
+                this.setAttribute(
+                    "aria-label",
+                    isVisible
+                        ? "Show password"
+                        : "Hide password"
+                );
+            });
+        }
+
+        setupPasswordToggle(
+            togglePassword,
+            passwordInput
         );
 
-        /*
-         * Some APIs automatically login after registration.
-         */
-        const accessToken =
-            data.access ||
-            data.access_token ||
-            data.token;
+        setupPasswordToggle(
+            toggleConfirmPassword,
+            confirmPasswordInput
+        );
 
-        const refreshToken =
-            data.refresh ||
-            data.refresh_token;
 
-        if (accessToken) {
+        // =====================================================
+        // PASSWORD STRENGTH
+        // =====================================================
 
-            TokenManager.save(
-                accessToken,
-                refreshToken,
-                true
+        function updatePasswordStrength() {
+
+            if (
+                !passwordInput ||
+                !passwordStrengthBar ||
+                !passwordStrengthText
+            ) {
+                return;
+            }
+
+            const password =
+                passwordInput.value;
+
+            let strength = 0;
+
+            if (password.length >= 8) {
+                strength++;
+            }
+
+            if (/[A-Z]/.test(password)) {
+                strength++;
+            }
+
+            if (/[a-z]/.test(password)) {
+                strength++;
+            }
+
+            if (/[0-9]/.test(password)) {
+                strength++;
+            }
+
+            if (/[^A-Za-z0-9]/.test(password)) {
+                strength++;
+            }
+
+
+            if (strength === 0) {
+
+                passwordStrengthBar.style.width =
+                    "0%";
+
+                passwordStrengthText.textContent =
+                    "Minimum 8 characters";
+
+            } else if (strength <= 2) {
+
+                passwordStrengthBar.style.width =
+                    "40%";
+
+                passwordStrengthText.textContent =
+                    "Weak password";
+
+            } else if (strength === 3) {
+
+                passwordStrengthBar.style.width =
+                    "60%";
+
+                passwordStrengthText.textContent =
+                    "Medium password";
+
+            } else if (strength === 4) {
+
+                passwordStrengthBar.style.width =
+                    "80%";
+
+                passwordStrengthText.textContent =
+                    "Strong password";
+
+            } else {
+
+                passwordStrengthBar.style.width =
+                    "100%";
+
+                passwordStrengthText.textContent =
+                    "Very strong password";
+            }
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener(
+                "input",
+                updatePasswordStrength
             );
-
-            showAlert(
-                "registerAlert",
-                "Account created successfully. Redirecting...",
-                "success"
-            );
-
-            setTimeout(() => {
-
-                redirectAfterLogin(data.user || data);
-
-            }, 800);
-
-        } else {
-
-            showAlert(
-                "registerAlert",
-                "Account created successfully. Please login.",
-                "success"
-            );
-
-            setTimeout(() => {
-
-                window.location.href = "/login/";
-
-            }, 1200);
         }
 
 
-    } catch (error) {
+        // =====================================================
+        // PASSWORD MATCH
+        // =====================================================
 
-        console.error(
-            "Registration error:",
-            error
-        );
+        function checkPasswordMatch() {
 
-        showAlert(
-            "registerAlert",
-            getApiErrorMessage(error),
-            "danger"
-        );
+            if (
+                !passwordInput ||
+                !confirmPasswordInput ||
+                !passwordMatchMessage
+            ) {
+                return;
+            }
 
-    } finally {
+            const password =
+                passwordInput.value;
 
-        setButtonLoading(
-            "registerButton",
-            "registerButtonText",
-            "registerSpinner",
-            false
-        );
-    }
-}
+            const confirmPassword =
+                confirmPasswordInput.value;
 
 
-/* =========================================================
-   FORGOT PASSWORD
-========================================================= */
+            if (!confirmPassword) {
 
-function initializeForgotPassword() {
+                passwordMatchMessage.textContent =
+                    "";
 
-    const form =
-        document.getElementById(
-            "forgotPasswordForm"
-        );
-
-    if (!form) {
-        return;
-    }
-
-    form.addEventListener(
-        "submit",
-        async event => {
-
-            event.preventDefault();
-
-            hideAlert("forgotAlert");
-
-            if (!form.checkValidity()) {
-
-                form.classList.add(
-                    "was-validated"
-                );
+                passwordMatchMessage.className =
+                    "small mt-1";
 
                 return;
             }
 
-            const email =
-                document.getElementById(
-                    "forgotEmail"
-                ).value.trim();
 
+            if (password === confirmPassword) {
 
-            setButtonLoading(
-                "forgotButton",
-                "forgotButtonText",
-                "forgotSpinner",
-                true,
-                "Sending..."
-            );
+                passwordMatchMessage.textContent =
+                    "Passwords match.";
 
+                passwordMatchMessage.className =
+                    "small mt-1 text-success";
 
-            try {
+            } else {
 
-                await apiRequest(
-                    AUTH_API.passwordReset,
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            email: email
-                        })
-                    }
-                );
+                passwordMatchMessage.textContent =
+                    "Passwords do not match.";
 
-                showAlert(
-                    "forgotAlert",
-                    "If an account exists with this email, password reset instructions have been sent.",
-                    "success"
-                );
-
-                form.reset();
-
-
-            } catch (error) {
-
-                console.error(
-                    "Password reset error:",
-                    error
-                );
-
-                /*
-                 * Don't reveal whether an email exists.
-                 * In production, the backend should ideally
-                 * return the same response for both cases.
-                 */
-                showAlert(
-                    "forgotAlert",
-                    "If an account exists with this email, password reset instructions have been sent.",
-                    "success"
-                );
-
-            } finally {
-
-                setButtonLoading(
-                    "forgotButton",
-                    "forgotButtonText",
-                    "forgotSpinner",
-                    false
-                );
+                passwordMatchMessage.className =
+                    "small mt-1 text-danger";
             }
         }
-    );
-}
+
+        if (passwordInput) {
+            passwordInput.addEventListener(
+                "input",
+                checkPasswordMatch
+            );
+        }
+
+        if (confirmPasswordInput) {
+            confirmPasswordInput.addEventListener(
+                "input",
+                checkPasswordMatch
+            );
+        }
 
 
-/* =========================================================
-   LOGOUT
-========================================================= */
+        // =====================================================
+        // PROFILE IMAGE PREVIEW
+        // =====================================================
 
-async function logoutUser() {
+        if (profileImage && profilePreview) {
 
-    const refreshToken =
-        TokenManager.getRefreshToken();
+            profileImage.addEventListener(
+                "change",
+                function () {
 
-    try {
+                    const file =
+                        this.files[0];
 
-        if (refreshToken) {
+                    if (!file) {
 
-            await apiRequest(
-                AUTH_API.logout,
-                {
-                    method: "POST",
-                    body: JSON.stringify({
-                        refresh: refreshToken
-                    })
+                        profilePreview.src = "";
+                        profilePreview.style.display =
+                            "none";
+
+                        return;
+                    }
+
+
+                    const reader =
+                        new FileReader();
+
+                    reader.onload =
+                        function (event) {
+
+                            profilePreview.src =
+                                event.target.result;
+
+                            profilePreview.style.display =
+                                "block";
+                        };
+
+                    reader.readAsDataURL(file);
                 }
             );
         }
 
-    } catch (error) {
 
-        console.warn(
-            "Logout API error:",
-            error
+        // =====================================================
+        // REGISTRATION SUBMIT
+        // =====================================================
+
+        registerForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                // VERY IMPORTANT:
+                // Prevent normal POST /register/
+                event.preventDefault();
+                event.stopPropagation();
+
+                hideMessage(registerAlert);
+
+
+                // -------------------------------------------------
+                // GET FORM VALUES
+                // -------------------------------------------------
+
+                const firstName =
+                    document.getElementById("firstName")
+                        ?.value.trim() || "";
+
+                const lastName =
+                    document.getElementById("lastName")
+                        ?.value.trim() || "";
+
+                const email =
+                    document.getElementById("registerEmail")
+                        ?.value.trim()
+                        .toLowerCase() || "";
+
+                const phone =
+                    document.getElementById("phoneNumber")
+                        ?.value.trim() || "";
+
+                const address =
+                    document.getElementById("address")
+                        ?.value.trim() || "";
+
+                const password =
+                    passwordInput?.value || "";
+
+                const passwordConfirm =
+                    confirmPasswordInput?.value || "";
+
+                const role =
+                    document.querySelector(
+                        'input[name="role"]:checked'
+                    )?.value || "DONOR";
+
+                const terms =
+                    document.getElementById("terms")
+                        ?.checked || false;
+
+
+                // -------------------------------------------------
+                // VALIDATION
+                // -------------------------------------------------
+
+                if (!firstName) {
+
+                    showMessage(
+                        registerAlert,
+                        "First name is required."
+                    );
+
+                    return;
+                }
+
+
+                if (!lastName) {
+
+                    showMessage(
+                        registerAlert,
+                        "Last name is required."
+                    );
+
+                    return;
+                }
+
+
+                if (!email) {
+
+                    showMessage(
+                        registerAlert,
+                        "Email is required."
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                        .test(email)
+                ) {
+
+                    showMessage(
+                        registerAlert,
+                        "Please enter a valid email address."
+                    );
+
+                    return;
+                }
+
+
+                if (!phone) {
+
+                    showMessage(
+                        registerAlert,
+                        "Phone number is required."
+                    );
+
+                    return;
+                }
+
+
+                if (!address) {
+
+                    showMessage(
+                        registerAlert,
+                        "Address is required."
+                    );
+
+                    return;
+                }
+
+
+                if (password.length < 8) {
+
+                    showMessage(
+                        registerAlert,
+                        "Password must contain at least 8 characters."
+                    );
+
+                    return;
+                }
+
+
+                if (password !== passwordConfirm) {
+
+                    showMessage(
+                        registerAlert,
+                        "Passwords do not match."
+                    );
+
+                    return;
+                }
+
+
+                if (!terms) {
+
+                    showMessage(
+                        registerAlert,
+                        "Please accept the Terms & Conditions."
+                    );
+
+                    return;
+                }
+
+
+                // -------------------------------------------------
+                // CREATE USERNAME
+                // -------------------------------------------------
+
+                const username =
+                    email
+                        .split("@")[0]
+                        .toLowerCase()
+                        .replace(
+                            /[^a-z0-9_]/g,
+                            ""
+                        );
+
+
+                if (!username) {
+
+                    showMessage(
+                        registerAlert,
+                        "Unable to create username from email."
+                    );
+
+                    return;
+                }
+
+
+                // -------------------------------------------------
+                // API DATA
+                // -------------------------------------------------
+
+                const data = {
+
+                    username: username,
+
+                    email: email,
+
+                    password: password,
+
+                    password_confirm:
+                        passwordConfirm,
+
+                    first_name:
+                        firstName,
+
+                    last_name:
+                        lastName,
+
+                    phone:
+                        phone,
+
+                    address:
+                        address,
+
+                    role:
+                        role
+                };
+
+
+                console.log(
+                    "Registration request started"
+                );
+
+
+                // -------------------------------------------------
+                // LOADING STATE
+                // -------------------------------------------------
+
+                if (registerButton) {
+                    registerButton.disabled = true;
+                }
+
+                if (registerButtonText) {
+
+                    registerButtonText.textContent =
+                        "Creating Account...";
+                }
+
+                if (registerSpinner) {
+
+                    registerSpinner.classList.remove(
+                        "d-none"
+                    );
+                }
+
+
+                try {
+
+                    // -------------------------------------------------
+                    // SEND TO DJANGO API
+                    // -------------------------------------------------
+
+                    const response =
+                        await fetch(
+                            "/api/v1/auth/register/",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Accept":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify(data)
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    console.log(
+                        "Registration status:",
+                        response.status
+                    );
+
+                    console.log(
+                        "Registration response:",
+                        result
+                    );
+
+
+                    // -------------------------------------------------
+                    // SUCCESS
+                    // -------------------------------------------------
+
+                    if (
+                        response.ok &&
+                        result.success !== false
+                    ) {
+
+                        showMessage(
+                            registerAlert,
+
+                            result.message ||
+                            "Registration successful! Redirecting to login...",
+
+                            "success"
+                        );
+
+
+                        console.log(
+                            "Registration successful."
+                        );
+
+
+                        // Redirect to login
+                        setTimeout(
+                            function () {
+
+                                window.location.replace(
+                                    "/login/"
+                                );
+
+                            },
+                            1000
+                        );
+
+
+                        return;
+                    }
+
+
+                    // -------------------------------------------------
+                    // BACKEND ERROR
+                    // -------------------------------------------------
+
+                    showMessage(
+                        registerAlert,
+                        formatErrors(result),
+                        "danger"
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Registration error:",
+                        error
+                    );
+
+
+                    showMessage(
+                        registerAlert,
+
+                        "Unable to connect to the server. Please make sure Django is running.",
+
+                        "danger"
+                    );
+
+
+                } finally {
+
+                    if (registerButton) {
+
+                        registerButton.disabled =
+                            false;
+                    }
+
+                    if (registerButtonText) {
+
+                        registerButtonText.textContent =
+                            "Create Account";
+                    }
+
+                    if (registerSpinner) {
+
+                        registerSpinner.classList.add(
+                            "d-none"
+                        );
+                    }
+                }
+            }
+        );
+    }
+
+
+    // =========================================================
+    // LOGIN PAGE
+    // =========================================================
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+
+    if (loginForm) {
+
+        const loginAlert =
+            document.getElementById("loginAlert");
+
+        const loginButton =
+            document.getElementById("loginButton");
+
+        const emailInput =
+            document.getElementById("loginEmail");
+
+        const passwordInput =
+            document.getElementById("loginPassword");
+
+        const showPassword =
+            document.getElementById("showPassword");
+
+
+        // -----------------------------------------------------
+        // LOGIN SUBMIT
+        // -----------------------------------------------------
+
+        loginForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                // Prevent normal POST /login/
+                event.preventDefault();
+                event.stopPropagation();
+
+                hideMessage(loginAlert);
+
+
+                const email =
+                    emailInput?.value
+                        .trim()
+                        .toLowerCase() || "";
+
+                const password =
+                    passwordInput?.value || "";
+
+
+                if (!email || !password) {
+
+                    showMessage(
+                        loginAlert,
+                        "Please enter email and password.",
+                        "warning"
+                    );
+
+                    return;
+                }
+
+
+                if (loginButton) {
+
+                    loginButton.disabled = true;
+
+                    loginButton.textContent =
+                        "Signing in...";
+                }
+
+
+                try {
+
+                    console.log(
+                        "Sending login request..."
+                    );
+
+
+                    const response =
+                        await fetch(
+                            "/api/v1/auth/login/",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Accept":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        email: email,
+                                        password: password
+                                    })
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    console.log(
+                        "Login status:",
+                        response.status
+                    );
+
+                    console.log(
+                        "Login response:",
+                        result
+                    );
+
+
+                    // -------------------------------------------------
+                    // LOGIN SUCCESS
+                    // -------------------------------------------------
+
+                    if (
+                        response.ok &&
+                        result.success
+                    ) {
+
+                        localStorage.setItem(
+                            "access_token",
+                            result.data.access
+                        );
+
+                        localStorage.setItem(
+                            "refresh_token",
+                            result.data.refresh
+                        );
+
+                        localStorage.setItem(
+                            "user",
+                            JSON.stringify(
+                                result.data.user
+                            )
+                        );
+
+
+                        showMessage(
+                            loginAlert,
+                            "Login successful! Redirecting...",
+                            "success"
+                        );
+
+
+                        const role =
+                            result.data.user.role;
+
+
+                        setTimeout(
+                            function () {
+
+                                if (
+                                    role === "DONOR"
+                                ) {
+
+                                    window.location.replace(
+                                        "/donor/"
+                                    );
+
+                                } else if (
+                                    role === "RECEIVER"
+                                ) {
+
+                                    window.location.replace(
+                                        "/receiver/"
+                                    );
+
+                                } else if (
+                                    role === "ADMIN"
+                                ) {
+
+                                    window.location.replace(
+                                        "/management/"
+                                    );
+
+                                } else {
+
+                                    window.location.replace(
+                                        "/"
+                                    );
+                                }
+
+                            },
+                            500
+                        );
+
+
+                        return;
+                    }
+
+
+                    // -------------------------------------------------
+                    // LOGIN ERROR
+                    // -------------------------------------------------
+
+                    showMessage(
+                        loginAlert,
+                        formatErrors(result),
+                        "danger"
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Login error:",
+                        error
+                    );
+
+
+                    showMessage(
+                        loginAlert,
+                        "Unable to connect to the server.",
+                        "danger"
+                    );
+
+
+                } finally {
+
+                    if (loginButton) {
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "Sign In";
+                    }
+                }
+            }
         );
 
-    } finally {
 
-        TokenManager.clear();
+        // -----------------------------------------------------
+        // LOGIN PASSWORD SHOW / HIDE
+        // -----------------------------------------------------
 
-        window.location.href = "/login/";
+        if (
+            passwordInput &&
+            showPassword
+        ) {
+
+            showPassword.addEventListener(
+                "click",
+                function () {
+
+                    const isVisible =
+                        passwordInput.type ===
+                        "text";
+
+
+                    passwordInput.type =
+                        isVisible
+                            ? "password"
+                            : "text";
+
+
+                    this.textContent =
+                        isVisible
+                            ? "👁"
+                            : "🙈";
+
+
+                    this.setAttribute(
+                        "aria-label",
+                        isVisible
+                            ? "Show password"
+                            : "Hide password"
+                    );
+                }
+            );
+        }
     }
-}
-
-
-/* =========================================================
-   AUTHENTICATED REQUEST
-========================================================= */
-
-async function authenticatedRequest(
-    url,
-    options = {}
-) {
-
-    return apiRequest(
-        url,
-        options
-    );
-}
-
-
-/* =========================================================
-   AUTO INITIALIZATION
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        initializeLogin();
-
-        initializeRegister();
-
-        initializeForgotPassword();
-
-    }
-);
+});

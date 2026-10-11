@@ -1,346 +1,149 @@
+
 {% extends "base.html" %}
 {% load static %}
 
 {% block title %}My Profile | FoodShare{% endblock %}
 
 {% block content %}
-
 <div class="container py-4">
-
     <div class="mb-4">
-
-        <h2 class="fw-bold">
-            My Profile
-        </h2>
-
-        <p class="text-muted">
-            Manage your donor account information.
-        </p>
-
+        <h2 class="fw-bold">My Profile</h2>
+        <p class="text-muted">Manage your donor account information.</p>
     </div>
 
-
-    <div id="profileMessage"></div>
-
+    <div id="profileMessage" class="d-none" role="alert"></div>
 
     <div class="row g-4">
-
-        <!-- Profile Summary -->
-
         <div class="col-lg-4">
-
             <div class="card border-0 shadow-sm">
-
                 <div class="card-body text-center p-4">
-
-                    <div class="rounded-circle bg-success-subtle
-                                text-success d-flex align-items-center
-                                justify-content-center mx-auto mb-3"
+                    <div class="rounded-circle bg-success-subtle text-success
+                                d-flex align-items-center justify-content-center
+                                mx-auto mb-3"
                          style="width:100px;height:100px;font-size:40px;">
-
                         <i class="bi bi-person"></i>
-
                     </div>
 
-                    <h4 class="fw-bold"
-                        id="profileName">
-                        Donor
-                    </h4>
-
-                    <p class="text-muted mb-1"
-                       id="profileEmail">
-                        —
-                    </p>
-
-                    <span class="badge text-bg-success">
-                        Donor
-                    </span>
-
+                    <h4 class="fw-bold" id="profileName">Donor</h4>
+                    <p class="text-muted mb-1" id="profileEmail">—</p>
+                    <span class="badge text-bg-success">Donor</span>
                 </div>
-
             </div>
-
         </div>
-
-
-        <!-- Profile Form -->
 
         <div class="col-lg-8">
-
             <div class="card border-0 shadow-sm">
-
                 <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Personal and Organization Information</h5>
 
-                    <h5 class="fw-bold mb-4">
-                        Personal Information
-                    </h5>
-
-
-                    <form id="profileForm">
+                    <form id="profileForm" enctype="multipart/form-data">
+                        {% csrf_token %}
 
                         <div class="row">
-
                             <div class="col-md-6 mb-3">
-
-                                <label class="form-label fw-semibold">
+                                <label for="firstName" class="form-label fw-semibold">
                                     First Name
                                 </label>
-
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="firstName"
-                                    name="first_name"
-                                    required
-                                >
-
+                                <input type="text" class="form-control"
+                                       id="firstName" name="first_name" required>
                             </div>
 
-
                             <div class="col-md-6 mb-3">
-
-                                <label class="form-label fw-semibold">
+                                <label for="lastName" class="form-label fw-semibold">
                                     Last Name
                                 </label>
-
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="lastName"
-                                    name="last_name"
-                                >
-
+                                <input type="text" class="form-control"
+                                       id="lastName" name="last_name">
                             </div>
 
-
                             <div class="col-md-6 mb-3">
-
-                                <label class="form-label fw-semibold">
+                                <label for="email" class="form-label fw-semibold">
                                     Email
                                 </label>
-
-                                <input
-                                    type="email"
-                                    class="form-control"
-                                    id="email"
-                                    name="email"
-                                    readonly
-                                >
-
+                                <input type="email" class="form-control"
+                                       id="email" name="email" readonly>
                             </div>
-
 
                             <div class="col-md-6 mb-3">
-
-                                <label class="form-label fw-semibold">
+                                <label for="phone" class="form-label fw-semibold">
                                     Phone Number
                                 </label>
-
-                                <input
-                                    type="tel"
-                                    class="form-control"
-                                    id="phone"
-                                    name="phone_no"
-                                >
-
+                                <input type="tel" class="form-control"
+                                       id="phone" name="phone_no">
                             </div>
-
 
                             <div class="col-12 mb-3">
-
-                                <label class="form-label fw-semibold">
-                                    Address
+                                <label for="organization_name"
+                                       class="form-label fw-semibold">
+                                    Organization Name
                                 </label>
-
-                                <textarea
-                                    class="form-control"
-                                    id="address"
-                                    name="address"
-                                    rows="3"
-                                ></textarea>
-
+                                <input type="text" class="form-control"
+                                       id="organization_name"
+                                       name="organization_name">
                             </div>
 
+                            <div class="col-12 mb-3">
+                                <label for="address" class="form-label fw-semibold">
+                                    Address
+                                </label>
+                                <textarea class="form-control"
+                                          id="address" name="address"
+                                          rows="3" required></textarea>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="city" class="form-label fw-semibold">
+                                    City
+                                </label>
+                                <input type="text" class="form-control"
+                                       id="city" name="city" required>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="state" class="form-label fw-semibold">
+                                    State
+                                </label>
+                                <input type="text" class="form-control"
+                                       id="state" name="state" required>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="pincode" class="form-label fw-semibold">
+                                    Pincode
+                                </label>
+                                <input type="text" class="form-control"
+                                       id="pincode" name="pincode"
+                                       inputmode="numeric" required>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <label for="profile_image"
+                                       class="form-label fw-semibold">
+                                    Profile Image (optional)
+                                </label>
+                                <input type="file" class="form-control"
+                                       id="profile_image" name="profile_image"
+                                       accept="image/*">
+                                <img id="imagePreview" src="" alt="Profile preview"
+                                     class="img-thumbnail mt-3 d-none"
+                                     style="max-width:150px;max-height:150px;">
+                            </div>
                         </div>
 
-
-                        <button
-                            type="submit"
-                            class="btn btn-success"
-                            id="saveProfileBtn">
-
+                        <button type="submit" class="btn btn-success"
+                                id="saveProfileBtn">
                             <i class="bi bi-check-lg me-2"></i>
                             Save Changes
-
                         </button>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 {% endblock %}
-
 
 {% block extra_js %}
-
-<script>
-const API_BASE = "/api/v1";
-
-function getAccessToken() {
-    return localStorage.getItem("access_token");
-}
-
-async function loadProfile() {
-
-    const token = getAccessToken();
-
-    if (!token) {
-        window.location.href = "{% url 'login' %}";
-        return;
-    }
-
-    try {
-
-        const response = await fetch(
-            `${API_BASE}/auth/profile/`,
-            {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("Unable to load profile");
-        }
-
-        const data = await response.json();
-
-        document.getElementById("firstName").value =
-            data.first_name || "";
-
-        document.getElementById("lastName").value =
-            data.last_name || "";
-
-        document.getElementById("email").value =
-            data.email || "";
-
-        document.getElementById("phone").value =
-            data.phone_no || "";
-
-        document.getElementById("address").value =
-            data.address || "";
-
-        document.getElementById("profileEmail").textContent =
-            data.email || "—";
-
-        document.getElementById("profileName").textContent =
-            `${data.first_name || ""} ${data.last_name || ""}`.trim()
-            || "Donor";
-
-    } catch (error) {
-
-        showProfileMessage(
-            "Unable to load profile.",
-            "danger"
-        );
-
-    }
-}
-
-
-document.getElementById("profileForm")
-.addEventListener("submit", async function(event) {
-
-    event.preventDefault();
-
-    const token = getAccessToken();
-
-    const button =
-        document.getElementById("saveProfileBtn");
-
-    button.disabled = true;
-
-    const payload = {
-        first_name:
-            document.getElementById("firstName").value.trim(),
-
-        last_name:
-            document.getElementById("lastName").value.trim(),
-
-        phone_no:
-            document.getElementById("phone").value.trim(),
-
-        address:
-            document.getElementById("address").value.trim()
-    };
-
-    try {
-
-        const response = await fetch(
-            `${API_BASE}/auth/profile/`,
-            {
-                method: "PATCH",
-
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-
-                body: JSON.stringify(payload)
-            }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                data.detail || "Profile update failed"
-            );
-        }
-
-        showProfileMessage(
-            "Profile updated successfully.",
-            "success"
-        );
-
-        loadProfile();
-
-    } catch (error) {
-
-        showProfileMessage(
-            error.message,
-            "danger"
-        );
-
-    } finally {
-
-        button.disabled = false;
-
-    }
-
-});
-
-
-function showProfileMessage(message, type) {
-
-    document.getElementById("profileMessage").innerHTML = `
-        <div class="alert alert-${type}">
-            ${message}
-        </div>
-    `;
-}
-
-
-document.addEventListener("DOMContentLoaded", loadProfile);
-</script>
-
+<script src="{% static 'js/profile.js' %}"></script>
 {% endblock %}
+

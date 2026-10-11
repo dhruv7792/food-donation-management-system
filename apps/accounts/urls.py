@@ -11,23 +11,22 @@ from .views import (
 
 
 urlpatterns = [
-
     path(
         "register/",
         RegisterView.as_view(),
-        name="register",
+        name="api-register",
     ),
 
     path(
         "login/",
         LoginView.as_view(),
-        name="login",
+        name="api-login",
     ),
 
     path(
         "logout/",
         LogoutView.as_view(),
-        name="logout",
+        name="api-logout",
     ),
 
     path(

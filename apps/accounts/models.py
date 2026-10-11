@@ -51,18 +51,21 @@ class DonorProfile(models.Model):
         blank=True,
     )
 
-    address = models.TextField()
+    address = models.TextField(blank=True)
 
     city = models.CharField(
-        max_length=100
+        max_length=100,
+        blank=True
     )
 
     state = models.CharField(
-        max_length=100
+        max_length=100,
+        blank=True
     )
 
     pincode = models.CharField(
-        max_length=10
+        max_length=10,
+        blank=True
     )
 
     latitude = models.DecimalField(
@@ -123,18 +126,21 @@ class ReceiverProfile(models.Model):
         default=OrganizationType.NGO,
     )
 
-    address = models.TextField()
+    address = models.TextField(blank=True)
 
     city = models.CharField(
-        max_length=100
+        max_length=100,
+        blank=True
     )
 
     state = models.CharField(
-        max_length=100
+        max_length=100,
+        blank=True
     )
 
     pincode = models.CharField(
-        max_length=10
+        max_length=10,
+        blank=True
     )
 
     latitude = models.DecimalField(
@@ -167,3 +173,4 @@ class ReceiverProfile(models.Model):
 
     def __str__(self):
         return self.organization_name
+

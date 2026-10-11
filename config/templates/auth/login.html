@@ -1,6 +1,8 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,45 +10,82 @@
     <title>Login | FoodShare</title>
 
     <style>
+        /* =========================================================
+           RESET
+        ========================================================= */
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+
+        /* =========================================================
+           ROOT VARIABLES
+        ========================================================= */
+
         :root {
             --green: #198754;
             --dark-green: #11683f;
             --light-green: #eef9f3;
+
             --text: #17251e;
             --muted: #718078;
+
             --border: #dce5df;
+
             --white: #ffffff;
+
+            --danger: #dc3545;
+            --warning: #ffc107;
         }
+
+
+        /* =========================================================
+           BODY
+        ========================================================= */
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #f4fbf7, #eaf7ef);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f4fbf7,
+                    #eaf7ef
+                );
+
             color: var(--text);
+
             min-height: 100vh;
         }
 
-        /* ================= NAVBAR ================= */
+
+        /* =========================================================
+           NAVBAR
+        ========================================================= */
 
         .navbar {
-            height: 86px;
             width: 100%;
+            height: 86px;
+
             background: rgba(255, 255, 255, 0.97);
+
             border-bottom: 1px solid #edf1ee;
+
             display: flex;
             align-items: center;
+
             position: relative;
             z-index: 10;
         }
 
         .nav-container {
             width: min(1180px, calc(100% - 50px));
+
             margin: auto;
+
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -54,8 +93,10 @@
 
         .logo {
             text-decoration: none;
+
             font-size: 25px;
             font-weight: 800;
+
             color: #16241d;
         }
 
@@ -66,14 +107,19 @@
         .nav-right {
             display: flex;
             align-items: center;
+
             gap: 16px;
         }
 
         .nav-link {
             color: #617067;
+
             text-decoration: none;
+
             font-weight: 600;
+
             padding: 10px 8px;
+
             transition: 0.2s;
         }
 
@@ -81,187 +127,365 @@
             color: var(--green);
         }
 
+
+        /* =========================================================
+           THEME BUTTON
+        ========================================================= */
+
         .theme-btn {
             border: 1px solid #e0e7e2;
+
             background: white;
+
             border-radius: 30px;
+
             padding: 10px 18px;
+
             font-size: 15px;
+
             font-weight: 600;
+
             cursor: pointer;
+
+            transition: 0.2s;
         }
+
+        .theme-btn:hover {
+            border-color: var(--green);
+        }
+
+
+        /* =========================================================
+           LOGIN / REGISTER NAV BUTTONS
+        ========================================================= */
 
         .login-btn {
             border: 1px solid var(--green);
+
             background: white;
+
             color: var(--green);
+
             border-radius: 8px;
+
             padding: 11px 25px;
+
             font-size: 15px;
+
             font-weight: 700;
+
             text-decoration: none;
         }
 
         .signup-btn {
             border: 1px solid var(--green);
+
             background: var(--green);
+
             color: white;
+
             border-radius: 8px;
+
             padding: 12px 25px;
+
             font-size: 15px;
+
             font-weight: 700;
+
             text-decoration: none;
         }
 
-        /* ================= MAIN ================= */
+        .login-btn:hover,
+        .signup-btn:hover {
+            opacity: 0.9;
+        }
+
+
+        /* =========================================================
+           MAIN PAGE
+        ========================================================= */
 
         .page {
             min-height: calc(100vh - 86px);
+
             display: flex;
+
             align-items: center;
             justify-content: center;
+
             padding: 55px 25px;
         }
 
+
+        /* =========================================================
+           LOGIN WRAPPER
+        ========================================================= */
+
         .login-wrapper {
             width: min(1000px, 100%);
+
             min-height: 570px;
+
             background: white;
+
             border-radius: 22px;
+
             overflow: hidden;
+
             display: grid;
+
             grid-template-columns: 46% 54%;
-            box-shadow: 0 20px 60px rgba(30, 75, 50, 0.12);
+
+            box-shadow:
+                0 20px 60px
+                rgba(30, 75, 50, 0.12);
         }
 
-        /* ================= LEFT PANEL ================= */
+
+        /* =========================================================
+           LEFT WELCOME PANEL
+        ========================================================= */
 
         .welcome-panel {
-            background: linear-gradient(
-                145deg,
-                #269a63,
-                #117746
-            );
+            background:
+                linear-gradient(
+                    145deg,
+                    #269a63,
+                    #117746
+                );
+
             color: white;
+
             padding: 55px 50px;
+
             display: flex;
+
             flex-direction: column;
+
             justify-content: center;
+
             position: relative;
+
             overflow: hidden;
         }
 
         .welcome-panel::before {
             content: "";
+
             width: 250px;
             height: 250px;
-            border: 1px solid rgba(255,255,255,0.12);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.12);
+
             border-radius: 50%;
+
             position: absolute;
+
             top: -100px;
             right: -100px;
         }
 
         .welcome-panel::after {
             content: "";
+
             width: 300px;
             height: 300px;
-            border: 1px solid rgba(255,255,255,0.10);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.10);
+
             border-radius: 50%;
+
             position: absolute;
+
             bottom: -170px;
             left: -150px;
         }
 
+
+        /* =========================================================
+           RECYCLE ICON
+        ========================================================= */
+
         .recycle-icon {
             width: 70px;
             height: 70px;
+
             border-radius: 20px;
-            background: rgba(255,255,255,0.13);
-            border: 1px solid rgba(255,255,255,0.20);
+
+            background:
+                rgba(255, 255, 255, 0.13);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.20);
+
             display: flex;
+
             align-items: center;
             justify-content: center;
+
             font-size: 36px;
+
             margin-bottom: 32px;
         }
 
+
+        /* =========================================================
+           WELCOME TEXT
+        ========================================================= */
+
         .welcome-panel h1 {
             font-size: 47px;
+
             line-height: 1.05;
+
             margin-bottom: 24px;
+
             font-weight: 800;
         }
 
         .welcome-panel p {
             max-width: 330px;
+
             font-size: 17px;
+
             line-height: 1.8;
-            color: rgba(255,255,255,0.91);
+
+            color:
+                rgba(255, 255, 255, 0.91);
         }
+
+
+        /* =========================================================
+           FEATURES
+        ========================================================= */
 
         .feature {
             margin-top: 35px;
+
             display: flex;
+
             align-items: center;
+
             gap: 12px;
+
             font-size: 15px;
+
             font-weight: 600;
         }
 
         .feature-icon {
             width: 36px;
             height: 36px;
+
             border-radius: 50%;
-            background: rgba(255,255,255,0.15);
+
+            background:
+                rgba(255, 255, 255, 0.15);
+
             display: flex;
+
             align-items: center;
             justify-content: center;
         }
 
-        /* ================= FORM PANEL ================= */
+
+        /* =========================================================
+           FORM PANEL
+        ========================================================= */
 
         .form-panel {
             padding: 60px 65px;
+
             display: flex;
+
             flex-direction: column;
+
             justify-content: center;
+
+            background: white;
         }
 
+
+        /* =========================================================
+           FORM HEADER
+        ========================================================= */
+
         .form-header {
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
 
         .form-header h2 {
             font-size: 38px;
+
             line-height: 1.1;
+
             margin-bottom: 14px;
+
             color: #17221c;
         }
 
         .form-header p {
             color: var(--muted);
+
             font-size: 16px;
+
             line-height: 1.6;
+
             max-width: 330px;
         }
 
-        /* Django messages */
 
-        .messages {
-            margin-bottom: 20px;
-        }
+        /* =========================================================
+           LOGIN ALERT
+        ========================================================= */
 
-        .message {
+        #loginAlert {
             padding: 12px 15px;
+
             border-radius: 8px;
-            background: #fff3cd;
-            color: #664d03;
+
+            margin-bottom: 20px;
+
             font-size: 14px;
-            margin-bottom: 8px;
         }
 
-        /* ================= FORM ================= */
+        .alert-success {
+            background: #d1e7dd;
+
+            color: #0f5132;
+
+            border: 1px solid #badbcc;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+
+            color: #664d03;
+
+            border: 1px solid #ffecb5;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+
+            color: #842029;
+
+            border: 1px solid #f5c2c7;
+        }
+
+        .d-none {
+            display: none !important;
+        }
+
+
+        /* =========================================================
+           FORM
+        ========================================================= */
 
         .form-group {
             margin-bottom: 21px;
@@ -269,21 +493,29 @@
 
         .form-label-row {
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
+
             margin-bottom: 9px;
         }
 
         label {
             font-size: 15px;
+
             font-weight: 700;
+
             color: #26342d;
         }
 
         .forgot {
             font-size: 13px;
+
             color: var(--green);
+
             text-decoration: none;
+
             font-weight: 600;
         }
 
@@ -291,26 +523,45 @@
             text-decoration: underline;
         }
 
+
+        /* =========================================================
+           INPUT
+        ========================================================= */
+
         .input-wrapper {
             position: relative;
         }
 
         .input {
             width: 100%;
+
             height: 52px;
-            border: 1px solid var(--border);
+
+            border:
+                1px solid
+                var(--border);
+
             border-radius: 10px;
+
             padding: 0 16px;
+
             font-size: 15px;
+
             outline: none;
+
             transition: 0.2s;
+
             color: #25332c;
+
             background: white;
         }
 
         .input:focus {
             border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.10);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(25, 135, 84, 0.10);
         }
 
         .input::placeholder {
@@ -321,82 +572,159 @@
             padding-right: 50px;
         }
 
+
+        /* =========================================================
+           SHOW PASSWORD
+        ========================================================= */
+
         .show-password {
             position: absolute;
+
             right: 14px;
+
             top: 50%;
+
             transform: translateY(-50%);
+
             border: none;
+
             background: transparent;
+
             cursor: pointer;
+
             font-size: 18px;
+
             color: #78857e;
         }
 
+
+        /* =========================================================
+           REMEMBER ME
+        ========================================================= */
+
         .remember-row {
             display: flex;
+
             align-items: center;
+
             gap: 9px;
+
             margin: 3px 0 25px;
+
             color: #66736c;
+
             font-size: 14px;
         }
 
         .remember-row input {
             width: 17px;
             height: 17px;
+
             accent-color: var(--green);
+
             cursor: pointer;
         }
 
+
+        /* =========================================================
+           SUBMIT BUTTON
+        ========================================================= */
+
         .submit-btn {
             width: 100%;
+
             height: 53px;
+
             border: none;
+
             border-radius: 10px;
+
             background: var(--green);
+
             color: white;
+
             font-size: 16px;
+
             font-weight: 700;
+
             cursor: pointer;
+
             transition: 0.2s;
         }
 
         .submit-btn:hover {
             background: var(--dark-green);
+
             transform: translateY(-1px);
         }
 
+        .submit-btn:disabled {
+            opacity: 0.7;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+
+        /* =========================================================
+           DIVIDER
+        ========================================================= */
+
         .divider {
             display: flex;
+
             align-items: center;
+
             gap: 12px;
+
             margin: 25px 0;
+
             color: #a1aaa5;
+
             font-size: 13px;
         }
 
         .divider::before,
         .divider::after {
             content: "";
+
             height: 1px;
+
             flex: 1;
+
             background: #e6ebe8;
         }
 
+
+        /* =========================================================
+           REGISTER TEXT
+        ========================================================= */
+
         .register-text {
             text-align: center;
+
             color: #68756e;
+
             font-size: 14px;
         }
 
         .register-text a {
             color: var(--green);
+
             font-weight: 700;
+
             text-decoration: none;
         }
 
-        /* ================= DARK MODE ================= */
+        .register-text a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =========================================================
+           DARK MODE
+        ========================================================= */
 
         body.dark {
             background: #101815;
@@ -404,6 +732,7 @@
 
         body.dark .navbar {
             background: #17211d;
+
             border-color: #27332e;
         }
 
@@ -414,7 +743,9 @@
 
         body.dark .theme-btn {
             background: #202c26;
+
             border-color: #34423a;
+
             color: white;
         }
 
@@ -438,7 +769,9 @@
 
         body.dark .input {
             background: #202c26;
+
             border-color: #39473f;
+
             color: white;
         }
 
@@ -450,12 +783,16 @@
             color: #adb9b2;
         }
 
-        /* ================= TABLET ================= */
+
+        /* =========================================================
+           TABLET
+        ========================================================= */
 
         @media (max-width: 850px) {
 
             .navbar {
                 height: auto;
+
                 min-height: 75px;
             }
 
@@ -486,6 +823,7 @@
 
             .login-wrapper {
                 grid-template-columns: 42% 58%;
+
                 min-height: 540px;
             }
 
@@ -510,7 +848,10 @@
             }
         }
 
-        /* ================= MOBILE ================= */
+
+        /* =========================================================
+           MOBILE
+        ========================================================= */
 
         @media (max-width: 650px) {
 
@@ -524,6 +865,7 @@
 
             .theme-btn {
                 font-size: 13px;
+
                 padding: 8px 11px;
             }
 
@@ -534,33 +876,40 @@
 
             .page {
                 padding: 25px 15px;
+
                 align-items: flex-start;
             }
 
             .login-wrapper {
                 grid-template-columns: 1fr;
+
                 border-radius: 18px;
             }
 
             .welcome-panel {
                 padding: 35px 30px;
+
                 min-height: 300px;
             }
 
             .recycle-icon {
                 width: 55px;
                 height: 55px;
+
                 font-size: 28px;
+
                 margin-bottom: 20px;
             }
 
             .welcome-panel h1 {
                 font-size: 32px;
+
                 margin-bottom: 15px;
             }
 
             .welcome-panel p {
                 font-size: 14px;
+
                 line-height: 1.6;
             }
 
@@ -583,278 +932,417 @@
     </style>
 </head>
 
+
 <body>
 
-<!-- ================= NAVBAR ================= -->
+    <!-- =========================================================
+         NAVBAR
+    ========================================================== -->
 
-<header class="navbar">
+    <header class="navbar">
 
-    <div class="nav-container">
+        <div class="nav-container">
 
-        <a href="/" class="logo">
-            Food<span>Share</span>
-        </a>
-
-        <nav class="nav-right">
-
-            <a href="/" class="nav-link">Home</a>
-            <a href="#" class="nav-link">About</a>
-            <a href="#" class="nav-link">Contact</a>
-
-            <button type="button" class="theme-btn" id="themeBtn">
-                🌙 <span id="themeText">Dark</span>
-            </button>
-
-            <a href="{% url 'login' %}" class="login-btn">
-                Login
+            <a href="/" class="logo">
+                Food<span>Share</span>
             </a>
 
-            <a href="{% url 'register' %}" class="signup-btn">
-                Get Started
-            </a>
+            <nav class="nav-right">
 
-        </nav>
+                <a href="/" class="nav-link">
+                    Home
+                </a>
 
-    </div>
+                <a href="{% url 'about' %}" class="nav-link">
+                    About
+                </a>
 
-</header>
+                <a href="{% url 'contact' %}" class="nav-link">
+                    Contact
+                </a>
 
+                <button
+                    type="button"
+                    class="theme-btn"
+                    id="themeBtn"
+                >
+                    🌙 <span id="themeText">Dark</span>
+                </button>
 
-<!-- ================= LOGIN PAGE ================= -->
+                <a
+                    href="{% url 'login' %}"
+                    class="login-btn"
+                >
+                    Login
+                </a>
 
-<main class="page">
+                <a
+                    href="{% url 'register' %}"
+                    class="signup-btn"
+                >
+                    Get Started
+                </a>
 
-    <div class="login-wrapper">
+            </nav>
 
-        <!-- LEFT SIDE -->
+        </div>
 
-        <section class="welcome-panel">
-
-            <div class="recycle-icon">
-                ♻
-            </div>
-
-            <h1>
-                Welcome<br>
-                Back!
-            </h1>
-
-            <p>
-                Connect with our food donation community
-                and help reduce food waste while supporting
-                people in need.
-            </p>
-
-            <div class="feature">
-                <div class="feature-icon">🍲</div>
-                <span>Donate surplus food</span>
-            </div>
-
-            <div class="feature">
-                <div class="feature-icon">🤝</div>
-                <span>Help people in need</span>
-            </div>
-
-        </section>
+    </header>
 
 
-        <!-- RIGHT SIDE -->
+    <!-- =========================================================
+         MAIN LOGIN PAGE
+    ========================================================== -->
 
-        <section class="form-panel">
+    <main class="page">
 
-            <div class="form-header">
+        <div class="login-wrapper">
 
-                <h2>Sign In</h2>
+
+            <!-- =================================================
+                 LEFT PANEL
+            ================================================== -->
+
+            <section class="welcome-panel">
+
+                <div class="recycle-icon">
+                    ♻
+                </div>
+
+                <h1>
+                    Welcome<br>
+                    Back!
+                </h1>
 
                 <p>
-                    Enter your account details to continue.
+                    Connect with our food donation community
+                    and help reduce food waste while supporting
+                    people in need.
                 </p>
 
-            </div>
+                <div class="feature">
 
-
-            <!-- Django Messages -->
-
-            {% if messages %}
-            <div class="messages">
-
-                {% for message in messages %}
-                    <div class="message">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-
-            </div>
-            {% endif %}
-
-
-            <!-- LOGIN FORM -->
-
-            <form method="POST">
-
-                {% csrf_token %}
-
-                <!-- EMAIL -->
-
-                <div class="form-group">
-
-                    <div class="form-label-row">
-                        <label for="email">
-                            Email Address
-                        </label>
+                    <div class="feature-icon">
+                        🍲
                     </div>
 
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        class="input"
-                        placeholder="you@example.com"
-                        autocomplete="email"
-                        required
-                    >
+                    <span>
+                        Donate surplus food
+                    </span>
+
+                </div>
+
+                <div class="feature">
+
+                    <div class="feature-icon">
+                        🤝
+                    </div>
+
+                    <span>
+                        Help people in need
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 RIGHT FORM PANEL
+            ================================================== -->
+
+            <section class="form-panel">
+
+                <div class="form-header">
+
+                    <h2>
+                        Sign In
+                    </h2>
+
+                    <p>
+                        Enter your account details to continue.
+                    </p>
 
                 </div>
 
 
-                <!-- PASSWORD -->
+                <!-- =================================================
+                     LOGIN FORM
+                ================================================== -->
 
-                <div class="form-group">
+                <form
+                    method="POST"
+                    id="loginForm"
+                    action="javascript:void(0);"
+                >
 
-                    <div class="form-label-row">
+                    {% csrf_token %}
 
-                        <label for="password">
-                            Password
-                        </label>
 
-                        <a href="{% url 'forgot_password' %}" class="forgot">
-                            Forgot Password?
-                        </a>
+                    <!-- LOGIN ALERT -->
 
-                    </div>
+                    <div
+                        id="loginAlert"
+                        class="d-none"
+                        role="alert"
+                    ></div>
 
-                    <div class="input-wrapper">
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <div class="form-label-row">
+
+                            <label for="loginEmail">
+                                Email Address
+                            </label>
+
+                        </div>
 
                         <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="input password-input"
-                            placeholder="Enter your password"
-                            autocomplete="current-password"
+                            type="email"
+                            id="loginEmail"
+                            name="email"
+                            class="input"
+                            placeholder="you@example.com"
+                            autocomplete="email"
                             required
                         >
 
-                        <button
-                            type="button"
-                            class="show-password"
-                            id="showPassword"
-                            aria-label="Show password"
-                        >
-                            👁
-                        </button>
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="form-group">
+
+                        <div class="form-label-row">
+
+                            <label for="loginPassword">
+                                Password
+                            </label>
+
+                            <a
+                                href="{% url 'forgot_password' %}"
+                                class="forgot"
+                            >
+                                Forgot Password?
+                            </a>
+
+                        </div>
+
+
+                        <div class="input-wrapper">
+
+                            <input
+                                type="password"
+                                id="loginPassword"
+                                name="password"
+                                class="input password-input"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="show-password"
+                                id="showPassword"
+                                aria-label="Show password"
+                            >
+                                👁
+                            </button>
+
+                        </div>
 
                     </div>
 
-                </div>
+
+                    <!-- REMEMBER ME -->
+
+                    <div class="remember-row">
+
+                        <input
+                            type="checkbox"
+                            id="remember"
+                            name="remember"
+                        >
+
+                        <label for="remember">
+                            Remember me
+                        </label>
+
+                    </div>
 
 
-                <!-- REMEMBER -->
+                    <!-- SUBMIT BUTTON -->
 
-                <div class="remember-row">
-
-                    <input
-                        type="checkbox"
-                        id="remember"
-                        name="remember"
+                    <button
+                        type="submit"
+                        id="loginButton"
+                        class="submit-btn"
                     >
+                        Sign In
+                    </button>
 
-                    <label for="remember">
-                        Remember me
-                    </label>
+                </form>
 
+
+                <!-- DIVIDER -->
+
+                <div class="divider">
+                    OR
                 </div>
 
 
-                <!-- SUBMIT -->
+                <!-- REGISTER -->
 
-                <button type="submit" class="submit-btn">
-                    Sign In
-                </button>
+                <div class="register-text">
 
-            </form>
+                    Don't have an account?
 
+                    <a href="{% url 'register' %}">
+                        Create an account
+                    </a>
 
-            <div class="divider">
-                OR
-            </div>
+                </div>
 
+            </section>
 
-            <div class="register-text">
+        </div>
 
-                Don't have an account?
-
-                <a href="{% url 'register' %}">
-                    Create an account
-                </a>
-
-            </div>
-
-        </section>
-
-    </div>
-
-</main>
+    </main>
 
 
-<script>
+    <!-- =========================================================
+         IMPORTANT:
+         LOGIN JAVASCRIPT IS IN auth.js
+         
+         DO NOT PUT ANOTHER LOGIN SUBMIT HANDLER HERE.
+    ========================================================== -->
 
-    /* ================= PASSWORD SHOW / HIDE ================= */
-
-    const password = document.getElementById("password");
-    const showPassword = document.getElementById("showPassword");
-
-    showPassword.addEventListener("click", function () {
-
-        if (password.type === "password") {
-
-            password.type = "text";
-            showPassword.textContent = "🙈";
-
-        } else {
-
-            password.type = "password";
-            showPassword.textContent = "👁";
-
-        }
-
-    });
+    <script src="{% static 'js/auth.js' %}"></script>
 
 
-    /* ================= DARK MODE ================= */
+    <!-- =========================================================
+         THEME + PASSWORD SCRIPT
+    ========================================================== -->
 
-    const themeBtn = document.getElementById("themeBtn");
-    const themeText = document.getElementById("themeText");
+    <script>
 
-    themeBtn.addEventListener("click", function () {
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
 
-        document.body.classList.toggle("dark");
+                /* ================================================
+                   SHOW / HIDE PASSWORD
+                ================================================= */
 
-        if (document.body.classList.contains("dark")) {
+                const passwordInput =
+                    document.getElementById(
+                        "loginPassword"
+                    );
 
-            themeText.textContent = "Light";
-            themeBtn.innerHTML = "☀️ <span>Light</span>";
+                const showPassword =
+                    document.getElementById(
+                        "showPassword"
+                    );
 
-        } else {
+                if (
+                    passwordInput &&
+                    showPassword
+                ) {
 
-            themeText.textContent = "Dark";
-            themeBtn.innerHTML = "🌙 <span>Dark</span>";
+                    showPassword.addEventListener(
+                        "click",
+                        function () {
 
-        }
+                            if (
+                                passwordInput.type ===
+                                "password"
+                            ) {
 
-    });
+                                passwordInput.type =
+                                    "text";
 
-</script>
+                                showPassword.textContent =
+                                    "🙈";
+
+                                showPassword.setAttribute(
+                                    "aria-label",
+                                    "Hide password"
+                                );
+
+                            } else {
+
+                                passwordInput.type =
+                                    "password";
+
+                                showPassword.textContent =
+                                    "👁";
+
+                                showPassword.setAttribute(
+                                    "aria-label",
+                                    "Show password"
+                                );
+                            }
+                        }
+                    );
+                }
+
+
+                /* ================================================
+                   DARK MODE
+                ================================================= */
+
+                const themeBtn =
+                    document.getElementById(
+                        "themeBtn"
+                    );
+
+                const themeText =
+                    document.getElementById(
+                        "themeText"
+                    );
+
+                if (
+                    themeBtn &&
+                    themeText
+                ) {
+
+                    themeBtn.addEventListener(
+                        "click",
+                        function () {
+
+                            document.body.classList.toggle(
+                                "dark"
+                            );
+
+                            if (
+                                document.body.classList.contains(
+                                    "dark"
+                                )
+                            ) {
+
+                                themeBtn.innerHTML =
+                                    "☀️ <span>Light</span>";
+
+                            } else {
+
+                                themeBtn.innerHTML =
+                                    "🌙 <span>Dark</span>";
+                            }
+
+                        }
+                    );
+                }
+
+            }
+        );
+
+    </script>
 
 </body>
+
 </html>
