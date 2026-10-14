@@ -1,59 +1,51 @@
+
 {% extends "base.html" %}
 {% load static %}
 
 {% block title %}Donation Details | FoodShare{% endblock %}
 
 {% block content %}
-
 <div class="container py-4">
 
     <div class="mb-4">
-
-        <a
-            href="{% url 'donor_donation_list' %}"
-            class="text-success text-decoration-none"
-        >
+        <a href="{% url 'donor_donation_list' %}"
+           class="text-success text-decoration-none">
             <i class="bi bi-arrow-left me-1"></i>
             Back to Donations
         </a>
-
     </div>
-
 
     <div id="detailMessage"></div>
 
-
     <div id="donationDetails">
-
         <div class="text-center py-5">
-
             <div class="spinner-border text-success"></div>
-
-            <p class="text-muted mt-3">
-                Loading donation...
-            </p>
-
+            <p class="text-muted mt-3">Loading donation...</p>
         </div>
-
     </div>
 
 </div>
-
 {% endblock %}
 
-
 {% block extra_js %}
-
 <script src="{% static 'js/donation.js' %}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+    const match = window.location.pathname.match(/\/donations\/(\d+)\/?$/);
 
-    if (typeof loadDonationDetail === "function") {
-        loadDonationDetail();
+    if (!match) {
+        const container = document.getElementById("donationDetails");
+        if (container) {
+            container.innerHTML =
+                '<div class="alert alert-danger">Invalid donation ID.</div>';
+        }
+        return;
     }
 
+    if (typeof loadDonationDetail === "function") {
+        loadDonationDetail(match[1]);
+    }
 });
 </script>
-
 {% endblock %}

@@ -9,6 +9,7 @@ console.log("FoodShare donation.js loaded");
 
 const DONATION_API = "/api/v1/donations/";
 const DONOR_PROFILE_API = "/api/v1/auth/donor/profile/";
+const REQUEST_API = "/api/v1/requests/";
 
 let donationCurrentPage = 1;
 
@@ -739,56 +740,147 @@ async function deleteDonation(donationId) {
    DONATION DETAILS
    ========================================================= */
 
+
+
 async function loadDonationDetail(donationId) {
-    try {
-        const data = await apiRequest(
-            `${DONATION_API}${donationId}/`
+    const container = document.getElementById("donationDetails");
+    const message = document.getElementById("detailMessage");
+
+    if (!container) return;
+
+    // Read the ID from the URL, for example /donor/donations/3/
+    if (!donationId) {
+        const match = window.location.pathname.match(
+            /\/donations\/(\d+)\/?$/
         );
 
-        const elements = {
-            name: document.getElementById("detailFoodName"),
-            category: document.getElementById("detailCategory"),
-            quantity: document.getElementById("detailQuantity"),
-            status: document.getElementById("detailStatus"),
-            description: document.getElementById("detailDescription"),
-            expiry: document.getElementById("detailExpiry")
-        };
+        donationId = match ? match[1] : null;
+    }
 
-        if (elements.name) {
-            elements.name.textContent = data.title || "-";
+    if (!donationId) {
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Donation ID could not be found in the page URL.
+            </div>
+        `;
+        return;
+    }
+
+    try {
+        const response = await apiRequest(
+            `${DONATION_API}${encodeURIComponent(donationId)}/`
+        );
+
+        const donation = response?.data ?? response;
+
+        if (!donation || !donation.id) {
+            throw new Error("Donation details were not found.");
         }
 
-        if (elements.category) {
-            elements.category.textContent = data.food_type || "-";
-        }
+        const address = [
+            donation.address,
+            donation.city,
+            donation.state,
+            donation.pincode
+        ].filter(Boolean).join(", ");
 
-        if (elements.quantity) {
-            elements.quantity.textContent =
-                `${data.quantity ?? "-"} ${data.quantity_unit || ""}`;
-        }
+        container.innerHTML = `
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between
+                                align-items-start flex-wrap gap-3 mb-4">
+                        <div>
+                            <h2 class="fw-bold text-success">
+                                ${escapeHTML(donation.title || "Food donation")}
+                            </h2>
+                            <p class="text-muted mb-0">
+                                Donation ID: ${escapeHTML(donation.id)}
+                            </p>
+                        </div>
+                        ${statusBadge(donation.status)}
+                    </div>
 
-        if (elements.status) {
-            elements.status.innerHTML = statusBadge(data.status);
-        }
+                    ${donation.image ? `
+                        <img
+                            src="${escapeHTML(donation.image)}"
+                            alt="${escapeHTML(donation.title || "Food donation")}"
+                            class="img-fluid rounded mb-4"
+                            style="max-height:350px;width:100%;object-fit:cover;">
+                    ` : ""}
 
-        if (elements.description) {
-            elements.description.textContent =
-                data.description || "No description available.";
-        }
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Food Category</h6>
+                            <p>${escapeHTML(donation.food_type || "Other")}</p>
+                        </div>
 
-        if (elements.expiry) {
-            elements.expiry.textContent = formatDate(data.expiry_at);
-        }
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Quantity</h6>
+                            <p>
+                                ${escapeHTML(donation.quantity ?? "-")}
+                                ${escapeHTML(donation.quantity_unit || "")}
+                            </p>
+                        </div>
 
-        return data;
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Expiry Date</h6>
+                            <p>${formatDate(donation.expiry_at)}</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Prepared Date</h6>
+                            <p>${formatDate(donation.prepared_at)}</p>
+                        </div>
+
+                        <div class="col-12">
+                            <h6 class="text-muted">Description</h6>
+                            <p>
+                                ${escapeHTML(
+            donation.description ||
+            "No description provided."
+        )}
+                            </p>
+                        </div>
+
+                        <div class="col-12">
+                            <h6 class="text-muted">Pickup Address</h6>
+                            <p>${escapeHTML(address || "Address unavailable")}</p>
+                        </div>
+
+                        <div class="col-12">
+                            <h6 class="text-muted">Pickup Window</h6>
+                            <p>
+                                ${formatDate(donation.pickup_start)}
+                                –
+                                ${formatDate(donation.pickup_end)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <a href="/donor/donations/"
+                       class="btn btn-outline-success mt-3">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Back to Donations
+                    </a>
+                </div>
+            </div>
+        `;
+
+        if (message) {
+            message.innerHTML = "";
+        }
 
     } catch (error) {
-        console.error("Loading donation details failed:", error);
-        showDonationMessage(
-            error.message || "Unable to load donation details.",
-            "danger"
-        );
-        return null;
+        console.error("Donation detail error:", error);
+
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                ${escapeHTML(
+            error.message ||
+            "Unable to load donation details."
+        )}
+            </div>
+        `;
     }
 }
 
@@ -833,3 +925,552 @@ document.addEventListener("DOMContentLoaded", () => {
         initializeDonationList();
     }
 });
+
+
+
+/* =========================================================
+   RECEIVER: BROWSE AVAILABLE DONATIONS
+   ========================================================= */
+
+let receiverCurrentPage = 1;
+
+function initializeReceiverDonations() {
+    const container = document.getElementById("receiverDonationsContainer");
+
+    if (!container) return;
+
+    const search = document.getElementById("receiverSearch");
+    const category = document.getElementById("receiverCategory");
+    const sort = document.getElementById("receiverSort");
+    const clearButton = document.getElementById("clearReceiverFilters");
+
+    let searchTimer;
+
+    if (search) {
+        search.addEventListener("input", () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => loadReceiverDonations(1), 350);
+        });
+    }
+
+    if (category) {
+        category.addEventListener("change", () => loadReceiverDonations(1));
+    }
+
+    if (sort) {
+        sort.addEventListener("change", () => loadReceiverDonations(1));
+    }
+
+    if (clearButton) {
+        clearButton.addEventListener("click", () => {
+            if (search) search.value = "";
+            if (category) category.value = "";
+            if (sort) sort.value = "newest";
+            loadReceiverDonations(1);
+        });
+    }
+
+    loadReceiverDonations(1);
+}
+
+async function loadReceiverDonations(page = 1) {
+    const container = document.getElementById("receiverDonationsContainer");
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-success"></div>
+            <p class="mt-3 text-muted">Loading available donations...</p>
+        </div>
+    `;
+
+    try {
+        const params = new URLSearchParams();
+        const search = document.getElementById("receiverSearch")?.value.trim() || "";
+        const category = document.getElementById("receiverCategory")?.value || "";
+        const sort = document.getElementById("receiverSort")?.value || "newest";
+
+        params.set("page", page);
+
+        if (search) params.set("search", search);
+
+        // Match the backend's actual food_type choices.
+        const categoryMap = {
+            prepared: "OTHER",
+            grains: "OTHER",
+            vegetables: "OTHER",
+            fruits: "FRUITS",
+            bakery: "BAKERY",
+            packaged: "PACKAGED",
+            other: "OTHER"
+        };
+
+        if (category) {
+            params.set("food_type", categoryMap[category] || category.toUpperCase());
+        }
+
+        params.set("ordering", sort === "expiry" ? "expiry_at" : "-created_at");
+
+        const response = await apiRequest(
+            `${DONATION_API}available/?${params.toString()}`
+        );
+
+        const donations = Array.isArray(response)
+            ? response
+            : Array.isArray(response?.data)
+                ? response.data
+                : Array.isArray(response?.results)
+                    ? response.results
+                    : Array.isArray(response?.data?.results)
+                        ? response.data.results
+                        : [];
+
+        renderReceiverDonations(donations);
+
+        const count = Number(
+            response?.count ??
+            response?.data?.count ??
+            donations.length
+        );
+
+        const info = document.getElementById("receiverPaginationInfo");
+        if (info) {
+            info.textContent = `Showing ${count} donation${count === 1 ? "" : "s"}`;
+        }
+
+        const pagination = document.getElementById("receiverPagination");
+        if (pagination) {
+            pagination.innerHTML = "";
+
+            const pageSize = donations.length || 10;
+            const totalPages = Math.ceil(count / pageSize);
+
+            if (totalPages > 1) {
+                pagination.innerHTML = `
+                    <li class="page-item ${page <= 1 ? "disabled" : ""}">
+                        <button class="page-link" type="button"
+                            ${page <= 1 ? "disabled" : ""}
+                            onclick="loadReceiverDonations(${page - 1})">
+                            Previous
+                        </button>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Page ${page} of ${totalPages}</span>
+                    </li>
+                    <li class="page-item ${page >= totalPages ? "disabled" : ""}">
+                        <button class="page-link" type="button"
+                            ${page >= totalPages ? "disabled" : ""}
+                            onclick="loadReceiverDonations(${page + 1})">
+                            Next
+                        </button>
+                    </li>
+                `;
+            }
+        }
+
+        receiverCurrentPage = page;
+
+    } catch (error) {
+        console.error("Could not load receiver donations:", error);
+
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    ${escapeHTML(error.message || "Unable to load available donations.")}
+                </div>
+            </div>
+        `;
+
+        const info = document.getElementById("receiverPaginationInfo");
+        if (info) info.textContent = "Unable to load donations";
+
+        const pagination = document.getElementById("receiverPagination");
+        if (pagination) pagination.innerHTML = "";
+    }
+}
+
+function renderReceiverDonations(donations) {
+    const container = document.getElementById("receiverDonationsContainer");
+    if (!container) return;
+
+    if (!donations.length) {
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-basket display-4 text-muted"></i>
+                        <h5 class="mt-3">No food donations available</h5>
+                        <p class="text-muted mb-0">
+                            Please try another search or check again later.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    const categoryLabels = {
+        VEG: "Vegetarian",
+        NON_VEG: "Non-Vegetarian",
+        VEGAN: "Vegan",
+        BAKERY: "Bakery",
+        FRUITS: "Fruits",
+        PACKAGED: "Packaged Food",
+        OTHER: "Prepared Food"
+    };
+
+    container.innerHTML = donations.map(donation => {
+        const title = donation.title || "Food donation";
+        const image = donation.image;
+        const foodType = categoryLabels[donation.food_type] || donation.food_type || "Other";
+
+        return `
+            <div class="col-md-6 col-xl-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    ${image
+                ? `<img src="${escapeHTML(image)}"
+                                class="card-img-top"
+                                alt="${escapeHTML(title)}"
+                                style="height:220px;object-fit:cover;">`
+                : `<div class="bg-light d-flex align-items-center justify-content-center"
+                                style="height:220px;">
+                                <i class="bi bi-basket display-3 text-secondary"></i>
+                               </div>`
+            }
+
+                    <div class="card-body d-flex flex-column">
+                        <span class="badge text-bg-success align-self-start mb-2">
+                            ${escapeHTML(foodType)}
+                        </span>
+
+                        <h5 class="card-title">${escapeHTML(title)}</h5>
+
+                        <p class="card-text text-muted">
+                            ${escapeHTML(donation.description || "No description provided.")}
+                        </p>
+
+                        <p class="mb-2">
+                            <i class="bi bi-box-seam me-2 text-success"></i>
+                            <strong>Quantity:</strong>
+                            ${escapeHTML(donation.quantity ?? "-")}
+                            ${escapeHTML(donation.quantity_unit || "")}
+                        </p>
+
+                        <p class="mb-2">
+                            <i class="bi bi-calendar-event me-2 text-success"></i>
+                            <strong>Expires:</strong>
+                            ${formatDate(donation.expiry_at)}
+                        </p>
+
+                        <p class="mb-3">
+                            <i class="bi bi-geo-alt me-2 text-success"></i>
+                            ${escapeHTML(donation.city || "Location unavailable")},
+                            ${escapeHTML(donation.state || "")}
+                        </p>
+
+                        <div class="mt-auto">
+                            <a href="/receiver/donations/${encodeURIComponent(donation.id)}/"
+                               class="btn btn-success w-100">
+                                <i class="bi bi-eye me-1"></i>
+                                View Donation
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+
+
+/* =========================================================
+   RECEIVER: DONATION DETAILS
+   ========================================================= */
+
+async function loadReceiverDonationDetail(donationId) {
+    const container = document.getElementById(
+        "receiverDonationDetail"
+    );
+
+    const message = document.getElementById(
+        "receiverDonationMessage"
+    );
+
+    if (!container) return;
+
+    // Extract ID from /receiver/donations/2/
+    if (!donationId) {
+        const match = window.location.pathname.match(
+            /\/receiver\/donations\/(\d+)\/?$/
+        );
+
+        donationId = match ? match[1] : null;
+    }
+
+    if (!donationId) {
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Donation ID could not be found in the URL.
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-success"></div>
+            <p class="text-muted mt-3">Loading donation details...</p>
+        </div>
+    `;
+
+    try {
+        const response = await apiRequest(
+            `${DONATION_API}${encodeURIComponent(donationId)}/`
+        );
+
+        const donation = response?.data ?? response;
+
+        if (!donation || !donation.id) {
+            throw new Error("Donation details were not found.");
+        }
+
+        const address = [
+            donation.address,
+            donation.city,
+            donation.state,
+            donation.pincode
+        ].filter(Boolean).join(", ");
+
+        container.innerHTML = `
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="d-flex justify-content-between
+                                align-items-start flex-wrap gap-3 mb-4">
+                        <div>
+                            <h2 class="fw-bold text-success">
+                                ${escapeHTML(donation.title || "Food donation")}
+                            </h2>
+                            <p class="text-muted">
+                                Donation ID: ${escapeHTML(donation.id)}
+                            </p>
+                        </div>
+
+                        ${statusBadge(donation.status)}
+                    </div>
+
+                    ${donation.image ? `
+                        <img
+                            src="${escapeHTML(donation.image)}"
+                            alt="${escapeHTML(donation.title || "Food donation")}"
+                            class="img-fluid rounded mb-4"
+                            style="width:100%;max-height:350px;object-fit:cover;">
+                    ` : ""}
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Food Category</h6>
+                            <p>${escapeHTML(donation.food_type || "Other")}</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Quantity</h6>
+                            <p>
+                                ${escapeHTML(donation.quantity ?? "-")}
+                                ${escapeHTML(donation.quantity_unit || "")}
+                            </p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Expiry Date</h6>
+                            <p>${formatDate(donation.expiry_at)}</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Prepared Date</h6>
+                            <p>${formatDate(donation.prepared_at)}</p>
+                        </div>
+
+                        <div class="col-12">
+                            <h6 class="text-muted">Description</h6>
+                            <p>
+                                ${escapeHTML(
+            donation.description ||
+            "No description provided."
+        )}
+                            </p>
+                        </div>
+
+                        <div class="col-12">
+                            <h6 class="text-muted">Pickup Address</h6>
+                            <p>${escapeHTML(address || "Address unavailable")}</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Pickup Starts</h6>
+                            <p>${formatDate(donation.pickup_start)}</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Pickup Ends</h6>
+                            <p>${formatDate(donation.pickup_end)}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="/receiver/donations/"
+                           class="btn btn-outline-success">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Back to Available Food
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        `;
+
+        if (message) {
+            message.textContent = "";
+            message.className = "d-none";
+        }
+
+        initializeFoodRequestForm(donation);
+
+    } catch (error) {
+        console.error(
+            "Receiver donation detail error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                ${escapeHTML(
+            error.message ||
+            "Unable to load donation details."
+        )}
+            </div>
+        `;
+    }
+}
+
+
+
+/* =========================================================
+   RECEIVER: SUBMIT FOOD REQUEST
+   ========================================================= */
+
+function initializeFoodRequestForm(donation) {
+    const form = document.getElementById("foodRequestForm");
+
+    if (!form || form.dataset.initialized === "true") {
+        return;
+    }
+
+    form.dataset.initialized = "true";
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const messageBox = document.getElementById(
+            "receiverDonationMessage"
+        );
+
+        const submitButton = document.getElementById(
+            "submitFoodRequest"
+        );
+
+        const quantityInput = document.getElementById(
+            "requested_quantity"
+        );
+
+        const requestedQuantity = Number(quantityInput.value);
+
+        if (
+            !Number.isFinite(requestedQuantity) ||
+            requestedQuantity <= 0
+        ) {
+            showReceiverRequestMessage(
+                "Enter a quantity greater than zero.",
+                "danger"
+            );
+            return;
+        }
+
+        if (requestedQuantity > Number(donation.quantity)) {
+            showReceiverRequestMessage(
+                "Requested quantity cannot exceed the available quantity.",
+                "danger"
+            );
+            return;
+        }
+
+        setButtonLoading(submitButton, true, "Submitting...");
+
+        try {
+            const payload = {
+                donation: donation.id,
+                requested_quantity: requestedQuantity,
+                message: document.getElementById(
+                    "request_message"
+                ).value.trim()
+            };
+
+            const response = await apiRequest(REQUEST_API, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+
+            showReceiverRequestMessage(
+                response.message || "Food request submitted successfully!",
+                "success"
+            );
+
+            form.reset();
+
+            // Prevent another request from this page after success.
+            form.innerHTML = `
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Your request has been submitted.
+                    You can check its status in My Requests.
+                </div>
+            `;
+
+        } catch (error) {
+            console.error("Food request error:", error);
+
+            showReceiverRequestMessage(
+                error.message || "Unable to submit your food request.",
+                "danger"
+            );
+
+        } finally {
+            if (submitButton && submitButton.isConnected) {
+                setButtonLoading(submitButton, false);
+            }
+        }
+    });
+}
+
+function showReceiverRequestMessage(message, type = "info") {
+    const container = document.getElementById(
+        "receiverDonationMessage"
+    );
+
+    if (!container) {
+        alert(message);
+        return;
+    }
+
+    container.textContent = message;
+    container.className = `alert alert-${type}`;
+    container.classList.remove("d-none");
+
+    container.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest"
+    });
+}
+

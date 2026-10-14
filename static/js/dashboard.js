@@ -1,5 +1,69 @@
 console.log('Dashboard JS loaded');
 
+// =========================================================
+// FOODSHARE API REQUEST HELPER
+// =========================================================
+
+async function apiRequest(endpoint, options = {}) {
+    const token =
+        localStorage.getItem("access_token") ||
+        sessionStorage.getItem("access_token");
+
+    const apiUrl = endpoint.startsWith("/api/v1/")
+        ? endpoint
+        : `/api/v1${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+
+    const headers = {
+        Accept: "application/json",
+        ...options.headers
+    };
+
+    if (!(options.body instanceof FormData)) {
+        headers["Content-Type"] = "application/json";
+    }
+
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(apiUrl, {
+        ...options,
+        headers
+    });
+
+    let data = {};
+
+    try {
+        data = await response.json();
+    } catch {
+        data = {};
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail ||
+            data.message ||
+            `API request failed (${response.status})`
+        );
+    }
+
+    return data;
+}
+
+
+// function escapeHTML(value) {
+//     return String(value ?? "").replace(/[&<>"']/g, function (char) {
+//         const entities = {
+//             "&": "&amp;",
+//             "<": "&lt;",
+//             ">": "&gt;",
+//             '"': "&quot;",
+//             "'": "&#39;"
+//         };
+
+//         return entities[char];
+//     });
+// }
 
 /* =========================================================
    DASHBOARD MANAGEMENT
@@ -9,106 +73,228 @@ console.log('Dashboard JS loaded');
 "use strict";
 
 
+// function escapeHTML(value) {
+//     return String(value ?? "").replace(/[&<>"']/g, function (char) {
+//         const entities = {
+//             "&": "&amp;",
+//             "<": "&lt;",
+//             ">": "&gt;",
+//             '"': "&quot;",
+//             "'": "&#39;"
+//         };
+
+//         return entities[char];
+//     });
+// }
+
+
 /* =========================================================
    DONOR DASHBOARD
    ========================================================= */
 
+// =========================================================
+// DONOR DASHBOARD
+// =========================================================
+
 async function loadDonorDashboard() {
+    const tableBody = document.getElementById("recentDonations");
+
+    if (!tableBody) {
+        console.error("Donor dashboard: #recentDonations was not found.");
+        return;
+    }
+
+    // Show loading state while fetching donations.
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="6" class="text-center py-4">
+                Loading donations...
+            </td>
+        </tr>
+    `;
 
     try {
+        // Fetch donations from the existing API.
+        const response = await apiRequest("/donations/");
 
-        const data =
-            await apiRequest(
-                "/dashboard/donor/"
+        console.log("Donor dashboard API response:", response);
+
+        // Support common Django REST Framework response formats.
+        let allDonations = [];
+
+        if (Array.isArray(response)) {
+            allDonations = response;
+        } else if (Array.isArray(response.results)) {
+            allDonations = response.results;
+        } else if (Array.isArray(response.donations)) {
+            allDonations = response.donations;
+        } else if (Array.isArray(response.data)) {
+            allDonations = response.data;
+        }
+
+        // Read the logged-in user's information.
+        let user = {};
+
+        try {
+            user = JSON.parse(
+                localStorage.getItem("user") ||
+                sessionStorage.getItem("user") ||
+                "{}"
             );
+        } catch (error) {
+            console.error("Unable to read logged-in user:", error);
+        }
 
+        const userId = user.id == null
+            ? ""
+            : String(user.id);
 
-        setText(
-            "donorTotalDonations",
-            data.total_donations ?? 0
-        );
+        // Match donations to the logged-in donor.
+        // The API may return donor as an ID or a nested object.
+        const myDonations = allDonations.filter(donation => {
+            const donor = donation.donor;
 
+            const donorId =
+                donation.donor_id ??
+                (donor && typeof donor === "object"
+                    ? donor.id
+                    : donor);
 
-        setText(
-            "donorAvailableDonations",
-            data.available_donations ?? 0
-        );
+            // If the API provides no donor ID, do not silently
+            // discard the donation. The backend may already
+            // return only the current donor's donations.
+            if (donorId == null || donorId === "") {
+                return true;
+            }
 
+            return String(donorId) === userId;
+        });
 
-        setText(
-            "donorCompletedDonations",
-            data.completed_donations ?? 0
-        );
+        // Calculate dashboard statistics from the matched donations.
+        const total = myDonations.length;
 
+        const available = myDonations.filter(donation =>
+            String(donation.status || "").toUpperCase() === "AVAILABLE"
+        ).length;
 
-        setText(
-            "donorPendingRequests",
-            data.pending_requests ?? 0
-        );
+        const requested = myDonations.filter(donation =>
+            ["REQUESTED", "PENDING", "APPROVED"].includes(
+                String(donation.status || "").toUpperCase()
+            )
+        ).length;
 
+        const completed = myDonations.filter(donation =>
+            String(donation.status || "").toUpperCase() === "COMPLETED"
+        ).length;
 
-        renderRecentDonations(
-            data.recent_donations || []
-        );
+        // Update dashboard counters.
+        setText("donorTotalDonations", total);
+        setText("donorAvailableDonations", available);
+        setText("donorRequestedDonations", requested);
+        setText("donorCompletedDonations", completed);
+
+        // Sort newest first and show the five most recent.
+        const recentDonations = [...myDonations]
+            .sort((a, b) =>
+                new Date(b.created_at || 0) -
+                new Date(a.created_at || 0)
+            )
+            .slice(0, 5);
+
+        renderRecentDonations(recentDonations);
 
     } catch (error) {
+        console.error("Donor dashboard loading error:", error);
 
-        console.error(
-            "Donor dashboard error:",
-            error
-        );
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    class="text-center text-danger py-4">
+                    Unable to load donations.
+                    Please refresh the page and try again.
+                </td>
+            </tr>
+        `;
     }
 }
+
+function formatDate(dateValue) {
+    if (!dateValue) {
+        return "N/A";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return "N/A";
+    }
+
+    return date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+    });
+}
+
 
 
 /* =========================================================
    RECEIVER DASHBOARD
    ========================================================= */
 
+
+
+
 async function loadReceiverDashboard() {
+    // Load receiver statistics.
+    try {
+        const data = await apiRequest("/dashboard/receiver/");
+
+        setText("receiverTotalRequests", data.total_requests ?? 0);
+        setText("receiverPendingRequests", data.pending_requests ?? 0);
+        setText("receiverCompletedRequests", data.completed_requests ?? 0);
+    } catch (error) {
+        console.error("Receiver statistics error:", error);
+    }
+
+    // Load available food donations.
+    const container = document.getElementById("availableFoodContainer");
+
+    if (!container) {
+        console.error("availableFoodContainer was not found.");
+        return;
+    }
 
     try {
+        // Load donations without the status query parameter.
+        const response = await apiRequest("/donations/");
 
-        const data =
-            await apiRequest(
-                "/dashboard/receiver/"
-            );
+        console.log("Donations API response:", response);
 
+        const allDonations = Array.isArray(response)
+            ? response
+            : response.results || response.donations || [];
 
-        setText(
-            "receiverAvailableFood",
-            data.available_food ?? 0
+        // Display only donations that are available.
+        const donations = allDonations.filter(
+            donation =>
+                String(donation.status || "").toUpperCase() === "AVAILABLE"
         );
 
-
-        setText(
-            "receiverTotalRequests",
-            data.total_requests ?? 0
-        );
-
-
-        setText(
-            "receiverPendingRequests",
-            data.pending_requests ?? 0
-        );
-
-
-        setText(
-            "receiverCompletedRequests",
-            data.completed_requests ?? 0
-        );
-
-
-        renderAvailableDonations(
-            data.available_donations || []
-        );
+        setText("receiverAvailableFood", donations.length);
+        renderAvailableDonations(donations);
 
     } catch (error) {
+        console.error("Available donations error:", error);
 
-        console.error(
-            "Receiver dashboard error:",
-            error
-        );
+        container.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    Could not load available food.
+                    Please check the browser console for the API error.
+                </div>
+            </div>
+        `;
     }
 }
 
@@ -174,219 +360,238 @@ async function loadAdminDashboard() {
    SET TEXT HELPER
    ========================================================= */
 
-function setText(
-    elementId,
-    value
-) {
 
-    const element =
-        document.getElementById(
-            elementId
-        );
+/* =========================================================
+   SET TEXT HELPER — DONOR, RECEIVER AND ADMIN
+   ========================================================= */
 
+function setText(elementId, value) {
+    const idAliases = {
+        totalDonations: [
+            "totalDonations",
+            "donorTotalDonations"
+        ],
+        donorTotalDonations: [
+            "totalDonations",
+            "donorTotalDonations"
+        ],
 
-    if (element) {
+        availableDonations: [
+            "availableDonations",
+            "donorAvailableDonations"
+        ],
+        donorAvailableDonations: [
+            "availableDonations",
+            "donorAvailableDonations"
+        ],
 
-        element.textContent =
-            value;
-    }
+        requestedDonations: [
+            "requestedDonations",
+            "donorRequestedDonations"
+        ],
+        donorRequestedDonations: [
+            "requestedDonations",
+            "donorRequestedDonations"
+        ],
+
+        completedDonations: [
+            "completedDonations",
+            "donorCompletedDonations"
+        ],
+        donorCompletedDonations: [
+            "completedDonations",
+            "donorCompletedDonations"
+        ]
+    };
+
+    const ids = idAliases[elementId] || [elementId];
+
+    ids.forEach(id => {
+        const element = document.getElementById(id);
+
+        if (element) {
+            element.textContent = String(value ?? 0);
+        }
+    });
 }
+
 
 
 /* =========================================================
    RECENT DONATIONS
    ========================================================= */
 
-function renderRecentDonations(
-    donations
-) {
-
-    const container =
-        document.getElementById(
-            "recentDonations"
-        );
-
+function renderRecentDonations(donations) {
+    const container = document.getElementById("recentDonations");
 
     if (!container) {
+        console.error("Dashboard element #recentDonations was not found.");
         return;
     }
 
-
-    if (!donations.length) {
-
+    if (!Array.isArray(donations) || donations.length === 0) {
         container.innerHTML = `
-            <div class="text-center
-                        text-muted
-                        py-4">
-
-                No recent donations.
-
-            </div>
+            <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                    No recent donations found.
+                </td>
+            </tr>
         `;
-
         return;
     }
 
-
-    container.innerHTML =
-        donations.map(
-            donation => `
-
-            <div class="d-flex
-                        justify-content-between
-                        align-items-center
-                        border-bottom
-                        py-3">
-
-                <div>
-
-                    <h6 class="mb-1">
-                        ${escapeHTML(
-                            donation.food_name ||
-                            donation.title ||
-                            "-"
-                        )}
-                    </h6>
-
-                    <small class="text-muted">
-                        ${formatDate(
-                            donation.created_at
-                        )}
-                    </small>
-
-                </div>
-
-
-                <div>
-
-                    ${statusBadge(
-                        donation.status
-                    )}
-
-                </div>
-
-            </div>
-        `
-        ).join("");
+    container.innerHTML = donations.map(donation => `
+        <tr>
+            <td>${escapeHTML(donation.title || donation.food_name || "-")}</td>
+            <td>${escapeHTML(donation.food_type || donation.category || "-")}</td>
+            <td>${escapeHTML(String(donation.quantity ?? "-"))}</td>
+            <td>${statusBadge(donation.status)}</td>
+            <td>${escapeHTML(formatDate(donation.created_at))}</td>
+            <td>
+                <a href="/donor/donations/${encodeURIComponent(donation.id)}/"
+                   class="btn btn-sm btn-outline-success">
+                    View
+                </a>
+            </td>
+        </tr>
+    `).join("");
 }
 
 
+
+function escapeHTML(value) {
+    const entities = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    };
+
+    return String(value ?? "").replace(/[&<>"']/g, function (char) {
+        return entities[char];
+    });
+}
+
+function statusBadge(status) {
+    const normalizedStatus = String(status || "UNKNOWN").toUpperCase();
+
+    const statusClasses = {
+        AVAILABLE: "bg-success",
+        PENDING: "bg-warning text-dark",
+        REQUESTED: "bg-warning text-dark",
+        APPROVED: "bg-primary",
+        COMPLETED: "bg-secondary",
+        REJECTED: "bg-danger",
+        CANCELLED: "bg-dark",
+        EXPIRED: "bg-secondary"
+    };
+
+    const badgeClass = statusClasses[normalizedStatus] || "bg-secondary";
+
+    return `
+        <span class="badge ${badgeClass}">
+            ${escapeHTML(normalizedStatus)}
+        </span>
+    `;
+}
 /* =========================================================
    AVAILABLE DONATIONS
    ========================================================= */
 
-function renderAvailableDonations(
-    donations
-) {
 
-    const container =
-        document.getElementById(
-            "availableDonations"
-        );
-
+function renderAvailableDonations(donations) {
+    const container = document.getElementById("availableFoodContainer");
 
     if (!container) {
         return;
     }
 
-
-    if (!donations.length) {
-
+    if (!donations || donations.length === 0) {
         container.innerHTML = `
-            <div class="text-center
-                        text-muted
-                        py-4">
-
+            <div class="col-12 text-center text-muted py-4">
                 No food donations currently available.
-
             </div>
         `;
-
         return;
     }
 
+    container.innerHTML = donations.map(donation => {
+        const title = donation.title || donation.food_name || "-";
+        const category = donation.food_type || donation.category || "-";
+        const quantity = donation.quantity ?? "-";
 
-    container.innerHTML =
-        donations.map(
-            donation => `
+        const imageHtml = donation.image
+            ? `
+                <img
+                    src="${escapeHTML(donation.image)}"
+                    class="card-img-top"
+                    style="height: 180px; object-fit: cover;"
+                    alt="Food donation"
+                >
+            `
+            : "";
 
+        return `
             <div class="col-md-6 col-xl-4 mb-4">
-
-                <div class="card
-                            h-100
-                            border-0
-                            shadow-sm">
-
-                    ${
-                        donation.image
-                        ?
-
-                        `<img
-                            src="${escapeHTML(donation.image)}"
-                            class="card-img-top"
-                            style="height:180px;
-                                   object-fit:cover;"
-                            alt="Food donation">`
-
-                        :
-
-                        ""
-                    }
-
+                <div class="card h-100 border-0 shadow-sm">
+                    ${imageHtml}
 
                     <div class="card-body">
-
                         <h5 class="card-title">
-
-                            ${escapeHTML(
-                                donation.food_name ||
-                                donation.title ||
-                                "-"
-                            )}
-
+                            ${escapeHTML(title)}
                         </h5>
 
-
                         <p class="text-muted mb-2">
-
-                            Category:
-                            ${escapeHTML(
-                                donation.category ||
-                                "-"
-                            )}
-
+                            Category: ${escapeHTML(category)}
                         </p>
 
+                        <p class="mb-2">
+                            Quantity:
+                            <strong>${escapeHTML(String(quantity))}</strong>
+                            ${escapeHTML(donation.quantity_unit || "")}
+                        </p>
 
                         <p class="mb-3">
-
-                            Quantity:
-                            <strong>
-                                ${escapeHTML(
-                                    donation.quantity ||
-                                    "-"
-                                )}
-                            </strong>
-
+                            <i class="bi bi-calendar-event me-1"></i>
+                            <strong>Expires:</strong>
+                            ${escapeHTML(
+            donation.expiry_at
+                ? formatDate(donation.expiry_at)
+                : donation.expiry_date
+                    ? formatDate(donation.expiry_date)
+                    : "Not specified"
+        )}
                         </p>
 
-
                         <a
-                            href="/receiver/donations/${donation.id}/"
+                            href="/receiver/donations/${encodeURIComponent(donation.id)}/"
                             class="btn btn-success w-100">
-
+                            <i class="bi bi-eye me-1"></i>
                             View Donation
-
                         </a>
-
                     </div>
-
                 </div>
-
             </div>
-        `
-        ).join("");
+        `;
+    }).join("");
 }
+
+
+
+// function escapeHTML(value) {
+//     return String(value ?? "").replace(/[&<>"']/g, function (char) {
+//         const entities = {
+//             "&": "&amp;",
+//             "<": "&lt;",
+//             ">": "&gt;",
+//             '"': "&quot;",
+//             "'": "&#39;"
+//         };
+
+//         return entities[char];
+//     });
+// }
 
 
 /* =========================================================
@@ -1082,48 +1287,48 @@ async function loadAdminUsers() {
                     <td>
                         <strong>
                             ${escapeHTML(
-                                user.username ||
-                                user.name ||
-                                "-"
-                            )}
+                    user.username ||
+                    user.name ||
+                    "-"
+                )}
                         </strong>
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            user.email ||
-                            "-"
-                        )}
+                    user.email ||
+                    "-"
+                )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            user.phone ||
-                            user.phone_no ||
-                            "-"
-                        )}
+                    user.phone ||
+                    user.phone_no ||
+                    "-"
+                )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            user.role ||
-                            "-"
-                        )}
+                    user.role ||
+                    "-"
+                )}
                     </td>
 
                     <td>
                         ${statusBadge(
-                            user.is_active
-                            ? "active"
-                            : "inactive"
-                        )}
+                    user.is_active
+                        ? "active"
+                        : "inactive"
+                )}
                     </td>
 
                     <td>
                         ${formatDate(
-                            user.date_joined ||
-                            user.created_at
-                        )}
+                    user.date_joined ||
+                    user.created_at
+                )}
                     </td>
 
                     <td>
@@ -1193,10 +1398,10 @@ async function viewUser(
 
                 <p>
                     ${escapeHTML(
-                        user.username ||
-                        user.name ||
-                        "-"
-                    )}
+            user.username ||
+            user.name ||
+            "-"
+        )}
                 </p>
 
             </div>
@@ -1208,9 +1413,9 @@ async function viewUser(
 
                 <p>
                     ${escapeHTML(
-                        user.email ||
-                        "-"
-                    )}
+            user.email ||
+            "-"
+        )}
                 </p>
 
             </div>
@@ -1222,9 +1427,9 @@ async function viewUser(
 
                 <p>
                     ${escapeHTML(
-                        user.role ||
-                        "-"
-                    )}
+            user.role ||
+            "-"
+        )}
                 </p>
 
             </div>
@@ -1236,10 +1441,10 @@ async function viewUser(
 
                 <p>
                     ${statusBadge(
-                        user.is_active
-                        ? "active"
-                        : "inactive"
-                    )}
+            user.is_active
+                ? "active"
+                : "inactive"
+        )}
                 </p>
 
             </div>
@@ -1424,58 +1629,58 @@ async function loadAdminDonations() {
         table.innerHTML =
             donations.length
 
-            ?
+                ?
 
-            donations.map(
-                donation => `
+                donations.map(
+                    donation => `
 
                 <tr>
 
                     <td>
                         ${escapeHTML(
-                            donation.food_name ||
-                            donation.title ||
-                            "-"
-                        )}
+                        donation.food_name ||
+                        donation.title ||
+                        "-"
+                    )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            donation.donor_name ||
-                            "-"
-                        )}
+                        donation.donor_name ||
+                        "-"
+                    )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            donation.quantity ||
-                            "-"
-                        )}
+                        donation.quantity ||
+                        "-"
+                    )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            donation.category ||
-                            "-"
-                        )}
+                        donation.category ||
+                        "-"
+                    )}
                     </td>
 
                     <td>
                         ${formatDate(
-                            donation.expiry_date
-                        )}
+                        donation.expiry_date
+                    )}
                     </td>
 
                     <td>
                         ${statusBadge(
-                            donation.status
-                        )}
+                        donation.status
+                    )}
                     </td>
 
                     <td>
                         ${formatDate(
-                            donation.created_at
-                        )}
+                        donation.created_at
+                    )}
                     </td>
 
                     <td>
@@ -1491,11 +1696,11 @@ async function loadAdminDonations() {
 
                 </tr>
             `
-            ).join("")
+                ).join("")
 
-            :
+                :
 
-            `
+                `
             <tr>
 
                 <td colspan="8"
@@ -1660,57 +1865,56 @@ async function loadAdminRequests() {
         table.innerHTML =
             requests.length
 
-            ?
+                ?
 
-            requests.map(
-                request => `
+                requests.map(
+                    request => `
 
                 <tr>
 
                     <td>
                         ${escapeHTML(
-                            request.receiver_name ||
-                            "-"
-                        )}
+                        request.receiver_name ||
+                        "-"
+                    )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            request.food_name ||
-                            "-"
-                        )}
+                        request.food_name ||
+                        "-"
+                    )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            request.quantity ||
-                            "-"
-                        )}
+                        request.quantity ||
+                        "-"
+                    )}
                     </td>
 
                     <td>
                         ${escapeHTML(
-                            request.donor_name ||
-                            "-"
-                        )}
+                        request.donor_name ||
+                        "-"
+                    )}
                     </td>
 
                     <td>
                         ${statusBadge(
-                            request.status
-                        )}
+                        request.status
+                    )}
                     </td>
 
                     <td>
                         ${formatDateTime(
-                            request.created_at
-                        )}
+                        request.created_at
+                    )}
                     </td>
 
                     <td>
 
-                        ${
-                            request.status === "pending"
+                        ${request.status === "pending"
 
                             ?
 
@@ -1741,11 +1945,11 @@ async function loadAdminRequests() {
 
                 </tr>
             `
-            ).join("")
+                ).join("")
 
-            :
+                :
 
-            `
+                `
             <tr>
 
                 <td colspan="7"
@@ -1812,36 +2016,41 @@ function debounce(
    DOM READY
    ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Dashboard JS loaded - updated version");
 
-        /*
-         * Donor dashboard
-         */
-
-        if (
-            document.getElementById(
-                "donorTotalDonations"
-            )
-        ) {
-
-            loadDonorDashboard();
-        }
-
-
-        /*
-         * Receiver dashboard
-         */
-
-        if (
-            document.getElementById(
-                "receiverAvailableFood"
-            )
-        ) {
-
-            loadReceiverDashboard();
-        }
-
+    // Donor dashboard
+    if (document.getElementById("recentDonations")) {
+        loadDonorDashboard();
     }
-);
+
+    // Receiver dashboard
+    if (document.getElementById("availableFoodContainer")) {
+        loadReceiverDashboard();
+    }
+
+    // Admin dashboard
+    if (document.getElementById("adminTotalUsers")) {
+        loadAdminDashboard();
+    }
+
+    // Admin report page
+    if (document.getElementById("generateReportBtn")) {
+        initializeAdminReports();
+    }
+
+    // Admin users page
+    if (document.getElementById("adminUsersTable")) {
+        initializeAdminUsers();
+    }
+
+    // Admin donations page
+    if (document.getElementById("adminDonationsTable")) {
+        initializeAdminDonations();
+    }
+
+    // Admin requests page
+    if (document.getElementById("adminRequestsTable")) {
+        initializeAdminRequests();
+    }
+});
