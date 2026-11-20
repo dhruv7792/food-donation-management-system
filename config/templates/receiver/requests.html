@@ -4,241 +4,128 @@
 {% block title %}My Requests | FoodShare{% endblock %}
 
 {% block content %}
-
 <div class="container-fluid py-4">
 
     <div class="mb-4">
-
-        <h2 class="fw-bold mb-1">
-            My Requests
-        </h2>
-
-        <p class="text-muted">
-            Track your food donation requests.
-        </p>
-
+        <h2 class="fw-bold mb-1">My Requests</h2>
+        <p class="text-muted">Track your food donation requests.</p>
     </div>
 
-
-    <div id="receiverRequestMessage"></div>
-
+    <div id="receiverRequestMessage" class="d-none"></div>
 
     <!-- Statistics -->
-
     <div class="row g-4 mb-4">
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Total Requests
-                    </p>
-
-                    <h3 class="fw-bold"
-                        id="receiverTotalRequests">
-                        0
-                    </h3>
-
+                    <p class="text-muted mb-1">Total Requests</p>
+                    <h3 class="fw-bold" id="receiverTotalRequests">0</h3>
                 </div>
-
             </div>
-
         </div>
 
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Pending
-                    </p>
-
+                    <p class="text-muted mb-1">Pending</p>
                     <h3 class="fw-bold text-warning"
-                        id="receiverPendingRequests">
-                        0
-                    </h3>
-
+                        id="receiverPendingRequests">0</h3>
                 </div>
-
             </div>
-
         </div>
 
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Approved
-                    </p>
-
+                    <p class="text-muted mb-1">Approved</p>
                     <h3 class="fw-bold text-success"
-                        id="receiverApprovedRequests">
-                        0
-                    </h3>
-
+                        id="receiverApprovedRequests">0</h3>
                 </div>
-
             </div>
-
         </div>
-
 
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Rejected
-                    </p>
-
+                    <p class="text-muted mb-1">Rejected</p>
                     <h3 class="fw-bold text-danger"
-                        id="receiverRejectedRequests">
-                        0
-                    </h3>
-
+                        id="receiverRejectedRequests">0</h3>
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- Filter -->
-
+    <!-- Status Filter -->
     <div class="card border-0 shadow-sm mb-4">
-
         <div class="card-body">
+            <label for="receiverRequestStatus"
+                   class="form-label fw-semibold">
+                Request Status
+            </label>
 
-            <div class="row">
-
-                <div class="col-md-4">
-
-                    <label class="form-label fw-semibold">
-                        Request Status
-                    </label>
-
-                    <select
-                        class="form-select"
-                        id="receiverRequestStatus"
-                    >
-
-                        <option value="">
-                            All Requests
-                        </option>
-
-                        <option value="pending">
-                            Pending
-                        </option>
-
-                        <option value="approved">
-                            Approved
-                        </option>
-
-                        <option value="rejected">
-                            Rejected
-                        </option>
-
-                        <option value="cancelled">
-                            Cancelled
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
+            <select class="form-select" id="receiverRequestStatus">
+                <option value="">All Requests</option>
+                <option value="PENDING">Pending</option>
+                <option value="ACCEPTED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+                <option value="CANCELLED">Cancelled</option>
+                <option value="COMPLETED">Completed</option>
+            </select>
         </div>
-
     </div>
-
 
     <!-- Request Table -->
-
     <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="fw-bold mb-0">My Food Requests</h5>
+        </div>
 
         <div class="card-body">
-
             <div class="table-responsive">
-
                 <table class="table table-hover align-middle">
-
                     <thead>
-
                         <tr>
-
                             <th>Food</th>
                             <th>Donor</th>
                             <th>Quantity</th>
                             <th>Status</th>
                             <th>Requested On</th>
                             <th>Action</th>
-
                         </tr>
-
                     </thead>
 
-
                     <tbody id="receiverRequestTable">
-
                         <tr>
-
-                            <td
-                                colspan="6"
-                                class="text-center py-5 text-muted"
-                            >
-
-                                <div
-                                    class="spinner-border spinner-border-sm text-success">
-                                </div>
-
+                            <td colspan="6"
+                                class="text-center py-5 text-muted">
+                                <span class="spinner-border spinner-border-sm text-success"></span>
                                 Loading requests...
-
                             </td>
-
                         </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
-
         </div>
+    </div>
 
+    <div class="text-end mt-4">
+        <a href="{% url 'receiver-pickups' %}"
+           class="btn btn-outline-success">
+            <i class="bi bi-box-seam me-2"></i>
+            View My Pickups
+        </a>
     </div>
 
 </div>
-
 {% endblock %}
 
-
 {% block extra_js %}
-
 <script src="{% static 'js/request.js' %}"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
     if (typeof initializeReceiverRequests === "function") {
         initializeReceiverRequests();
     }
-
 });
 </script>
-
 {% endblock %}

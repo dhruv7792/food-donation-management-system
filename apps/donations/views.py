@@ -10,11 +10,24 @@ from .models import Donation
 from .permissions import IsDonor, IsDonationOwner
 from .serializers import DonationSerializer
 
+def expire_outdated_donations():
+    now = timezone.now()
 
+    Donation.objects.filter(
+        expiry_at__lte=now,
+    ).exclude(
+        status__in=[
+            Donation.Status.EXPIRED,
+            Donation.Status.COMPLETED,
+            Donation.Status.CANCELLED,
+        ],
+    ).update(
+        status=Donation.Status.EXPIRED,
+        updated_at=now,
+    )
+    
 class DonationViewSet(viewsets.ModelViewSet):
-
     serializer_class = DonationSerializer
-
     filterset_class = DonationFilter
 
     search_fields = [
@@ -31,17 +44,10 @@ class DonationViewSet(viewsets.ModelViewSet):
     ]
 
     def get_queryset(self):
-
-        queryset = Donation.objects.select_related(
-            "donor"
-        )
-
-        return queryset
+        return Donation.objects.select_related("donor")
 
     def get_permissions(self):
-
         if self.action == "create":
-
             return [
                 IsAuthenticated(),
                 IsDonor(),
@@ -53,24 +59,17 @@ class DonationViewSet(viewsets.ModelViewSet):
             "destroy",
             "cancel",
         ]:
-
             return [
                 IsAuthenticated(),
                 IsDonationOwner(),
             ]
 
-        return [
-            IsAuthenticated()
-        ]
+        return [IsAuthenticated()]
 
     def perform_create(self, serializer):
-
-        serializer.save(
-            donor=self.request.user
-        )
+        serializer.save(donor=self.request.user)
 
     def perform_update(self, serializer):
-
         serializer.save()
 
     @action(
@@ -79,31 +78,24 @@ class DonationViewSet(viewsets.ModelViewSet):
         url_path="available",
     )
     def available(self, request):
-
+        """
+        Return only donations that are AVAILABLE
+        and have not expired.
+        """
         donations = self.get_queryset().filter(
             status=Donation.Status.AVAILABLE,
             expiry_at__gt=timezone.now(),
         )
 
-        page = self.paginate_queryset(
-            donations
-        )
+        donations = self.filter_queryset(donations)
+
+        page = self.paginate_queryset(donations)
 
         if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
-            serializer = self.get_serializer(
-                page,
-                many=True,
-            )
-
-            return self.get_paginated_response(
-                serializer.data
-            )
-
-        serializer = self.get_serializer(
-            donations,
-            many=True,
-        )
+        serializer = self.get_serializer(donations, many=True)
 
         return Response({
             "success": True,
@@ -116,15 +108,22 @@ class DonationViewSet(viewsets.ModelViewSet):
         url_path="my",
     )
     def my_donations(self, request):
-
+        """
+        Return donations belonging to the logged-in user.
+        """
         donations = self.get_queryset().filter(
             donor=request.user
         )
 
-        serializer = self.get_serializer(
-            donations,
-            many=True,
-        )
+        donations = self.filter_queryset(donations)
+
+        page = self.paginate_queryset(donations)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(donations, many=True)
 
         return Response({
             "success": True,
@@ -137,25 +136,24 @@ class DonationViewSet(viewsets.ModelViewSet):
         url_path="cancel",
     )
     def cancel(self, request, pk=None):
-
+        """
+        Allow the donation owner to cancel an eligible donation.
+        """
         donation = self.get_object()
 
         if donation.status not in [
             Donation.Status.AVAILABLE,
             Donation.Status.REQUESTED,
         ]:
-
             return Response(
                 {
                     "success": False,
-                    "message":
-                        "This donation cannot be cancelled."
+                    "message": "This donation cannot be cancelled.",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         donation.status = Donation.Status.CANCELLED
-
         donation.save(
             update_fields=[
                 "status",

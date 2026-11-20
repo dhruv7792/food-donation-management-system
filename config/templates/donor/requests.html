@@ -125,6 +125,92 @@
     </div>
 
 
+<section class="card shadow-sm my-4">
+    <div class="card-body">
+        <h4 class="card-title">Schedule Food Pickup</h4>
+        <p class="text-muted">
+            Schedule collection for an accepted food request.
+        </p>
+
+        <div id="pickupMessage" class="alert d-none" role="alert"></div>
+
+        <form id="schedulePickupForm">
+            <div class="mb-3">
+                <label for="food_request" class="form-label">
+                    Accepted Request ID
+                </label>
+                <input
+                    type="number"
+                    id="food_request"
+                    name="food_request"
+                    class="form-control"
+                    min="1"
+                    required
+                >
+                <small class="text-muted">
+                    Enter the ID of an accepted request assigned to your donation.
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <label for="pickup_date" class="form-label">
+                    Pickup Date
+                </label>
+                <input
+                    type="date"
+                    id="pickup_date"
+                    name="pickup_date"
+                    class="form-control"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="pickup_time" class="form-label">
+                    Pickup Time
+                </label>
+                <input
+                    type="time"
+                    id="pickup_time"
+                    name="pickup_time"
+                    class="form-control"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="volunteer_name" class="form-label">
+                    Volunteer Name (Optional)
+                </label>
+                <input
+                    type="text"
+                    id="volunteer_name"
+                    name="volunteer_name"
+                    class="form-control"
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="volunteer_phone" class="form-label">
+                    Volunteer Phone (Optional)
+                </label>
+                <input
+                    type="tel"
+                    id="volunteer_phone"
+                    name="volunteer_phone"
+                    class="form-control"
+                >
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-calendar-check"></i>
+                Schedule Pickup
+            </button>
+        </form>
+    </div>
+</section>
+
+
     <!-- Requests -->
 
     <div class="card border-0 shadow-sm">
@@ -227,7 +313,7 @@
 {% block extra_js %}
 
 <script src="{% static 'js/request.js' %}"></script>
-
+<script src="/static/js/pickup.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 

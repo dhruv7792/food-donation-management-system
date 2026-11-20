@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% load static %}
 
@@ -15,11 +14,13 @@
         </a>
     </div>
 
-    <div id="detailMessage"></div>
+    <div id="detailMessage" class="d-none" role="alert"></div>
 
     <div id="donationDetails">
         <div class="text-center py-5">
-            <div class="spinner-border text-success"></div>
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
             <p class="text-muted mt-3">Loading donation...</p>
         </div>
     </div>
@@ -33,9 +34,9 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const match = window.location.pathname.match(/\/donations\/(\d+)\/?$/);
+    const container = document.getElementById("donationDetails");
 
     if (!match) {
-        const container = document.getElementById("donationDetails");
         if (container) {
             container.innerHTML =
                 '<div class="alert alert-danger">Invalid donation ID.</div>';
@@ -45,6 +46,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (typeof loadDonationDetail === "function") {
         loadDonationDetail(match[1]);
+    } else {
+        console.error("loadDonationDetail() was not found in donation.js.");
+
+        if (container) {
+            container.innerHTML =
+                '<div class="alert alert-danger">Unable to load donation details. Please check donation.js.</div>';
+        }
     }
 });
 </script>

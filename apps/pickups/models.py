@@ -1,14 +1,18 @@
+
 import uuid
+
 from django.db import models
+
 from apps.requests.models import FoodRequest
+
 
 def generate_pickup_code():
     return uuid.uuid4().hex[:8].upper()
 
+
 class Pickup(models.Model):
 
     class Status(models.TextChoices):
-
         SCHEDULED = "SCHEDULED", "Scheduled"
         IN_PROGRESS = "IN_PROGRESS", "In Progress"
         PICKED_UP = "PICKED_UP", "Picked Up"
@@ -24,11 +28,10 @@ class Pickup(models.Model):
     pickup_code = models.CharField(
         max_length=20,
         unique=True,
-        default=lambda: uuid.uuid4().hex[:8].upper(),
+        default=generate_pickup_code,
     )
 
     pickup_date = models.DateField()
-
     pickup_time = models.TimeField()
 
     volunteer_name = models.CharField(
@@ -58,19 +61,12 @@ class Pickup(models.Model):
     )
 
     created_at = models.DateTimeField(
-        auto_now_add=True
+        auto_now_add=True,
     )
 
     updated_at = models.DateTimeField(
-        auto_now=True
+        auto_now=True,
     )
-    pickup_code = models.CharField(
-        max_length=20,
-        unique=True,
-        default=generate_pickup_code,
-    )
-    def __str__(self):
 
-        return (
-            f"Pickup {self.pickup_code}"
-        )
+    def __str__(self):
+        return f"Pickup {self.pickup_code}"

@@ -263,6 +263,20 @@ urlpatterns = [
         ),
         name="admin_reports",
     ),
+
+    path(
+    "donor/pickups/",
+    TemplateView.as_view(
+        template_name="donor/pickups.html"
+    ),
+    name="donor-pickups",
+),
+
+path(
+    "receiver/pickups/",
+    TemplateView.as_view(template_name="receiver/pickups.html"),
+    name="receiver-pickups",
+),
 ]
 
 

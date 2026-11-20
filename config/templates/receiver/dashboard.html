@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -5,188 +6,369 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<style>
+    .receiver-dashboard {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 28px;
+    }
+
+    .receiver-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .receiver-header h1 {
+        font-size: clamp(1.7rem, 3vw, 2.2rem);
+        font-weight: 750;
+        margin-bottom: 8px;
+    }
+
+    .receiver-subtitle {
+        margin: 0;
+        color: var(--gray, #64748b);
+    }
+
+    .receiver-stat-link {
+        display: block;
+        height: 100%;
+        color: inherit;
+        text-decoration: none;
+        border-radius: 16px;
+    }
+
+    .receiver-stat-card {
+        height: 100%;
+        min-height: 155px;
+        padding: 22px;
+        border-radius: 16px;
+        border: 1px solid var(--border, #dee2e6);
+        background: var(--card-bg, #ffffff);
+        box-shadow: var(--shadow, 0 4px 15px rgba(0, 0, 0, .06));
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .receiver-stat-link:hover .receiver-stat-card {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .12);
+    }
+
+    .receiver-stat-link:focus-visible {
+        outline: 3px solid #198754;
+        outline-offset: 4px;
+    }
+
+    .receiver-stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .receiver-stat-label {
+        font-size: .95rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .receiver-stat-icon {
+        width: 46px;
+        height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(25, 135, 84, .12);
+        color: #198754;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .receiver-stat-value {
+        font-size: 2rem;
+        font-weight: 750;
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .receiver-stat-hint {
+        margin: 8px 0 0;
+        font-size: .82rem;
+        color: var(--gray, #6c757d);
+    }
+
+    .receiver-section {
+        margin-top: 30px;
+    }
+
+    .receiver-section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .receiver-action-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 100%;
+        padding: 22px;
+        border: 1px solid var(--border, #dee2e6);
+        border-radius: 14px;
+        background: var(--card-bg, #ffffff);
+        color: inherit;
+        text-decoration: none;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .receiver-action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .09);
+    }
+
+    .receiver-action-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(25, 135, 84, .12);
+        color: #198754;
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+
+    .receiver-action-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 5px;
+    }
+
+    .receiver-action-card p {
+        font-size: .85rem;
+        color: var(--gray, #6c757d);
+        margin: 0;
+    }
+
+    @media (max-width: 576px) {
+        .receiver-dashboard {
+            padding: 20px 12px;
+        }
+
+        .receiver-stat-card {
+            min-height: 130px;
+            padding: 18px;
+        }
+
+        .receiver-stat-value {
+            font-size: 1.8rem;
+        }
+
+        .receiver-header .btn {
+            width: 100%;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
+<div class="container-fluid receiver-dashboard">
 
-<div class="container-fluid py-4">
-
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Dashboard Header -->
+    <header class="receiver-header">
         <div>
-            <h2 class="fw-bold mb-1">Receiver Dashboard</h2>
-            <p class="text-muted mb-0">
-                Welcome back, <span id="receiverName">Receiver</span>
+            <h1>Receiver Dashboard</h1>
+
+            <p class="receiver-subtitle">
+                Welcome back,
+                <span id="receiverName">Receiver</span>!
+                Find food and manage your requests.
             </p>
         </div>
 
         <a href="{% url 'receiver_donations' %}"
-           class="btn btn-success">
+           class="btn btn-success px-4 py-2">
             <i class="bi bi-search me-2"></i>
             Find Food
         </a>
-    </div>
+    </header>
 
+    <!-- Dashboard Messages -->
+    <div id="dashboardMessage"
+         class="d-none"
+         role="alert"
+         aria-live="polite"></div>
 
-    <div id="dashboardMessage"></div>
+<!-- Receiver Dashboard Statistics -->
 
+<div class="row g-3">
 
-    <!-- Statistics -->
-    <div class="row g-4 mb-4">
+    <!-- 1. Available Donations -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <a href="{% url 'receiver_donations' %}"
+           class="receiver-stat-link"
+           aria-label="View available food donations">
 
-        <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
+            <div class="receiver-stat-card">
+                <div class="receiver-stat-top">
+                    <h2 class="receiver-stat-label">
                         Available Donations
-                    </p>
-
-                    <h3 class="fw-bold"
-                        id="receiverAvailableFood">
-                        0
-                    </h3>
-
-                    <span class="text-success">
-                        <i class="bi bi-box-seam me-1"></i>
-                        Available food
+                    </h2>
+                    <span class="receiver-stat-icon">
+                        <i class="bi bi-basket2"></i>
                     </span>
-
                 </div>
+
+                <p class="receiver-stat-value"
+                   id="availableDonations">0</p>
+
+                <p class="receiver-stat-hint">
+                    Browse food available for collection
+                </p>
             </div>
-        </div>
-
-
-        <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        My Requests
-                    </p>
-
-                    <h3 class="fw-bold"
-                        id="receiverTotalRequests">
-                        0
-                    </h3>
-
-                    <span class="text-primary">
-                        <i class="bi bi-send me-1"></i>
-                        Total requests
-                    </span>
-
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Pending Requests
-                    </p>
-
-                    <h3 class="fw-bold text-warning"
-                        id="receiverPendingRequests">
-                        0
-                    </h3>
-
-                    <span class="text-warning">
-                        <i class="bi bi-hourglass-split me-1"></i>
-                        Awaiting response
-                    </span>
-
-                </div>
-            </div>
-        </div>
-
-
-        <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Completed
-                    </p>
-
-                    <h3 class="fw-bold text-success"
-                        id="receiverCompletedRequests">
-                        0
-                    </h3>
-
-                    <span class="text-success">
-                        <i class="bi bi-check-circle me-1"></i>
-                        Food received
-                    </span>
-
-                </div>
-            </div>
-        </div>
-
+        </a>
     </div>
 
+    <!-- 2. My Requests -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <a href="{% url 'receiver_requests' %}"
+           class="receiver-stat-link"
+           aria-label="View my food requests">
 
-    <!-- Available Food -->
-    <div class="card border-0 shadow-sm">
-
-        <div class="card-header bg-white border-0 py-3">
-
-            <div class="d-flex justify-content-between align-items-center">
-
-                <h5 class="fw-bold mb-0">
-                    Available Food
-                </h5>
-
-                <a href="{% url 'receiver_donations' %}"
-                   class="text-success text-decoration-none">
-                    View All
-                    <i class="bi bi-arrow-right"></i>
-                </a>
-
-            </div>
-
-        </div>
-
-
-        <div class="card-body">
-
-            <div class="row g-4"
-                 id="availableFoodContainer">
-
-                <div class="col-12 text-center py-5 text-muted">
-
-                    <div class="spinner-border spinner-border-sm text-success">
-                    </div>
-
-                    Loading available food...
-
+            <div class="receiver-stat-card">
+                <div class="receiver-stat-top">
+                    <h2 class="receiver-stat-label">
+                        My Requests
+                    </h2>
+                    <span class="receiver-stat-icon">
+                        <i class="bi bi-card-checklist"></i>
+                    </span>
                 </div>
 
+                <p class="receiver-stat-value"
+                   id="totalDonations">0</p>
+
+                <p class="receiver-stat-hint">
+                    Total food requests you have made
+                </p>
             </div>
+        </a>
+    </div>
 
-        </div>
+    <!-- 3. Pending Requests -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <a href="{% url 'receiver_requests' %}"
+           class="receiver-stat-link"
+           aria-label="View pending food requests">
 
+            <div class="receiver-stat-card">
+                <div class="receiver-stat-top">
+                    <h2 class="receiver-stat-label">
+                        Pending Requests
+                    </h2>
+                    <span class="receiver-stat-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </span>
+                </div>
+
+                <p class="receiver-stat-value"
+                   id="requestedDonations">0</p>
+
+                <p class="receiver-stat-hint">
+                    Requests waiting for a response
+                </p>
+            </div>
+        </a>
+    </div>
+
+    <!-- 4. Completed Requests -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <a href="{% url 'receiver_history' %}"
+           class="receiver-stat-link"
+           aria-label="View completed food requests">
+
+            <div class="receiver-stat-card">
+                <div class="receiver-stat-top">
+                    <h2 class="receiver-stat-label">
+                        Completed Requests
+                    </h2>
+                    <span class="receiver-stat-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </span>
+                </div>
+
+                <p class="receiver-stat-value"
+                   id="completedDonations">0</p>
+
+                <p class="receiver-stat-hint">
+                    Successfully fulfilled requests
+                </p>
+            </div>
+        </a>
     </div>
 
 </div>
 
+
+    <!-- Quick Actions -->
+    <section class="receiver-section" id="my-requests">
+        <h2 class="receiver-section-title">
+            Quick Actions
+        </h2>
+
+        <div class="row g-3">
+
+            <!-- Find Available Food -->
+            <div class="col-12 col-md-6">
+                <a href="{% url 'receiver_donations' %}"
+                   class="receiver-action-card">
+
+                    <span class="receiver-action-icon">
+                        <i class="bi bi-search"></i>
+                    </span>
+
+                    <div>
+                        <h3>Find Available Food</h3>
+                        <p>
+                            Explore food donations in your area.
+                        </p>
+                    </div>
+
+                </a>
+            </div>
+
+            <!-- Request Food -->
+            <div class="col-12 col-md-6">
+                <a href="{% url 'receiver_donations' %}"
+                   class="receiver-action-card">
+
+                    <span class="receiver-action-icon">
+                        <i class="bi bi-heart"></i>
+                    </span>
+
+                    <div>
+                        <h3>Request Food</h3>
+                        <p>
+                            Browse donations and request the food you need.
+                        </p>
+                    </div>
+
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+</div>
 {% endblock %}
 
-
 {% block extra_js %}
-
-<script src="{% static 'js/dashboard.js' %}"></script>
-
-{% comment %} <script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    if (typeof loadReceiverDashboard === "function") {
-        loadReceiverDashboard();
-    }
-
-});
-</script> {% endcomment %}
-
+<script src="{% static 'js/dashboard.js' %}" defer></script>
 {% endblock %}

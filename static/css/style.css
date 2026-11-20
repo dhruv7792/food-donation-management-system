@@ -1573,3 +1573,49 @@ body {
     }
 
 }
+
+
+/* Donation request status badge */
+#donorRequestSection .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    width: auto !important;
+    min-width: 90px;
+    height: auto !important;
+    min-height: 32px;
+    padding: 8px 14px !important;
+    border-radius: 50rem !important;
+    white-space: nowrap;
+    line-height: 1.2;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+#donorRequestSection .d-flex {
+    align-items: flex-start;
+}
+
+#donorRequestSection .card-body > .d-flex > .badge {
+    flex: 0 0 auto;
+}
+
+/* Fix ACCEPTED and other donation status badges */
+#donorRequestSection .badge,
+#donationDetails .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content !important;
+    height: auto !important;
+    min-height: 32px;
+    min-width: 90px;
+    padding: 8px 14px !important;
+    border-radius: 50rem !important;
+    white-space: nowrap;
+    line-height: 1.2;
+    font-size: 12px;
+    font-weight: 600;
+    flex: 0 0 auto;
+}

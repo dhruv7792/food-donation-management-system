@@ -1,0 +1,145 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Pickups | FoodShare{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pickup-header {
+        background: linear-gradient(135deg, #e8f5e9, #f7fff8);
+        border-radius: 16px;
+        padding: 28px;
+    }
+
+    .pickup-icon {
+        width: 54px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #d1e7dd;
+        color: #198754;
+        border-radius: 14px;
+        font-size: 1.6rem;
+        flex-shrink: 0;
+    }
+
+    .pickup-card {
+        border: 0;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    #pickupList {
+        min-height: 100px;
+    }
+
+    #pickupList .table-responsive {
+        border-radius: 10px;
+    }
+
+    @media (max-width: 576px) {
+        .pickup-header {
+            padding: 20px;
+        }
+
+        .pickup-header h2 {
+            font-size: 1.45rem;
+        }
+
+        #refreshPickups {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-4 py-md-5">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="pickup-header mb-4">
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                <div class="pickup-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+                <div>
+                    <h2 class="fw-bold mb-2">My Food Pickups</h2>
+                    <p class="text-muted mb-0">
+                        View your scheduled food collections and confirm
+                        when the food has been collected.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- API success and error messages -->
+        <div
+            id="pickupMessage"
+            class="alert d-none"
+            role="alert"
+            aria-live="polite">
+        </div>
+
+        <!-- Pickup Records -->
+        <div class="card pickup-card shadow-sm">
+            <div class="card-body p-3 p-md-4">
+
+                <div class="d-flex flex-column flex-sm-row
+                            justify-content-between align-items-sm-center
+                            gap-3 mb-4">
+
+                    <div>
+                        <h5 class="fw-bold mb-1">Your Pickup Records</h5>
+                        <p class="text-muted small mb-0">
+                            Check pickup dates, times, codes, and status.
+                        </p>
+                    </div>
+
+                    <button
+                        id="refreshPickups"
+                        type="button"
+                        class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+                        Refresh Pickups
+                    </button>
+                </div>
+
+                <div id="pickupList" aria-live="polite">
+                    <div class="text-center py-5">
+                        <div
+                            class="spinner-border text-success"
+                            role="status">
+                            <span class="visually-hidden">
+                                Loading pickups...
+                            </span>
+                        </div>
+
+                        <p class="text-muted mt-3 mb-0">
+                            Loading your pickup records...
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Helpful Information -->
+        <div class="alert alert-info border-0 mt-4 mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Reminder:</strong>
+            Check your pickup date and time before collection.
+            Use the available action on your pickup record to confirm
+            collection when the food has been picked up.
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pickup.js' %}"></script>
+{% endblock %}

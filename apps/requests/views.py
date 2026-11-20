@@ -46,7 +46,7 @@ class FoodRequestViewSet(
                 "receiver",
             )
 
-        return FoodRequest.objects.all()
+        return FoodRequest.objects.none()
 
     def create(self, request, *args, **kwargs):
 

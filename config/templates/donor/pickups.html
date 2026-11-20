@@ -1,0 +1,46 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Food Pickups | FoodShare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="mb-4">
+        <h2 class="fw-bold">
+            <i class="bi bi-box-seam text-success"></i>
+            Scheduled Pickups
+        </h2>
+        <p class="text-muted">
+            View and manage your scheduled food pickups.
+        </p>
+    </div>
+
+    <div id="pickupMessage" class="alert d-none" role="alert"></div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Your Pickup Records</h5>
+
+                <button
+                    type="button"
+                    id="refreshPickups"
+                    class="btn btn-outline-success btn-sm"
+                >
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Refresh
+                </button>
+            </div>
+
+            <div id="pickupList" aria-live="polite">
+                <p class="text-muted mb-0">Loading pickups...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pickup.js' %}"></script>
+{% endblock %}

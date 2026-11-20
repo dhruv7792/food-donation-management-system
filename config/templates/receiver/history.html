@@ -247,17 +247,5 @@
 
 
 {% block extra_js %}
-
-<script src="{% static 'js/request.js' %}"></script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    if (typeof initializeReceiverHistory === "function") {
-        initializeReceiverHistory();
-    }
-
-});
-</script>
-
+<script src="{% static 'js/history.js' %}"></script>
 {% endblock %}
