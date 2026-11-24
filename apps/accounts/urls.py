@@ -7,6 +7,7 @@ from .views import (
     MeView,
     DonorProfileView,
     ReceiverProfileView,
+    UserProfileView,
 )
 
 
@@ -15,25 +16,31 @@ urlpatterns = [
     path(
         "register/",
         RegisterView.as_view(),
-        name="register",
+        name="api-register",
     ),
 
     path(
         "login/",
         LoginView.as_view(),
-        name="login",
+        name="api-login",
     ),
 
     path(
         "logout/",
         LogoutView.as_view(),
-        name="logout",
+        name="api-logout",
     ),
 
     path(
         "me/",
         MeView.as_view(),
         name="me",
+    ),
+
+    path(
+        "profile/",
+        UserProfileView.as_view(),
+        name="user-profile",
     ),
 
     path(

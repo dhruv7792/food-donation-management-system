@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -8,39 +9,25 @@
 <div class="container py-4">
 
     <div class="mb-4">
-
-        <a
-            href="{% url 'donor_donation_list' %}"
-            class="text-success text-decoration-none"
-        >
+        <a href="{% url 'donor_donation_list' %}"
+           class="text-success text-decoration-none">
             <i class="bi bi-arrow-left me-1"></i>
             Back to Donations
         </a>
-
     </div>
-
 
     <div id="detailMessage"></div>
 
-
     <div id="donationDetails">
-
         <div class="text-center py-5">
-
             <div class="spinner-border text-success"></div>
-
-            <p class="text-muted mt-3">
-                Loading donation...
-            </p>
-
+            <p class="text-muted mt-3">Loading donation...</p>
         </div>
-
     </div>
 
 </div>
 
 {% endblock %}
-
 
 {% block extra_js %}
 
@@ -49,8 +36,15 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    if (typeof loadDonationDetail === "function") {
-        loadDonationDetail();
+    const donationId = getDonationIdFromURL();
+
+    console.log("Donation ID from URL:", donationId);
+
+    if (donationId && typeof loadDonationDetail === "function") {
+        loadDonationDetail(donationId);
+    } else {
+        document.getElementById("donationDetails").innerHTML =
+            '<div class="alert alert-danger">Invalid donation ID.</div>';
     }
 
 });

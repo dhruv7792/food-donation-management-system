@@ -1,6 +1,7 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
     <div class="container">
 
+        <!-- Brand -->
         <a class="navbar-brand d-flex align-items-center gap-2"
            href="{% url 'home' %}">
 
@@ -11,17 +12,20 @@
             <span>Food<span class="brand-highlight">Share</span></span>
         </a>
 
-
+        <!-- Mobile Toggle -->
         <button
             class="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target="#mainNavbar">
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
 
             <span class="navbar-toggler-icon"></span>
         </button>
 
-
+        <!-- Navigation -->
         <div class="collapse navbar-collapse" id="mainNavbar">
 
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
@@ -46,7 +50,7 @@
 
                 <!-- Theme Toggle -->
                 <li class="nav-item ms-lg-2">
-                   <button
+                    <button
                         type="button"
                         id="themeToggle"
                         class="theme-toggle"
@@ -55,22 +59,62 @@
                         <i class="bi bi-moon-fill" id="themeIcon"></i>
                         <span id="themeText">Dark</span>
 
-                   </button>
+                    </button>
                 </li>
 
+                {% if request.user.is_authenticated %}
+                <li class="nav-item ms-lg-2 dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 fw-semibold text-success"
+                       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle fs-5"></i>
+                        <span id="navUserName">{{ request.user.first_name|default:request.user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        {% if request.user.role == 'DONOR' %}
+                        <li><a class="dropdown-item" href="{% url 'donor_dashboard' %}"><i class="bi bi-speedometer2 me-2 text-success"></i>Dashboard</a></li>
+                        <li><a class="dropdown-item" href="{% url 'donor_donation_list' %}"><i class="bi bi-box-seam me-2 text-success"></i>My Donations</a></li>
+                        <li><a class="dropdown-item" href="{% url 'donor_create_donation' %}"><i class="bi bi-plus-circle me-2 text-success"></i>Create Donation</a></li>
+                        <li><a class="dropdown-item" href="{% url 'donor_requests' %}"><i class="bi bi-hourglass-split me-2 text-success"></i>Requests</a></li>
+                        <li><a class="dropdown-item" href="{% url 'donor_profile' %}"><i class="bi bi-person me-2 text-success"></i>Profile</a></li>
+                        {% elif request.user.role == 'RECEIVER' %}
+                        <li><a class="dropdown-item" href="{% url 'receiver_dashboard' %}"><i class="bi bi-speedometer2 me-2 text-success"></i>Dashboard</a></li>
+                        <li><a class="dropdown-item" href="{% url 'receiver_donations' %}"><i class="bi bi-search me-2 text-success"></i>Find Food</a></li>
+                        <li><a class="dropdown-item" href="{% url 'receiver_requests' %}"><i class="bi bi-clock-history me-2 text-success"></i>My Requests</a></li>
+                        <li><a class="dropdown-item" href="{% url 'receiver_profile' %}"><i class="bi bi-person me-2 text-success"></i>Profile</a></li>
+                        {% else %}
+                        <li><a class="dropdown-item" href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2 me-2 text-success"></i>Admin Panel</a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" href="{% url 'login' %}"
+                               onclick="if(typeof TokenManager!=='undefined')TokenManager.clear();">
+                                <i class="bi bi-box-arrow-right me-2"></i>Sign Out
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <!-- Login -->
                 <li class="nav-item ms-lg-2">
-                    <a href="login" class="btn btn-outline-success px-4"> Login
+                    <a
+                        href="{% url 'login' %}"
+                        class="btn btn-outline-success px-4">
+                        Login
                     </a>
                 </li>
 
+                <!-- Register -->
                 <li class="nav-item">
-                    <a href="/register" class="btn btn-success px-4">Get Started
+                    <a
+                        href="{% url 'register' %}"
+                        class="btn btn-success px-4">
+                        Get Started
                     </a>
                 </li>
+                {% endif %}
 
             </ul>
 
         </div>
-
     </div>
 </nav>

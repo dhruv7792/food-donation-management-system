@@ -5,9 +5,15 @@ from .views import PickupViewSet
 router = DefaultRouter()
 
 router.register(
-    "pickups",
+    "",
     PickupViewSet,
     basename="pickup",
+)
+
+router.register(
+    "pickups",
+    PickupViewSet,
+    basename="pickup-alias",
 )
 
 urlpatterns = router.urls

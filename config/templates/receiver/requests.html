@@ -7,238 +7,253 @@
 
 <div class="container-fluid py-4">
 
-    <div class="mb-4">
-
-        <h2 class="fw-bold mb-1">
-            My Requests
-        </h2>
-
-        <p class="text-muted">
-            Track your food donation requests.
-        </p>
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                My Requests
+            </h2>
+            <p class="text-muted mb-0">
+                Track your food donation requests.
+            </p>
+        </div>
+        <a href="{% url 'receiver_donations' %}" class="btn btn-success">
+            <i class="bi bi-search me-1"></i> Browse Food
+        </a>
     </div>
-
 
     <div id="receiverRequestMessage"></div>
 
-
     <!-- Statistics -->
-
     <div class="row g-4 mb-4">
 
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Total Requests
-                    </p>
-
-                    <h3 class="fw-bold"
-                        id="receiverTotalRequests">
-                        0
-                    </h3>
-
+            <a href="{% url 'receiver_requests' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small text-uppercase fw-semibold">
+                                    Total Requests
+                                </p>
+                                <h3 class="fw-bold text-dark mb-0" id="receiverTotalRequests">
+                                    {{ total_count|default:0 }}
+                                </h3>
+                            </div>
+                            <div class="p-2 bg-primary-subtle text-primary rounded-3">
+                                <i class="bi bi-send fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Pending
-                    </p>
-
-                    <h3 class="fw-bold text-warning"
-                        id="receiverPendingRequests">
-                        0
-                    </h3>
-
+            <a href="{% url 'receiver_requests' %}?status=pending" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small text-uppercase fw-semibold">
+                                    Pending
+                                </p>
+                                <h3 class="fw-bold text-warning mb-0" id="receiverPendingRequests">
+                                    {{ pending_count|default:0 }}
+                                </h3>
+                            </div>
+                            <div class="p-2 bg-warning-subtle text-warning rounded-3">
+                                <i class="bi bi-hourglass-split fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Approved
-                    </p>
-
-                    <h3 class="fw-bold text-success"
-                        id="receiverApprovedRequests">
-                        0
-                    </h3>
-
+            <a href="{% url 'receiver_requests' %}?status=approved" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small text-uppercase fw-semibold">
+                                    Approved
+                                </p>
+                                <h3 class="fw-bold text-success mb-0" id="receiverApprovedRequests">
+                                    {{ approved_count|default:0 }}
+                                </h3>
+                            </div>
+                            <div class="p-2 bg-success-subtle text-success rounded-3">
+                                <i class="bi bi-check-circle fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Rejected
-                    </p>
-
-                    <h3 class="fw-bold text-danger"
-                        id="receiverRejectedRequests">
-                        0
-                    </h3>
-
+            <a href="{% url 'receiver_requests' %}?status=rejected" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small text-uppercase fw-semibold">
+                                    Rejected
+                                </p>
+                                <h3 class="fw-bold text-danger mb-0" id="receiverRejectedRequests">
+                                    {{ rejected_count|default:0 }}
+                                </h3>
+                            </div>
+                            <div class="p-2 bg-danger-subtle text-danger rounded-3">
+                                <i class="bi bi-x-circle fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
     </div>
 
-
     <!-- Filter -->
-
     <div class="card border-0 shadow-sm mb-4">
-
         <div class="card-body">
-
-            <div class="row">
-
+            <div class="row align-items-center">
                 <div class="col-md-4">
-
-                    <label class="form-label fw-semibold">
-                        Request Status
+                    <label class="form-label fw-semibold small text-muted text-uppercase mb-1">
+                        Filter By Status
                     </label>
-
                     <select
                         class="form-select"
                         id="receiverRequestStatus"
+                        onchange="window.location.href = this.value ? '?status=' + this.value : '{% url 'receiver_requests' %}';"
                     >
-
-                        <option value="">
+                        <option value="" {% if not current_status %}selected{% endif %}>
                             All Requests
                         </option>
-
-                        <option value="pending">
+                        <option value="pending" {% if current_status|lower == 'pending' %}selected{% endif %}>
                             Pending
                         </option>
-
-                        <option value="approved">
+                        <option value="approved" {% if current_status|lower == 'approved' or current_status|lower == 'accepted' %}selected{% endif %}>
                             Approved
                         </option>
-
-                        <option value="rejected">
+                        <option value="completed" {% if current_status|lower == 'completed' %}selected{% endif %}>
+                            Completed
+                        </option>
+                        <option value="rejected" {% if current_status|lower == 'rejected' %}selected{% endif %}>
                             Rejected
                         </option>
-
-                        <option value="cancelled">
+                        <option value="cancelled" {% if current_status|lower == 'cancelled' %}selected{% endif %}>
                             Cancelled
                         </option>
-
                     </select>
-
                 </div>
-
+                {% if current_status %}
+                <div class="col-md-4 d-flex align-items-end pt-3 pt-md-0">
+                    <a href="{% url 'receiver_requests' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-x-circle me-1"></i> Clear Filter
+                    </a>
+                </div>
+                {% endif %}
             </div>
-
         </div>
-
     </div>
 
-
     <!-- Request Table -->
-
     <div class="card border-0 shadow-sm">
-
         <div class="card-body">
-
             <div class="table-responsive">
-
-                <table class="table table-hover align-middle">
-
-                    <thead>
-
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-
                             <th>Food</th>
                             <th>Donor</th>
                             <th>Quantity</th>
                             <th>Status</th>
                             <th>Requested On</th>
-                            <th>Action</th>
-
+                            <th class="text-end">Action</th>
                         </tr>
-
                     </thead>
-
-
                     <tbody id="receiverRequestTable">
-
-                        <tr>
-
-                            <td
-                                colspan="6"
-                                class="text-center py-5 text-muted"
-                            >
-
-                                <div
-                                    class="spinner-border spinner-border-sm text-success">
-                                </div>
-
-                                Loading requests...
-
-                            </td>
-
-                        </tr>
-
+                        {% if requests %}
+                            {% for req in requests %}
+                            <tr>
+                                <td class="fw-semibold">
+                                    <a href="{% url 'receiver_donation_detail' req.donation.id %}" class="text-decoration-none text-dark">
+                                        {{ req.donation.title }}
+                                    </a>
+                                </td>
+                                <td>{{ req.donation.donor.first_name|default:req.donation.donor.username }}</td>
+                                <td><strong>{{ req.requested_quantity }}</strong> {{ req.donation.quantity_unit }}</td>
+                                <td>
+                                    {% if req.status == 'PENDING' %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">Pending</span>
+                                    {% elif req.status == 'ACCEPTED' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Ready for Pickup</span>
+                                    {% if req.pickup %}
+                                    <div class="small mt-1 text-muted"><i class="bi bi-upc-scan me-1"></i>Code: <strong class="text-dark">{{ req.pickup.pickup_code }}</strong></div>
+                                    {% endif %}
+                                    {% elif req.status == 'COMPLETED' %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">Completed</span>
+                                    {% elif req.status == 'REJECTED' %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Rejected</span>
+                                    {% elif req.status == 'CANCELLED' %}
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">Cancelled</span>
+                                    {% else %}
+                                    <span class="badge bg-light text-dark border px-2 py-1">{{ req.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">{{ req.requested_at|date:"M d, Y" }}</td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex align-items-center gap-1">
+                                        <a href="{% url 'receiver_donation_detail' req.donation.id %}" class="btn btn-sm btn-outline-success">
+                                            View
+                                        </a>
+                                        {% if req.status == 'ACCEPTED' %}
+                                        <button class="btn btn-sm btn-success" onclick="handleReceiverCompletePickup({{ req.id }})">
+                                            <i class="bi bi-bag-check me-1"></i> Received
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                                    <h6 class="fw-bold text-dark mb-1">No requests found</h6>
+                                    <p class="small text-muted mb-3">
+                                        {% if current_status %}
+                                            No {{ current_status }} requests at this time.
+                                        {% else %}
+                                            You haven't requested any food donations yet.
+                                        {% endif %}
+                                    </p>
+                                    <a href="{% url 'receiver_donations' %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-search me-1"></i> Browse Available Food
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
-
                 </table>
-
             </div>
-
         </div>
-
     </div>
 
 </div>
 
 {% endblock %}
 
-
 {% block extra_js %}
-
 <script src="{% static 'js/request.js' %}"></script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
     if (typeof initializeReceiverRequests === "function") {
         initializeReceiverRequests();
     }
-
 });
 </script>
-
 {% endblock %}

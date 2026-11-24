@@ -8,6 +8,21 @@ console.log('Dashboard JS loaded');
 
 "use strict";
 
+// Convert special HTML characters into safe text
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, function (char) {
+        const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        };
+
+        return entities[char];
+    });
+}
+
 
 /* =========================================================
    DONOR DASHBOARD
@@ -17,35 +32,36 @@ async function loadDonorDashboard() {
 
     try {
 
-        const data =
+        const response =
             await apiRequest(
-                "/dashboard/donor/"
+                "/api/v1/dashboard/donor/"
             );
 
+        const data = response.data || response;
 
-        setText(
-            "donorTotalDonations",
-            data.total_donations ?? 0
-        );
+        if (data.donor_name) {
+            setText("donorName", data.donor_name);
+        } else if (typeof TokenManager !== "undefined" && TokenManager.getUserName()) {
+            setText("donorName", TokenManager.getUserName());
+        }
 
+        const total = data.total_donations ?? 0;
+        const available = data.available_donations ?? data.active_donations ?? 0;
+        const requested = data.pending_requests ?? data.requested_donations ?? 0;
+        const completed = data.completed_donations ?? 0;
 
-        setText(
-            "donorAvailableDonations",
-            data.available_donations ?? 0
-        );
+        // Support both ID conventions (dashboard.html has totalDonations, older had donorTotalDonations)
+        setText("totalDonations", total);
+        setText("donorTotalDonations", total);
 
+        setText("availableDonations", available);
+        setText("donorAvailableDonations", available);
 
-        setText(
-            "donorCompletedDonations",
-            data.completed_donations ?? 0
-        );
+        setText("requestedDonations", requested);
+        setText("donorPendingRequests", requested);
 
-
-        setText(
-            "donorPendingRequests",
-            data.pending_requests ?? 0
-        );
-
+        setText("completedDonations", completed);
+        setText("donorCompletedDonations", completed);
 
         renderRecentDonations(
             data.recent_donations || []
@@ -57,58 +73,112 @@ async function loadDonorDashboard() {
             "Donor dashboard error:",
             error
         );
+
+        const container = document.getElementById("recentDonations");
+        if (container) {
+            container.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-5">
+                        <i class="bi bi-exclamation-triangle text-warning fs-3 d-block mb-2"></i>
+                        <span class="text-danger fw-medium">Unable to load recent donations right now.</span>
+                        <div class="mt-2">
+                            <button class="btn btn-sm btn-outline-success" onclick="loadDonorDashboard()">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Retry
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
     }
 }
 
 
-/* =========================================================
-   RECEIVER DASHBOARD
-   ========================================================= */
-
 async function loadReceiverDashboard() {
-
     try {
+        let response = null;
 
-        const data =
-            await apiRequest(
-                "/dashboard/receiver/"
-            );
+        try {
+            response = await apiRequest("/api/v1/dashboard/receiver/");
+        } catch (err) {
+            response = await apiRequest("/dashboard/receiver/");
+        }
 
+        const data = response?.data || response || {};
 
-        setText(
-            "receiverAvailableFood",
-            data.available_food ?? 0
-        );
+        // Receiver name
+        if (data.receiver_name) {
+            setText("receiverName", data.receiver_name);
+        } else if (
+            typeof TokenManager !== "undefined" &&
+            TokenManager.getUserName()
+        ) {
+            setText("receiverName", TokenManager.getUserName());
+        }
 
+        // Available donations list
+        const foodList = Array.isArray(data.available_food)
+            ? data.available_food
+            : Array.isArray(data.available_donations)
+                ? data.available_donations
+                : null;
 
-        setText(
-            "receiverTotalRequests",
-            data.total_requests ?? 0
-        );
+        // Available donations count
+        const availableCount =
+            typeof data.available_donations_count === "number"
+                ? data.available_donations_count
+                : typeof data.available_food_count === "number"
+                    ? data.available_food_count
+                    : foodList !== null
+                        ? foodList.length
+                        : null;
 
+        // Only update if we have a valid count.
+        // Otherwise, preserve the count rendered by Django.
+        if (availableCount !== null) {
+            setText("availableDonations", availableCount);
+            setText("receiverAvailableFood", availableCount);
+            setText("availableDonationsCount", availableCount);
+        }
 
-        setText(
-            "receiverPendingRequests",
-            data.pending_requests ?? 0
-        );
+        // My requests
+        const total =
+            data.total_requests_count ??
+            data.total_requests ??
+            data.my_requests ??
+            0;
 
+        setText("totalRequests", total);
+        setText("receiverTotalRequests", total);
+        setText("totalRequestsCount", total);
 
-        setText(
-            "receiverCompletedRequests",
-            data.completed_requests ?? 0
-        );
+        // Pending requests
+        const pending =
+            data.pending_requests_count ??
+            data.pending_requests ??
+            0;
 
+        setText("pendingRequests", pending);
+        setText("receiverPendingRequests", pending);
+        setText("pendingRequestsCount", pending);
 
-        renderAvailableDonations(
-            data.available_donations || []
-        );
+        // Completed requests
+        const completed =
+            data.completed_requests_count ??
+            data.completed_requests ??
+            0;
+
+        setText("completedRequests", completed);
+        setText("receiverCompletedRequests", completed);
+        setText("completedRequestsCount", completed);
+
+        // Render donation cards only if API provides the list
+        if (foodList !== null) {
+            renderAvailableDonations(foodList);
+        }
 
     } catch (error) {
-
-        console.error(
-            "Receiver dashboard error:",
-            error
-        );
+        console.error("Receiver dashboard error:", error);
     }
 }
 
@@ -212,16 +282,20 @@ function renderRecentDonations(
     }
 
 
-    if (!donations.length) {
+    if (!donations || !donations.length) {
 
         container.innerHTML = `
-            <div class="text-center
-                        text-muted
-                        py-4">
-
-                No recent donations.
-
-            </div>
+            <tr>
+                <td colspan="6" class="text-center text-muted py-5">
+                    <i class="bi bi-inbox fs-2 text-muted d-block mb-2"></i>
+                    No donations created yet.
+                    <div class="mt-2">
+                        <a href="/donor/donations/create/" class="btn btn-sm btn-success">
+                            <i class="bi bi-plus-lg me-1"></i> Create Donation
+                        </a>
+                    </div>
+                </td>
+            </tr>
         `;
 
         return;
@@ -230,43 +304,45 @@ function renderRecentDonations(
 
     container.innerHTML =
         donations.map(
-            donation => `
+            donation => {
+                const foodName = escapeHTML(
+                    donation.title ||
+                    donation.food_name ||
+                    "-"
+                );
+                const category = escapeHTML(
+                    donation.food_type ||
+                    donation.category ||
+                    "-"
+                );
+                const qty = `${donation.quantity || 0} ${escapeHTML(donation.quantity_unit || donation.unit || "")}`;
+                const status = donation.status || "AVAILABLE";
+                const date = formatDate(donation.created_at);
+                const detailUrl = `/donor/donations/${donation.id}/`;
 
-            <div class="d-flex
-                        justify-content-between
-                        align-items-center
-                        border-bottom
-                        py-3">
-
-                <div>
-
-                    <h6 class="mb-1">
-                        ${escapeHTML(
-                            donation.food_name ||
-                            donation.title ||
-                            "-"
-                        )}
-                    </h6>
-
-                    <small class="text-muted">
-                        ${formatDate(
-                            donation.created_at
-                        )}
-                    </small>
-
-                </div>
-
-
-                <div>
-
-                    ${statusBadge(
-                        donation.status
-                    )}
-
-                </div>
-
-            </div>
-        `
+                return `
+                <tr>
+                    <td class="fw-semibold">
+                        <a href="${detailUrl}" class="text-decoration-none text-dark">
+                            ${foodName}
+                        </a>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark border">
+                            ${category}
+                        </span>
+                    </td>
+                    <td>${qty}</td>
+                    <td>${statusBadge(status)}</td>
+                    <td class="text-muted small">${date}</td>
+                    <td class="text-end">
+                        <a href="${detailUrl}" class="btn btn-sm btn-outline-success">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                `;
+            }
         ).join("");
 }
 
@@ -280,9 +356,8 @@ function renderAvailableDonations(
 ) {
 
     const container =
-        document.getElementById(
-            "availableDonations"
-        );
+        document.getElementById("availableFoodContainer") ||
+        document.getElementById("availableFoodList");
 
 
     if (!container) {
@@ -290,15 +365,13 @@ function renderAvailableDonations(
     }
 
 
-    if (!donations.length) {
+    if (!Array.isArray(donations) || !donations.length) {
 
         container.innerHTML = `
-            <div class="text-center
-                        text-muted
-                        py-4">
-
-                No food donations currently available.
-
+            <div class="col-12 text-center text-muted py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-3 text-secondary opacity-50"></i>
+                <h6 class="fw-bold text-dark">No food donations currently available</h6>
+                <p class="small text-muted mb-0">Check back later or explore other categories.</p>
             </div>
         `;
 
@@ -308,83 +381,77 @@ function renderAvailableDonations(
 
     container.innerHTML =
         donations.map(
-            donation => `
+            donation => {
+                const title = escapeHTML(
+                    donation.title ||
+                    donation.food_name ||
+                    "Food Donation"
+                );
+                const category = escapeHTML(
+                    donation.food_type ||
+                    donation.category ||
+                    "Food"
+                );
+                const description = escapeHTML(
+                    donation.description ||
+                    "Surplus food donation available for pickup."
+                );
+                const qty = `${donation.quantity || 0} ${escapeHTML(donation.quantity_unit || donation.unit || "")}`;
+                const location = escapeHTML(
+                    donation.city
+                        ? `${donation.city}${donation.pincode ? ", " + donation.pincode : ""}`
+                        : (donation.pickup_address || "Nearby")
+                );
+                const expiryDate = donation.expiry_at
+                    ? formatDate(donation.expiry_at)
+                    : "Soon";
+                const detailUrl = `/receiver/donations/${donation.id}/`;
+                const imageHtml = donation.image
+                    ? `<img src="${escapeHTML(donation.image)}" class="card-img-top" style="height:180px; object-fit:cover;" alt="${title}">`
+                    : `<div class="bg-light d-flex align-items-center justify-content-center text-muted" style="height:180px;">
+                            <i class="bi bi-card-image fs-1 text-secondary opacity-50"></i>
+                       </div>`;
 
-            <div class="col-md-6 col-xl-4 mb-4">
-
-                <div class="card
-                            h-100
-                            border-0
-                            shadow-sm">
-
-                    ${
-                        donation.image
-                        ?
-
-                        `<img
-                            src="${escapeHTML(donation.image)}"
-                            class="card-img-top"
-                            style="height:180px;
-                                   object-fit:cover;"
-                            alt="Food donation">`
-
-                        :
-
-                        ""
-                    }
-
-
-                    <div class="card-body">
-
-                        <h5 class="card-title">
-
-                            ${escapeHTML(
-                                donation.food_name ||
-                                donation.title ||
-                                "-"
-                            )}
-
-                        </h5>
-
-
-                        <p class="text-muted mb-2">
-
-                            Category:
-                            ${escapeHTML(
-                                donation.category ||
-                                "-"
-                            )}
-
-                        </p>
-
-
-                        <p class="mb-3">
-
-                            Quantity:
-                            <strong>
-                                ${escapeHTML(
-                                    donation.quantity ||
-                                    "-"
-                                )}
-                            </strong>
-
-                        </p>
-
-
-                        <a
-                            href="/receiver/donations/${donation.id}/"
-                            class="btn btn-success w-100">
-
-                            View Donation
-
-                        </a>
-
+                return `
+                <div class="col-md-6 col-xl-4">
+                    <div class="card h-100 border shadow-sm food-card">
+                        ${imageHtml}
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold mb-0 text-truncate" title="${title}">
+                                    ${title}
+                                </h5>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle badge-category text-uppercase">
+                                    ${category}
+                                </span>
+                            </div>
+                            <p class="card-text text-muted small mb-3" style="min-height: 2.2rem;">
+                                ${description.length > 80 ? description.substring(0, 80) + "..." : description}
+                            </p>
+                            <div class="mb-3 small">
+                                <div class="text-dark mb-1">
+                                    <i class="bi bi-box-seam text-success me-1"></i>
+                                    Quantity: <strong>${qty}</strong>
+                                </div>
+                                <div class="text-muted mb-1">
+                                    <i class="bi bi-geo-alt text-danger me-1"></i>
+                                    ${location}
+                                </div>
+                                <div class="text-muted">
+                                    <i class="bi bi-clock text-warning me-1"></i>
+                                    Expires: <strong>${expiryDate}</strong>
+                                </div>
+                            </div>
+                            <div class="mt-auto">
+                                <a href="${detailUrl}" class="btn btn-success w-100 fw-semibold">
+                                    <i class="bi bi-bag-plus me-1"></i> Request Food
+                                </a>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
-
-            </div>
-        `
+                `;
+            }
         ).join("");
 }
 

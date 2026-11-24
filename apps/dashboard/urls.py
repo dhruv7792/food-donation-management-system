@@ -3,6 +3,7 @@ from .views import (
     AdminDashboardView,
     DonorDashboardView,
     ReceiverDashboardView,
+    ReceiverHistoryView,
 )
 
 
@@ -24,5 +25,11 @@ urlpatterns = [
         "receiver/",
         ReceiverDashboardView.as_view(),
         name="receiver-dashboard",
+    ),
+
+    path(
+        "receiver/history/",
+        ReceiverHistoryView.as_view(),
+        name="receiver-history-api",
     ),
 ]

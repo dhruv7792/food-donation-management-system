@@ -31,6 +31,7 @@
                 id="donationForm"
                 enctype="multipart/form-data"
             >
+                {% csrf_token %}
 
                 <div class="row">
 
@@ -253,8 +254,26 @@
                             rows="3"
                             placeholder="Enter pickup location"
                             required
-                        ></textarea>
+                        >{{ request.user.donor_profile.address|default:'' }}</textarea>
 
+                    </div>
+
+
+                    <!-- City, State, Pincode -->
+
+                    <div class="col-md-4 mb-3">
+                        <label for="city" class="form-label fw-semibold">City</label>
+                        <input type="text" class="form-control" id="city" name="city" value="{{ request.user.donor_profile.city|default:'Surat' }}" placeholder="City">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="state" class="form-label fw-semibold">State</label>
+                        <input type="text" class="form-control" id="state" name="state" value="{{ request.user.donor_profile.state|default:'Gujarat' }}" placeholder="State">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="pincode" class="form-label fw-semibold">Pincode</label>
+                        <input type="text" class="form-control" id="pincode" name="pincode" value="{{ request.user.donor_profile.pincode|default:'395001' }}" placeholder="Pincode">
                     </div>
 
 
@@ -328,6 +347,8 @@
                     <!-- Buttons -->
 
                     <div class="col-12">
+
+                        <div id="donationBtnMessage"></div>
 
                         <div class="d-flex gap-2">
 

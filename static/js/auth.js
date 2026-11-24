@@ -1,21 +1,7 @@
-console.log('Auth JS loaded');
 
-/**
- * FoodShare Authentication
- *
- * Handles:
- * - Login
- * - Registration
- * - Forgot Password
- * - JWT token storage
- * - Form validation
- * - Password visibility
- * - Password strength
- * - Profile image preview
- */
+console.log("FoodShare Auth JS loaded");
 
 "use strict";
-
 
 /* =========================================================
    API CONFIGURATION
@@ -36,34 +22,7 @@ const AUTH_API = {
 
 const TokenManager = {
 
-    getStorage() {
-        const remember = localStorage.getItem("remember_me");
-
-        return remember === "true"
-            ? localStorage
-            : sessionStorage;
-    },
-
-    save(accessToken, refreshToken, remember = false) {
-
-        localStorage.setItem(
-            "remember_me",
-            remember ? "true" : "false"
-        );
-
-        const storage = remember
-            ? localStorage
-            : sessionStorage;
-
-        storage.setItem("access_token", accessToken);
-
-        if (refreshToken) {
-            storage.setItem("refresh_token", refreshToken);
-        }
-    },
-
     getAccessToken() {
-
         return (
             localStorage.getItem("access_token") ||
             sessionStorage.getItem("access_token")
@@ -71,26 +30,61 @@ const TokenManager = {
     },
 
     getRefreshToken() {
-
         return (
             localStorage.getItem("refresh_token") ||
             sessionStorage.getItem("refresh_token")
         );
     },
 
-    clear() {
+    save(accessToken, refreshToken, remember = true) {
 
+        this.clear();
+
+        localStorage.setItem("access_token", accessToken);
+        sessionStorage.setItem("access_token", accessToken);
+
+        if (refreshToken) {
+            localStorage.setItem("refresh_token", refreshToken);
+            sessionStorage.setItem("refresh_token", refreshToken);
+        }
+
+        localStorage.setItem(
+            "remember_me",
+            remember ? "true" : "false"
+        );
+    },
+
+    clear() {
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("remember_me");
+        localStorage.removeItem("user");
 
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
+        sessionStorage.removeItem("user");
     },
 
     isAuthenticated() {
-
         return Boolean(this.getAccessToken());
+    },
+
+    getUser() {
+        try {
+            return JSON.parse(
+                localStorage.getItem("user") ||
+                sessionStorage.getItem("user") ||
+                "null"
+            );
+        } catch (e) {
+            return null;
+        }
+    },
+
+    getUserName() {
+        const user = this.getUser();
+        if (!user) return "";
+        return user.first_name || user.username || (user.email ? user.email.split("@")[0] : "");
     }
 };
 
@@ -99,11 +93,44 @@ const TokenManager = {
    API REQUEST HELPER
 ========================================================= */
 
-async function apiRequest(
-    url,
-    options = {}
-) {
+function getCsrfToken() {
+    const metaOrInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (metaOrInput) return metaOrInput.value;
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : "";
+}
 
+function resolveApiUrl(url) {
+    if (typeof url !== "string" || !url.startsWith("/")) return url;
+    if (url.startsWith("/api/v1/")) return url;
+
+    if (url.startsWith("/dashboard/")) return `/api/v1${url}`;
+    if (url.startsWith("/donations/")) {
+        const sub = url.replace(/^\/donations\/?/, "");
+        return `/api/v1/donations/${sub}`;
+    }
+    if (url.startsWith("/requests/")) {
+        const sub = url.replace(/^\/requests\/?/, "");
+        return `/api/v1/requests/${sub}`;
+    }
+    if (url.startsWith("/pickups/")) {
+        const sub = url.replace(/^\/pickups\/?/, "");
+        return `/api/v1/pickups/${sub}`;
+    }
+    if (url.startsWith("/auth/")) {
+        const sub = url.replace(/^\/auth\/?/, "");
+        return `/api/v1/auth/${sub}`;
+    }
+    if (url.startsWith("/notifications/")) {
+        const sub = url.replace(/^\/notifications\/?/, "");
+        return `/api/v1/notifications/${sub}`;
+    }
+    return url;
+}
+
+async function apiRequest(url, options = {}) {
+
+    const resolvedUrl = resolveApiUrl(url);
     const token = TokenManager.getAccessToken();
 
     const headers = {
@@ -111,20 +138,26 @@ async function apiRequest(
         ...options.headers
     };
 
-    /*
-     * Do not manually set Content-Type when
-     * sending FormData.
-     */
+    const csrfToken = getCsrfToken();
+    if (csrfToken && !headers["X-CSRFToken"]) {
+        headers["X-CSRFToken"] = csrfToken;
+    }
+
     if (!(options.body instanceof FormData)) {
         headers["Content-Type"] = "application/json";
     }
 
-    if (token) {
+    // Login and registration must not send old JWT tokens.
+    if (token && options.auth !== false) {
         headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(url, {
-        ...options,
+    const requestOptions = { ...options };
+
+    delete requestOptions.auth;
+
+    const response = await fetch(resolvedUrl, {
+        ...requestOptions,
         headers
     });
 
@@ -164,9 +197,9 @@ function getApiErrorMessage(error) {
         return "Something went wrong.";
     }
 
-    if (error.data) {
+    const data = error.data;
 
-        const data = error.data;
+    if (data) {
 
         if (typeof data === "string") {
             return data;
@@ -190,11 +223,13 @@ function getApiErrorMessage(error) {
                 messages.push(`${key}: ${value.join(", ")}`);
             } else if (typeof value === "string") {
                 messages.push(`${key}: ${value}`);
+            } else if (value && typeof value === "object") {
+                messages.push(`${key}: ${JSON.stringify(value)}`);
             }
 
         });
 
-        if (messages.length > 0) {
+        if (messages.length) {
             return messages.join("<br>");
         }
     }
@@ -207,21 +242,17 @@ function getApiErrorMessage(error) {
    ALERT HELPER
 ========================================================= */
 
-function showAlert(
-    elementId,
-    message,
-    type = "danger"
-) {
+function showAlert(elementId, message, type = "danger") {
 
-    const alert = document.getElementById(elementId);
+    const alertElement = document.getElementById(elementId);
 
-    if (!alert) {
+    if (!alertElement) {
         return;
     }
 
-    alert.className = `alert alert-${type}`;
-    alert.innerHTML = message;
-    alert.classList.remove("d-none");
+    alertElement.className = `alert alert-${type}`;
+    alertElement.innerHTML = message;
+    alertElement.classList.remove("d-none");
 
     window.scrollTo({
         top: 0,
@@ -232,13 +263,11 @@ function showAlert(
 
 function hideAlert(elementId) {
 
-    const alert = document.getElementById(elementId);
+    const alertElement = document.getElementById(elementId);
 
-    if (!alert) {
-        return;
+    if (alertElement) {
+        alertElement.classList.add("d-none");
     }
-
-    alert.classList.add("d-none");
 }
 
 
@@ -262,12 +291,16 @@ function setButtonLoading(
         return;
     }
 
+    if (text && !text.dataset.originalText) {
+        text.dataset.originalText = text.textContent;
+    }
+
     button.disabled = loading;
 
     if (text) {
         text.textContent = loading
             ? loadingText
-            : text.dataset.originalText || text.textContent;
+            : text.dataset.originalText;
     }
 
     if (spinner) {
@@ -280,10 +313,7 @@ function setButtonLoading(
    PASSWORD VISIBILITY
 ========================================================= */
 
-function setupPasswordToggle(
-    buttonId,
-    inputId
-) {
+function setupPasswordToggle(buttonId, inputId) {
 
     const button = document.getElementById(buttonId);
     const input = document.getElementById(inputId);
@@ -317,6 +347,45 @@ function setupPasswordToggle(
 
 
 /* =========================================================
+   ROLE-BASED REDIRECTION
+========================================================= */
+
+function redirectAfterLogin(user) {
+
+    if (!user) {
+        window.location.href = "/";
+        return;
+    }
+
+    try {
+        localStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.setItem("user", JSON.stringify(user));
+    } catch (e) { }
+
+    const role = String(
+        user.role ||
+        user.user_type ||
+        user.account_type ||
+        ""
+    ).toUpperCase();
+
+    if (
+        role === "ADMIN" ||
+        user.is_staff === true ||
+        user.is_superuser === true
+    ) {
+        window.location.href = "/management/";
+    } else if (role === "DONOR") {
+        window.location.href = "/donor/";
+    } else if (role === "RECEIVER") {
+        window.location.href = "/receiver/";
+    } else {
+        window.location.href = "/";
+    }
+}
+
+
+/* =========================================================
    LOGIN
 ========================================================= */
 
@@ -333,6 +402,11 @@ function initializeLogin() {
         "loginPassword"
     );
 
+    setupPasswordToggle(
+        "showPassword",
+        "loginPassword"
+    );
+
     form.addEventListener("submit", async event => {
 
         event.preventDefault();
@@ -340,20 +414,20 @@ function initializeLogin() {
         hideAlert("loginAlert");
 
         if (!form.checkValidity()) {
-
             form.classList.add("was-validated");
-
             return;
         }
 
-        const email =
-            document.getElementById("loginEmail").value.trim();
+        const email = document
+            .getElementById("loginEmail")
+            .value.trim();
 
-        const password =
-            document.getElementById("loginPassword").value;
+        const password = document
+            .getElementById("loginPassword")
+            .value;
 
-        const remember =
-            document.getElementById("rememberMe").checked;
+        const rememberEl = document.getElementById("rememberMe") || document.getElementById("remember");
+        const remember = rememberEl ? rememberEl.checked : false;
 
         setButtonLoading(
             "loginButton",
@@ -365,10 +439,11 @@ function initializeLogin() {
 
         try {
 
-            const data = await apiRequest(
+            const response = await apiRequest(
                 AUTH_API.login,
                 {
                     method: "POST",
+                    auth: false,
                     body: JSON.stringify({
                         email: email,
                         password: password
@@ -376,19 +451,22 @@ function initializeLogin() {
                 }
             );
 
+            const responseData = response.data || response;
+
             const accessToken =
-                data.access ||
-                data.access_token ||
-                data.token;
+                responseData.access ||
+                responseData.access_token ||
+                responseData.token;
 
             const refreshToken =
-                data.refresh ||
-                data.refresh_token;
+                responseData.refresh ||
+                responseData.refresh_token;
+
+            const user = responseData.user || null;
 
             if (!accessToken) {
-
                 throw new Error(
-                    "Login succeeded but no access token was returned."
+                    "Access token not received from server."
                 );
             }
 
@@ -398,21 +476,6 @@ function initializeLogin() {
                 remember
             );
 
-            /*
-             * Fetch current user so we can determine
-             * the correct dashboard.
-             */
-            let user = null;
-
-            try {
-                user = await apiRequest(AUTH_API.me);
-            } catch (error) {
-                console.warn(
-                    "Unable to fetch user profile:",
-                    error
-                );
-            }
-
             showAlert(
                 "loginAlert",
                 "Login successful. Redirecting...",
@@ -420,9 +483,7 @@ function initializeLogin() {
             );
 
             setTimeout(() => {
-
                 redirectAfterLogin(user);
-
             }, 700);
 
         } catch (error) {
@@ -449,57 +510,7 @@ function initializeLogin() {
 
 
 /* =========================================================
-   ROLE REDIRECTION
-========================================================= */
-
-function redirectAfterLogin(user) {
-
-    if (!user) {
-
-        window.location.href = "/";
-
-        return;
-    }
-
-    const role =
-        String(
-            user.role ||
-            user.user_type ||
-            user.account_type ||
-            ""
-        ).toUpperCase();
-
-    if (
-        role === "ADMIN" ||
-        user.is_staff === true ||
-        user.is_superuser === true
-    ) {
-
-        window.location.href = "/admin/dashboard/";
-
-        return;
-    }
-
-    if (role === "DONOR") {
-
-        window.location.href = "/donor/dashboard/";
-
-        return;
-    }
-
-    if (role === "RECEIVER") {
-
-        window.location.href = "/receiver/dashboard/";
-
-        return;
-    }
-
-    window.location.href = "/";
-}
-
-
-/* =========================================================
-   REGISTER
+   REGISTER INITIALIZATION
 ========================================================= */
 
 function initializeRegister() {
@@ -520,11 +531,7 @@ function initializeRegister() {
         "confirmPassword"
     );
 
-
-    /* -----------------------------------------
-       Role Selection
-    ----------------------------------------- */
-
+    // Role selection
     const roleCards = document.querySelectorAll(".role-card");
 
     roleCards.forEach(card => {
@@ -537,8 +544,9 @@ function initializeRegister() {
 
             card.classList.add("active");
 
-            const radio =
-                card.querySelector('input[type="radio"]');
+            const radio = card.querySelector(
+                'input[type="radio"]'
+            );
 
             if (radio) {
                 radio.checked = true;
@@ -546,63 +554,28 @@ function initializeRegister() {
         });
     });
 
-
-    /* -----------------------------------------
-       Password Strength
-    ----------------------------------------- */
-
-    const password =
-        document.getElementById("registerPassword");
+    // Password strength
+    const password = document.getElementById("registerPassword");
 
     if (password) {
-
-        password.addEventListener(
-            "input",
-            updatePasswordStrength
-        );
+        password.addEventListener("input", updatePasswordStrength);
     }
 
-
-    /* -----------------------------------------
-       Password Match
-    ----------------------------------------- */
-
-    const confirmPassword =
-        document.getElementById("confirmPassword");
+    // Password match
+    const confirmPassword = document.getElementById("confirmPassword");
 
     if (confirmPassword) {
-
-        confirmPassword.addEventListener(
-            "input",
-            checkPasswordMatch
-        );
+        confirmPassword.addEventListener("input", checkPasswordMatch);
     }
 
-
-    /* -----------------------------------------
-       Image Preview
-    ----------------------------------------- */
-
-    const profileImage =
-        document.getElementById("profileImage");
+    // Profile image preview
+    const profileImage = document.getElementById("profileImage");
 
     if (profileImage) {
-
-        profileImage.addEventListener(
-            "change",
-            previewProfileImage
-        );
+        profileImage.addEventListener("change", previewProfileImage);
     }
 
-
-    /* -----------------------------------------
-       Submit
-    ----------------------------------------- */
-
-    form.addEventListener(
-        "submit",
-        handleRegister
-    );
+    form.addEventListener("submit", handleRegister);
 }
 
 
@@ -612,14 +585,9 @@ function initializeRegister() {
 
 function updatePasswordStrength() {
 
-    const password =
-        document.getElementById("registerPassword");
-
-    const bar =
-        document.getElementById("passwordStrengthBar");
-
-    const text =
-        document.getElementById("passwordStrengthText");
+    const password = document.getElementById("registerPassword");
+    const bar = document.getElementById("passwordStrengthBar");
+    const text = document.getElementById("passwordStrengthText");
 
     if (!password || !bar || !text) {
         return;
@@ -629,30 +597,13 @@ function updatePasswordStrength() {
 
     let score = 0;
 
-    if (value.length >= 8) {
-        score++;
-    }
+    if (value.length >= 8) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[a-z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^A-Za-z0-9]/.test(value)) score++;
 
-    if (/[A-Z]/.test(value)) {
-        score++;
-    }
-
-    if (/[a-z]/.test(value)) {
-        score++;
-    }
-
-    if (/[0-9]/.test(value)) {
-        score++;
-    }
-
-    if (/[^A-Za-z0-9]/.test(value)) {
-        score++;
-    }
-
-    const percentage =
-        Math.min(score / 5 * 100, 100);
-
-    bar.style.width = `${percentage}%`;
+    bar.style.width = `${score * 20}%`;
 
     if (score <= 1) {
 
@@ -678,14 +629,9 @@ function updatePasswordStrength() {
 
 function checkPasswordMatch() {
 
-    const password =
-        document.getElementById("registerPassword");
-
-    const confirm =
-        document.getElementById("confirmPassword");
-
-    const message =
-        document.getElementById("passwordMatchMessage");
+    const password = document.getElementById("registerPassword");
+    const confirm = document.getElementById("confirmPassword");
+    const message = document.getElementById("passwordMatchMessage");
 
     if (!password || !confirm || !message) {
         return;
@@ -694,6 +640,7 @@ function checkPasswordMatch() {
     if (!confirm.value) {
 
         message.textContent = "";
+        confirm.classList.remove("is-valid", "is-invalid");
 
         return;
     }
@@ -701,19 +648,15 @@ function checkPasswordMatch() {
     if (password.value === confirm.value) {
 
         message.textContent = "Passwords match.";
-        message.className =
-            "small mt-1 text-success";
+        message.className = "small mt-1 text-success";
 
         confirm.classList.remove("is-invalid");
         confirm.classList.add("is-valid");
 
     } else {
 
-        message.textContent =
-            "Passwords do not match.";
-
-        message.className =
-            "small mt-1 text-danger";
+        message.textContent = "Passwords do not match.";
+        message.className = "small mt-1 text-danger";
 
         confirm.classList.remove("is-valid");
         confirm.classList.add("is-invalid");
@@ -729,8 +672,7 @@ function previewProfileImage(event) {
 
     const file = event.target.files[0];
 
-    const preview =
-        document.getElementById("profilePreview");
+    const preview = document.getElementById("profilePreview");
 
     if (!file || !preview) {
         return;
@@ -755,10 +697,7 @@ function previewProfileImage(event) {
         return;
     }
 
-    const maxSize =
-        5 * 1024 * 1024;
-
-    if (file.size > maxSize) {
+    if (file.size > 5 * 1024 * 1024) {
 
         event.target.value = "";
 
@@ -771,13 +710,10 @@ function previewProfileImage(event) {
         return;
     }
 
-    const reader =
-        new FileReader();
+    const reader = new FileReader();
 
-    reader.onload = function(e) {
-
+    reader.onload = function (e) {
         preview.src = e.target.result;
-
         preview.style.display = "block";
     };
 
@@ -798,17 +734,17 @@ async function handleRegister(event) {
     hideAlert("registerAlert");
 
     if (!form.checkValidity()) {
-
         form.classList.add("was-validated");
-
         return;
     }
 
-    const password =
-        document.getElementById("registerPassword").value;
+    const password = document
+        .getElementById("registerPassword")
+        .value;
 
-    const confirmPassword =
-        document.getElementById("confirmPassword").value;
+    const confirmPassword = document
+        .getElementById("confirmPassword")
+        .value;
 
     if (password !== confirmPassword) {
 
@@ -832,16 +768,9 @@ async function handleRegister(event) {
         return;
     }
 
+    const formData = new FormData(form);
 
-    const formData =
-        new FormData(form);
-
-    /*
-     * password_confirm is generally frontend-only.
-     * Remove it unless your serializer explicitly expects it.
-     */
-    formData.delete("password_confirm");
-
+    // Keep password_confirm: Django serializer requires it.
 
     setButtonLoading(
         "registerButton",
@@ -851,71 +780,32 @@ async function handleRegister(event) {
         "Creating Account..."
     );
 
-
     try {
 
-        const data = await apiRequest(
+        const response = await apiRequest(
+
             AUTH_API.register,
             {
                 method: "POST",
+                auth: false,
                 body: formData
             }
         );
 
-        /*
-         * Some APIs automatically login after registration.
-         */
-        const accessToken =
-            data.access ||
-            data.access_token ||
-            data.token;
 
-        const refreshToken =
-            data.refresh ||
-            data.refresh_token;
+        showAlert(
+            "registerAlert",
+            "Account created successfully. Please login.",
+            "success"
+        );
 
-        if (accessToken) {
-
-            TokenManager.save(
-                accessToken,
-                refreshToken,
-                true
-            );
-
-            showAlert(
-                "registerAlert",
-                "Account created successfully. Redirecting...",
-                "success"
-            );
-
-            setTimeout(() => {
-
-                redirectAfterLogin(data.user || data);
-
-            }, 800);
-
-        } else {
-
-            showAlert(
-                "registerAlert",
-                "Account created successfully. Please login.",
-                "success"
-            );
-
-            setTimeout(() => {
-
-                window.location.href = "/login/";
-
-            }, 1200);
-        }
-
+        setTimeout(() => {
+            window.location.href = "/login/";
+        }, 1200);
 
     } catch (error) {
 
-        console.error(
-            "Registration error:",
-            error
-        );
+        console.error("Registration error:", error);
 
         showAlert(
             "registerAlert",
@@ -941,97 +831,74 @@ async function handleRegister(event) {
 
 function initializeForgotPassword() {
 
-    const form =
-        document.getElementById(
-            "forgotPasswordForm"
-        );
+    const form = document.getElementById("forgotPasswordForm");
 
     if (!form) {
         return;
     }
 
-    form.addEventListener(
-        "submit",
-        async event => {
+    form.addEventListener("submit", async event => {
 
-            event.preventDefault();
+        event.preventDefault();
 
-            hideAlert("forgotAlert");
+        hideAlert("forgotAlert");
 
-            if (!form.checkValidity()) {
+        if (!form.checkValidity()) {
+            form.classList.add("was-validated");
+            return;
+        }
 
-                form.classList.add(
-                    "was-validated"
-                );
+        const email = document
+            .getElementById("forgotEmail")
+            .value.trim();
 
-                return;
-            }
+        setButtonLoading(
+            "forgotButton",
+            "forgotButtonText",
+            "forgotSpinner",
+            true,
+            "Sending..."
+        );
 
-            const email =
-                document.getElementById(
-                    "forgotEmail"
-                ).value.trim();
+        try {
 
+            await apiRequest(
+                AUTH_API.passwordReset,
+                {
+                    method: "POST",
+                    auth: false,
+                    body: JSON.stringify({ email: email })
+                }
+            );
+
+            showAlert(
+                "forgotAlert",
+                "If an account exists with this email, password reset instructions have been sent.",
+                "success"
+            );
+
+            form.reset();
+
+        } catch (error) {
+
+            console.error("Password reset error:", error);
+
+            showAlert(
+                "forgotAlert",
+                "If an account exists with this email, password reset instructions have been sent.",
+                "success"
+            );
+
+        } finally {
 
             setButtonLoading(
                 "forgotButton",
                 "forgotButtonText",
                 "forgotSpinner",
-                true,
-                "Sending..."
+                false
             );
-
-
-            try {
-
-                await apiRequest(
-                    AUTH_API.passwordReset,
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            email: email
-                        })
-                    }
-                );
-
-                showAlert(
-                    "forgotAlert",
-                    "If an account exists with this email, password reset instructions have been sent.",
-                    "success"
-                );
-
-                form.reset();
-
-
-            } catch (error) {
-
-                console.error(
-                    "Password reset error:",
-                    error
-                );
-
-                /*
-                 * Don't reveal whether an email exists.
-                 * In production, the backend should ideally
-                 * return the same response for both cases.
-                 */
-                showAlert(
-                    "forgotAlert",
-                    "If an account exists with this email, password reset instructions have been sent.",
-                    "success"
-                );
-
-            } finally {
-
-                setButtonLoading(
-                    "forgotButton",
-                    "forgotButtonText",
-                    "forgotSpinner",
-                    false
-                );
-            }
         }
-    );
+    });
 }
 
 
@@ -1041,8 +908,7 @@ function initializeForgotPassword() {
 
 async function logoutUser() {
 
-    const refreshToken =
-        TokenManager.getRefreshToken();
+    const refreshToken = TokenManager.getRefreshToken();
 
     try {
 
@@ -1061,10 +927,7 @@ async function logoutUser() {
 
     } catch (error) {
 
-        console.warn(
-            "Logout API error:",
-            error
-        );
+        console.warn("Logout API error:", error);
 
     } finally {
 
@@ -1079,15 +942,9 @@ async function logoutUser() {
    AUTHENTICATED REQUEST
 ========================================================= */
 
-async function authenticatedRequest(
-    url,
-    options = {}
-) {
+async function authenticatedRequest(url, options = {}) {
 
-    return apiRequest(
-        url,
-        options
-    );
+    return apiRequest(url, options);
 }
 
 
@@ -1095,15 +952,10 @@ async function authenticatedRequest(
    AUTO INITIALIZATION
 ========================================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+document.addEventListener("DOMContentLoaded", () => {
 
-        initializeLogin();
+    initializeLogin();
+    initializeRegister();
+    initializeForgotPassword();
 
-        initializeRegister();
-
-        initializeForgotPassword();
-
-    }
-);
+});

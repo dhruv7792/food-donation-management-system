@@ -5,9 +5,15 @@ from .views import DonationViewSet
 router = DefaultRouter()
 
 router.register(
-    "donations",
+    "",
     DonationViewSet,
     basename="donation",
+)
+
+router.register(
+    "donations",
+    DonationViewSet,
+    basename="donation-nested",
 )
 
 

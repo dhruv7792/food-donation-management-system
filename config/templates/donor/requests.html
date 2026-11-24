@@ -41,7 +41,7 @@
                         class="fw-bold mt-2"
                         id="totalRequests"
                     >
-                        0
+                        {{ total_count|default:"0" }}
                     </h3>
 
                 </div>
@@ -65,7 +65,7 @@
                         class="fw-bold mt-2 text-warning"
                         id="pendingRequests"
                     >
-                        0
+                        {{ pending_count|default:"0" }}
                     </h3>
 
                 </div>
@@ -89,7 +89,7 @@
                         class="fw-bold mt-2 text-success"
                         id="approvedRequests"
                     >
-                        0
+                        {{ approved_count|default:"0" }}
                     </h3>
 
                 </div>
@@ -113,7 +113,7 @@
                         class="fw-bold mt-2 text-danger"
                         id="rejectedRequests"
                     >
-                        0
+                        {{ rejected_count|default:"0" }}
                     </h3>
 
                 </div>
@@ -156,6 +156,10 @@
                         Approved
                     </option>
 
+                    <option value="completed">
+                        Completed
+                    </option>
+
                     <option value="rejected">
                         Rejected
                     </option>
@@ -192,22 +196,73 @@
 
                     <tbody id="requestTableBody">
 
-                        <tr>
-
-                            <td
-                                colspan="7"
-                                class="text-center py-5 text-muted"
-                            >
-
-                                <div
-                                    class="spinner-border spinner-border-sm text-success">
-                                </div>
-
-                                Loading requests...
-
-                            </td>
-
-                        </tr>
+                        {% if requests %}
+                            {% for req in requests %}
+                            <tr>
+                                <td>
+                                    <strong>{{ req.receiver.first_name|default:req.receiver.username }}</strong>
+                                    <div class="text-muted small">{{ req.receiver.email }}</div>
+                                </td>
+                                <td>
+                                    <a href="{% url 'donor_donation_detail' req.donation.id %}" class="text-decoration-none text-dark fw-semibold">
+                                        {{ req.donation.title }}
+                                    </a>
+                                </td>
+                                <td>{{ req.requested_quantity }} {{ req.donation.get_quantity_unit_display|default:req.donation.quantity_unit }}</td>
+                                <td><span class="text-muted small">{{ req.message|default:"-" }}</span></td>
+                                <td>
+                                    {% if req.status == 'PENDING' %}
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Pending</span>
+                                    {% elif req.status == 'ACCEPTED' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Accepted</span>
+                                    {% elif req.status == 'REJECTED' %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Rejected</span>
+                                    {% elif req.status == 'COMPLETED' %}
+                                        <span class="badge bg-success border">Completed</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border">{{ req.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><small class="text-muted">{{ req.requested_at|date:"M d, Y" }}</small></td>
+                                <td>
+                                    {% if req.status == 'PENDING' %}
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-success" onclick="handleAcceptRequest({{ req.id }})">
+                                            <i class="bi bi-check-lg"></i> Accept
+                                        </button>
+                                        <button class="btn btn-outline-danger" onclick="handleRejectRequest({{ req.id }})">
+                                            <i class="bi bi-x-lg"></i> Reject
+                                        </button>
+                                    </div>
+                                    {% elif req.status == 'ACCEPTED' %}
+                                    <div class="d-flex align-items-center gap-1">
+                                        {% if req.pickup %}
+                                        <span class="badge bg-light text-dark border me-1" title="Pickup Code">
+                                            <i class="bi bi-upc-scan me-1"></i>{{ req.pickup.pickup_code }}
+                                        </span>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-success" onclick="handleCompletePickup({{ req.id }})">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Complete Pickup
+                                        </button>
+                                    </div>
+                                    {% elif req.status == 'COMPLETED' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                        <i class="bi bi-check2-all me-1"></i> Completed
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted small">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 text-muted d-block mb-2"></i>
+                                    No donation requests received yet.
+                                </td>
+                            </tr>
+                        {% endif %}
 
                     </tbody>
 
@@ -226,7 +281,7 @@
 
 {% block extra_js %}
 
-<script src="{% static 'js/request.js' %}"></script>
+<script src="{% static 'js/request.js' %}?v=1.3"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

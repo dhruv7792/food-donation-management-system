@@ -17,6 +17,17 @@ class FoodRequestSerializer(
         read_only=True,
     )
 
+    pickup_code = serializers.SerializerMethodField()
+    pickup_status = serializers.SerializerMethodField()
+
+    def get_pickup_code(self, obj):
+        pickup = getattr(obj, "pickup", None)
+        return pickup.pickup_code if pickup else None
+
+    def get_pickup_status(self, obj):
+        pickup = getattr(obj, "pickup", None)
+        return pickup.status if pickup else None
+
     class Meta:
 
         model = FoodRequest
@@ -30,6 +41,8 @@ class FoodRequestSerializer(
             "requested_quantity",
             "message",
             "status",
+            "pickup_code",
+            "pickup_status",
             "requested_at",
             "accepted_at",
             "updated_at",

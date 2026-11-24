@@ -1,10 +1,10 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Login | FoodShare</title>
 
     <style>
@@ -17,11 +17,9 @@
         :root {
             --green: #198754;
             --dark-green: #11683f;
-            --light-green: #eef9f3;
+            --border: #dce5df;
             --text: #17251e;
             --muted: #718078;
-            --border: #dce5df;
-            --white: #ffffff;
         }
 
         body {
@@ -31,17 +29,15 @@
             min-height: 100vh;
         }
 
-        /* ================= NAVBAR ================= */
+        /* NAVBAR */
 
         .navbar {
-            height: 86px;
+            min-height: 86px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.97);
+            background: rgba(255,255,255,.97);
             border-bottom: 1px solid #edf1ee;
             display: flex;
             align-items: center;
-            position: relative;
-            z-index: 10;
         }
 
         .nav-container {
@@ -74,46 +70,41 @@
             text-decoration: none;
             font-weight: 600;
             padding: 10px 8px;
-            transition: 0.2s;
         }
 
         .nav-link:hover {
             color: var(--green);
         }
 
+        .theme-btn,
+        .login-btn,
+        .signup-btn {
+            border-radius: 8px;
+            padding: 11px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
         .theme-btn {
             border: 1px solid #e0e7e2;
             background: white;
-            border-radius: 30px;
-            padding: 10px 18px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
         }
 
         .login-btn {
             border: 1px solid var(--green);
-            background: white;
             color: var(--green);
-            border-radius: 8px;
-            padding: 11px 25px;
-            font-size: 15px;
-            font-weight: 700;
-            text-decoration: none;
+            background: white;
         }
 
         .signup-btn {
             border: 1px solid var(--green);
-            background: var(--green);
             color: white;
-            border-radius: 8px;
-            padding: 12px 25px;
-            font-size: 15px;
-            font-weight: 700;
-            text-decoration: none;
+            background: var(--green);
         }
 
-        /* ================= MAIN ================= */
+        /* MAIN */
 
         .page {
             min-height: calc(100vh - 86px);
@@ -131,17 +122,13 @@
             overflow: hidden;
             display: grid;
             grid-template-columns: 46% 54%;
-            box-shadow: 0 20px 60px rgba(30, 75, 50, 0.12);
+            box-shadow: 0 20px 60px rgba(30,75,50,.12);
         }
 
-        /* ================= LEFT PANEL ================= */
+        /* LEFT PANEL */
 
         .welcome-panel {
-            background: linear-gradient(
-                145deg,
-                #269a63,
-                #117746
-            );
+            background: linear-gradient(145deg,#269a63,#117746);
             color: white;
             padding: 55px 50px;
             display: flex;
@@ -151,24 +138,24 @@
             overflow: hidden;
         }
 
-        .welcome-panel::before {
+        .welcome-panel::before,
+        .welcome-panel::after {
             content: "";
+            position: absolute;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 50%;
+        }
+
+        .welcome-panel::before {
             width: 250px;
             height: 250px;
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 50%;
-            position: absolute;
             top: -100px;
             right: -100px;
         }
 
         .welcome-panel::after {
-            content: "";
             width: 300px;
             height: 300px;
-            border: 1px solid rgba(255,255,255,0.10);
-            border-radius: 50%;
-            position: absolute;
             bottom: -170px;
             left: -150px;
         }
@@ -177,8 +164,8 @@
             width: 70px;
             height: 70px;
             border-radius: 20px;
-            background: rgba(255,255,255,0.13);
-            border: 1px solid rgba(255,255,255,0.20);
+            background: rgba(255,255,255,.13);
+            border: 1px solid rgba(255,255,255,.2);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -197,11 +184,11 @@
             max-width: 330px;
             font-size: 17px;
             line-height: 1.8;
-            color: rgba(255,255,255,0.91);
+            color: rgba(255,255,255,.91);
         }
 
         .feature {
-            margin-top: 35px;
+            margin-top: 25px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -213,13 +200,13 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,.15);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* ================= FORM PANEL ================= */
+        /* FORM PANEL */
 
         .form-panel {
             padding: 60px 65px;
@@ -229,12 +216,11 @@
         }
 
         .form-header {
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
 
         .form-header h2 {
             font-size: 38px;
-            line-height: 1.1;
             margin-bottom: 14px;
             color: #17221c;
         }
@@ -243,10 +229,7 @@
             color: var(--muted);
             font-size: 16px;
             line-height: 1.6;
-            max-width: 330px;
         }
-
-        /* Django messages */
 
         .messages {
             margin-bottom: 20px;
@@ -261,7 +244,26 @@
             margin-bottom: 8px;
         }
 
-        /* ================= FORM ================= */
+        #loginAlert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        #loginAlert.alert-success {
+            color: #0f5132;
+            background: #d1e7dd;
+        }
+
+        #loginAlert.alert-danger {
+            color: #842029;
+            background: #f8d7da;
+        }
+
+        .d-none {
+            display: none !important;
+        }
 
         .form-group {
             margin-bottom: 21px;
@@ -287,10 +289,6 @@
             font-weight: 600;
         }
 
-        .forgot:hover {
-            text-decoration: underline;
-        }
-
         .input-wrapper {
             position: relative;
         }
@@ -303,14 +301,13 @@
             padding: 0 16px;
             font-size: 15px;
             outline: none;
-            transition: 0.2s;
             color: #25332c;
             background: white;
         }
 
         .input:focus {
             border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.10);
+            box-shadow: 0 0 0 3px rgba(25,135,84,.10);
         }
 
         .input::placeholder {
@@ -330,7 +327,6 @@
             background: transparent;
             cursor: pointer;
             font-size: 18px;
-            color: #78857e;
         }
 
         .remember-row {
@@ -346,7 +342,6 @@
             width: 17px;
             height: 17px;
             accent-color: var(--green);
-            cursor: pointer;
         }
 
         .submit-btn {
@@ -359,12 +354,31 @@
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
+            transition: .2s;
         }
 
         .submit-btn:hover {
             background: var(--dark-green);
-            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: .7;
+            cursor: not-allowed;
+        }
+
+        .spinner-border {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .divider {
@@ -396,7 +410,7 @@
             text-decoration: none;
         }
 
-        /* ================= DARK MODE ================= */
+        /* DARK MODE */
 
         body.dark {
             background: #101815;
@@ -418,10 +432,7 @@
             color: white;
         }
 
-        body.dark .login-wrapper {
-            background: #1b2520;
-        }
-
+        body.dark .login-wrapper,
         body.dark .form-panel {
             background: #1b2520;
         }
@@ -432,7 +443,8 @@
         }
 
         body.dark .form-header p,
-        body.dark .register-text {
+        body.dark .register-text,
+        body.dark .remember-row {
             color: #aebbb4;
         }
 
@@ -446,23 +458,9 @@
             color: #849189;
         }
 
-        body.dark .remember-row {
-            color: #adb9b2;
-        }
-
-        /* ================= TABLET ================= */
+        /* RESPONSIVE */
 
         @media (max-width: 850px) {
-
-            .navbar {
-                height: auto;
-                min-height: 75px;
-            }
-
-            .nav-container {
-                width: calc(100% - 30px);
-            }
-
             .nav-link {
                 display: none;
             }
@@ -471,22 +469,8 @@
                 gap: 8px;
             }
 
-            .theme-btn {
-                padding: 9px 13px;
-            }
-
-            .login-btn,
-            .signup-btn {
-                padding: 10px 14px;
-            }
-
-            .page {
-                padding: 35px 18px;
-            }
-
             .login-wrapper {
                 grid-template-columns: 42% 58%;
-                min-height: 540px;
             }
 
             .welcome-panel {
@@ -497,34 +481,18 @@
                 font-size: 38px;
             }
 
-            .welcome-panel p {
-                font-size: 15px;
-            }
-
             .form-panel {
                 padding: 45px 35px;
             }
-
-            .form-header h2 {
-                font-size: 34px;
-            }
         }
 
-        /* ================= MOBILE ================= */
-
         @media (max-width: 650px) {
-
             .navbar {
                 min-height: 70px;
             }
 
             .logo {
                 font-size: 22px;
-            }
-
-            .theme-btn {
-                font-size: 13px;
-                padding: 8px 11px;
             }
 
             .login-btn,
@@ -539,7 +507,6 @@
 
             .login-wrapper {
                 grid-template-columns: 1fr;
-                border-radius: 18px;
             }
 
             .welcome-panel {
@@ -547,33 +514,12 @@
                 min-height: 300px;
             }
 
-            .recycle-icon {
-                width: 55px;
-                height: 55px;
-                font-size: 28px;
-                margin-bottom: 20px;
-            }
-
             .welcome-panel h1 {
                 font-size: 32px;
-                margin-bottom: 15px;
-            }
-
-            .welcome-panel p {
-                font-size: 14px;
-                line-height: 1.6;
-            }
-
-            .feature {
-                margin-top: 20px;
             }
 
             .form-panel {
                 padding: 38px 25px;
-            }
-
-            .form-header {
-                margin-bottom: 28px;
             }
 
             .form-header h2 {
@@ -585,10 +531,7 @@
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-
 <header class="navbar">
-
     <div class="nav-container">
 
         <a href="/" class="logo">
@@ -596,48 +539,30 @@
         </a>
 
         <nav class="nav-right">
-
             <a href="/" class="nav-link">Home</a>
-            <a href="#" class="nav-link">About</a>
-            <a href="#" class="nav-link">Contact</a>
+            <a href="{% url 'about' %}" class="nav-link">About</a>
+            <a href="{% url 'contact' %}" class="nav-link">Contact</a>
 
             <button type="button" class="theme-btn" id="themeBtn">
                 🌙 <span id="themeText">Dark</span>
             </button>
 
-            <a href="{% url 'login' %}" class="login-btn">
-                Login
-            </a>
-
-            <a href="{% url 'register' %}" class="signup-btn">
-                Get Started
-            </a>
-
+            <a href="{% url 'login' %}" class="login-btn">Login</a>
+            <a href="{% url 'register' %}" class="signup-btn">Get Started</a>
         </nav>
 
     </div>
-
 </header>
-
-
-<!-- ================= LOGIN PAGE ================= -->
 
 <main class="page">
 
     <div class="login-wrapper">
 
-        <!-- LEFT SIDE -->
-
         <section class="welcome-panel">
 
-            <div class="recycle-icon">
-                ♻
-            </div>
+            <div class="recycle-icon">♻</div>
 
-            <h1>
-                Welcome<br>
-                Back!
-            </h1>
+            <h1>Welcome<br>Back!</h1>
 
             <p>
                 Connect with our food donation community
@@ -657,56 +582,49 @@
 
         </section>
 
-
-        <!-- RIGHT SIDE -->
-
         <section class="form-panel">
 
             <div class="form-header">
-
                 <h2>Sign In</h2>
-
-                <p>
-                    Enter your account details to continue.
-                </p>
-
+                <p>Enter your account details to continue.</p>
             </div>
-
-
-            <!-- Django Messages -->
 
             {% if messages %}
-            <div class="messages">
-
-                {% for message in messages %}
-                    <div class="message">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-
-            </div>
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
 
+            <div
+                id="loginAlert"
+                class="d-none"
+                role="alert"
+                aria-live="polite">
+            </div>
 
-            <!-- LOGIN FORM -->
-
-            <form method="POST">
+            <form
+                id="loginForm"
+                method="POST"
+                action="{% url 'login' %}"
+                novalidate>
 
                 {% csrf_token %}
-
-                <!-- EMAIL -->
 
                 <div class="form-group">
 
                     <div class="form-label-row">
-                        <label for="email">
+                        <label for="loginEmail">
                             Email Address
                         </label>
                     </div>
 
                     <input
                         type="email"
-                        id="email"
+                        id="loginEmail"
                         name="email"
                         class="input"
                         placeholder="you@example.com"
@@ -716,18 +634,17 @@
 
                 </div>
 
-
-                <!-- PASSWORD -->
-
                 <div class="form-group">
 
                     <div class="form-label-row">
 
-                        <label for="password">
+                        <label for="loginPassword">
                             Password
                         </label>
 
-                        <a href="{% url 'forgot_password' %}" class="forgot">
+                        <a
+                            href="{% url 'forgot_password' %}"
+                            class="forgot">
                             Forgot Password?
                         </a>
 
@@ -737,7 +654,7 @@
 
                         <input
                             type="password"
-                            id="password"
+                            id="loginPassword"
                             name="password"
                             class="input password-input"
                             placeholder="Enter your password"
@@ -748,9 +665,8 @@
                         <button
                             type="button"
                             class="show-password"
-                            id="showPassword"
-                            aria-label="Show password"
-                        >
+                            id="toggleLoginPassword"
+                            aria-label="Show password">
                             👁
                         </button>
 
@@ -758,46 +674,46 @@
 
                 </div>
 
-
-                <!-- REMEMBER -->
-
                 <div class="remember-row">
 
                     <input
                         type="checkbox"
-                        id="remember"
+                        id="rememberMe"
                         name="remember"
                     >
 
-                    <label for="remember">
+                    <label for="rememberMe">
                         Remember me
                     </label>
 
                 </div>
 
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="submit-btn">
 
-                <!-- SUBMIT -->
+                    <span id="loginButtonText">
+                        Sign In
+                    </span>
 
-                <button type="submit" class="submit-btn">
-                    Sign In
+                    <span
+                        id="loginSpinner"
+                        class="spinner-border d-none"
+                        aria-hidden="true">
+                    </span>
+
                 </button>
 
             </form>
 
-
-            <div class="divider">
-                OR
-            </div>
-
+            <div class="divider">OR</div>
 
             <div class="register-text">
-
                 Don't have an account?
-
                 <a href="{% url 'register' %}">
                     Create an account
                 </a>
-
             </div>
 
         </section>
@@ -806,55 +722,33 @@
 
 </main>
 
-
+<!-- DARK MODE -->
 <script>
+    const themeButton = document.getElementById("themeBtn");
 
-    /* ================= PASSWORD SHOW / HIDE ================= */
+    function applyTheme(isDark) {
+        document.body.classList.toggle("dark", isDark);
 
-    const password = document.getElementById("password");
-    const showPassword = document.getElementById("showPassword");
+        themeButton.innerHTML = isDark
+            ? '☀️ <span id="themeText">Light</span>'
+            : '🌙 <span id="themeText">Dark</span>';
 
-    showPassword.addEventListener("click", function () {
+        localStorage.setItem(
+            "foodshare-theme",
+            isDark ? "dark" : "light"
+        );
+    }
 
-        if (password.type === "password") {
+    const savedTheme = localStorage.getItem("foodshare-theme");
 
-            password.type = "text";
-            showPassword.textContent = "🙈";
+    applyTheme(savedTheme === "dark");
 
-        } else {
-
-            password.type = "password";
-            showPassword.textContent = "👁";
-
-        }
-
+    themeButton.addEventListener("click", function () {
+        applyTheme(!document.body.classList.contains("dark"));
     });
-
-
-    /* ================= DARK MODE ================= */
-
-    const themeBtn = document.getElementById("themeBtn");
-    const themeText = document.getElementById("themeText");
-
-    themeBtn.addEventListener("click", function () {
-
-        document.body.classList.toggle("dark");
-
-        if (document.body.classList.contains("dark")) {
-
-            themeText.textContent = "Light";
-            themeBtn.innerHTML = "☀️ <span>Light</span>";
-
-        } else {
-
-            themeText.textContent = "Dark";
-            themeBtn.innerHTML = "🌙 <span>Dark</span>";
-
-        }
-
-    });
-
 </script>
+
+<script src="{% static 'js/auth.js' %}"></script>
 
 </body>
 </html>

@@ -7,257 +7,222 @@
 
 <div class="container-fluid py-4">
 
-    <div class="mb-4">
-
-        <h2 class="fw-bold mb-1">
-            Donation History
-        </h2>
-
-        <p class="text-muted">
-            View your previous food requests and completed donations.
-        </p>
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                Donation History
+            </h2>
+            <p class="text-muted mb-0">
+                View your previous food requests and completed donations.
+            </p>
+        </div>
+        <a href="{% url 'receiver_donations' %}" class="btn btn-success">
+            <i class="bi bi-search me-1"></i> Browse Available Food
+        </a>
     </div>
-
 
     <div id="historyMessage"></div>
 
-
     <!-- Summary -->
-
     <div class="row g-4 mb-4">
 
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Total Received
-                    </p>
-
-                    <h3
-                        class="fw-bold text-success"
-                        id="historyTotal"
-                    >
-                        0
-                    </h3>
-
+            <a href="{% url 'receiver_history' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small text-uppercase fw-semibold">
+                                    Total Requests
+                                </p>
+                                <h3 class="fw-bold text-dark mb-0" id="historyTotal">
+                                    {{ total_count|default:0 }}
+                                </h3>
+                            </div>
+                            <div class="p-2 bg-primary-subtle text-primary rounded-3">
+                                <i class="bi bi-clock-history fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Completed
-                    </p>
-
-                    <h3
-                        class="fw-bold"
-                        id="historyCompleted"
-                    >
-                        0
-                    </h3>
-
+            <a href="{% url 'receiver_history' %}?status=completed" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small text-uppercase fw-semibold">
+                                    Completed
+                                </p>
+                                <h3 class="fw-bold text-success mb-0" id="historyCompleted">
+                                    {{ completed_count|default:0 }}
+                                </h3>
+                            </div>
+                            <div class="p-2 bg-success-subtle text-success rounded-3">
+                                <i class="bi bi-check-circle fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Cancelled
-                    </p>
-
-                    <h3
-                        class="fw-bold text-secondary"
-                        id="historyCancelled"
-                    >
-                        0
-                    </h3>
-
+            <a href="{% url 'receiver_history' %}?status=cancelled" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="text-muted mb-1 small text-uppercase fw-semibold">
+                                    Cancelled
+                                </p>
+                                <h3 class="fw-bold text-secondary mb-0" id="historyCancelled">
+                                    {{ cancelled_count|default:0 }}
+                                </h3>
+                            </div>
+                            <div class="p-2 bg-secondary-subtle text-secondary rounded-3">
+                                <i class="bi bi-dash-circle fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
-
         <div class="col-sm-6 col-lg-3">
-
-            <div class="card border-0 shadow-sm">
-
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-
-                    <p class="text-muted mb-1">
-                        Food Quantity
-                    </p>
-
-                    <h3
-                        class="fw-bold text-primary"
-                        id="historyQuantity"
-                    >
-                        0
-                    </h3>
-
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small text-uppercase fw-semibold">
+                                Food Received
+                            </p>
+                            <h3 class="fw-bold text-primary mb-0" id="historyQuantity">
+                                {{ total_quantity|default:0 }}
+                            </h3>
+                        </div>
+                        <div class="p-2 bg-info-subtle text-info rounded-3">
+                            <i class="bi bi-box-seam fs-4"></i>
+                        </div>
+                    </div>
                 </div>
-
             </div>
-
         </div>
 
     </div>
 
-
-    <!-- History -->
-
+    <!-- History Table Card -->
     <div class="card border-0 shadow-sm">
-
         <div class="card-header bg-white border-0 py-3">
-
-            <div class="d-flex justify-content-between
-                        align-items-center">
-
-                <h5 class="fw-bold mb-0">
-                    Previous Requests
-                </h5>
-
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Previous Requests &amp; Completed Deliveries</h5>
                 <select
-                    class="form-select"
+                    class="form-select form-select-sm"
                     id="historyFilter"
                     style="max-width:180px;"
+                    onchange="window.location.href = this.value ? '?status=' + this.value : '{% url 'receiver_history' %}';"
                 >
-
-                    <option value="">
-                        All
+                    <option value="" {% if not current_status %}selected{% endif %}>
+                        All Records
                     </option>
-
-                    <option value="completed">
+                    <option value="completed" {% if current_status|lower == 'completed' %}selected{% endif %}>
                         Completed
                     </option>
-
-                    <option value="cancelled">
+                    <option value="cancelled" {% if current_status|lower == 'cancelled' %}selected{% endif %}>
                         Cancelled
                     </option>
-
-                    <option value="rejected">
+                    <option value="rejected" {% if current_status|lower == 'rejected' %}selected{% endif %}>
                         Rejected
                     </option>
-
                 </select>
-
             </div>
-
         </div>
 
-
-        <div class="card-body">
-
+        <div class="card-body pt-0">
             <div class="table-responsive">
-
-                <table class="table table-hover align-middle">
-
-                    <thead>
-
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-
                             <th>Food</th>
                             <th>Donor</th>
                             <th>Quantity</th>
                             <th>Status</th>
                             <th>Request Date</th>
-                            <th>Completed Date</th>
-                            <th></th>
-
+                            <th>Updated Date</th>
+                            <th class="text-end">Action</th>
                         </tr>
-
                     </thead>
-
-
                     <tbody id="historyTableBody">
-
-                        <tr>
-
-                            <td
-                                colspan="7"
-                                class="text-center py-5 text-muted"
-                            >
-
-                                <div
-                                    class="spinner-border spinner-border-sm text-success">
-                                </div>
-
-                                Loading history...
-
-                            </td>
-
-                        </tr>
-
+                        {% if history_requests %}
+                            {% for req in history_requests %}
+                            <tr>
+                                <td class="fw-semibold">
+                                    <a href="{% url 'receiver_donation_detail' req.donation.id %}" class="text-decoration-none text-dark">
+                                        {{ req.donation.title }}
+                                    </a>
+                                </td>
+                                <td>{{ req.donation.donor.first_name|default:req.donation.donor.username }}</td>
+                                <td><strong>{{ req.requested_quantity }}</strong> {{ req.donation.quantity_unit }}</td>
+                                <td>
+                                    {% if req.status == 'COMPLETED' %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Completed</span>
+                                    {% elif req.status == 'ACCEPTED' %}
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">Accepted</span>
+                                    {% elif req.status == 'CANCELLED' %}
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">Cancelled</span>
+                                    {% elif req.status == 'REJECTED' %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Rejected</span>
+                                    {% else %}
+                                    <span class="badge bg-light text-dark border px-2 py-1">{{ req.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">{{ req.requested_at|date:"M d, Y" }}</td>
+                                <td class="text-muted small">{{ req.updated_at|date:"M d, Y" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'receiver_donation_detail' req.donation.id %}" class="btn btn-sm btn-outline-success">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                                    <h6 class="fw-bold text-dark mb-1">No donation history found</h6>
+                                    <p class="small text-muted mb-3">
+                                        {% if current_status %}
+                                            No {{ current_status }} records found.
+                                        {% else %}
+                                            You have no previous completed donation records yet.
+                                        {% endif %}
+                                    </p>
+                                    <a href="{% url 'receiver_donations' %}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-search me-1"></i> Browse Available Food
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
-
                 </table>
-
             </div>
-
-
-            <div class="d-flex justify-content-between
-                        align-items-center mt-3">
-
-                <small
-                    class="text-muted"
-                    id="historyPaginationInfo"
-                >
-                    Showing 0 records
-                </small>
-
-                <nav>
-
-                    <ul
-                        class="pagination mb-0"
-                        id="historyPagination"
-                    ></ul>
-
-                </nav>
-
-            </div>
-
         </div>
-
     </div>
 
 </div>
 
 {% endblock %}
 
-
 {% block extra_js %}
-
-<script src="{% static 'js/request.js' %}"></script>
-
+<script src="{% static 'js/request.js' %}?v=1.2"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
     if (typeof initializeReceiverHistory === "function") {
         initializeReceiverHistory();
     }
-
 });
 </script>
-
 {% endblock %}

@@ -1,61 +1,340 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Food Donation Details | FoodShare{% endblock %}
+{% block title %}{{ donation.title|default:"Food Donation Details" }} | FoodShare{% endblock %}
+
+{% block extra_css %}
+<style>
+.detail-card {
+    border-radius: 14px;
+}
+.food-detail-img {
+    height: 340px;
+    object-fit: cover;
+    border-radius: 12px;
+    width: 100%;
+}
+.info-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 
 <div class="container py-4">
 
     <div class="mb-4">
-
-        <a
-            href="{% url 'receiver_donations' %}"
-            class="text-success text-decoration-none"
-        >
-            <i class="bi bi-arrow-left me-1"></i>
-            Back to Available Food
+        <a href="{% url 'receiver_donations' %}" class="text-success text-decoration-none fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Back to Available Food
         </a>
-
     </div>
-
 
     <div id="receiverDonationMessage"></div>
 
-
     <div id="receiverDonationDetail">
+        <div class="row g-4">
+            
+            <!-- Left Column: Food Details & Image -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm detail-card mb-4">
+                    <div class="card-body p-4">
+                        {% if donation.image %}
+                        <div class="mb-4">
+                            <img src="{{ donation.image.url }}" class="food-detail-img shadow-sm" alt="{{ donation.title }}">
+                        </div>
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center text-muted mb-4 rounded-3" style="height: 240px;">
+                            <div class="text-center">
+                                <i class="bi bi-card-image fs-1 text-secondary opacity-50 d-block mb-2"></i>
+                                <span class="small text-muted">No food image uploaded</span>
+                            </div>
+                        </div>
+                        {% endif %}
 
-        <div class="text-center py-5">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="fw-bold mb-1 text-dark">{{ donation.title }}</h3>
+                                <p class="text-muted small mb-0">
+                                    Posted on {{ donation.created_at|date:"M d, Y" }} by 
+                                    <strong>{{ donation.donor.first_name|default:donation.donor.username }}</strong>
+                                </p>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle text-uppercase px-3 py-2 fw-semibold">
+                                {{ donation.food_type|default:"Food" }}
+                            </span>
+                        </div>
 
-            <div class="spinner-border text-success"></div>
+                        <hr class="my-3 opacity-25">
 
-            <p class="text-muted mt-3">
-                Loading donation details...
-            </p>
+                        <h5 class="fw-bold text-dark mb-2">Description</h5>
+                        <p class="text-secondary leading-relaxed mb-4">
+                            {{ donation.description|default:"No additional description provided. This is fresh surplus food ready for immediate pickup."|linebreaks }}
+                        </p>
+
+                        <h5 class="fw-bold text-dark mb-3">Donation Information</h5>
+                        <div class="row g-3">
+                            <div class="col-sm-6 col-md-4">
+                                <div class="p-3 bg-light rounded-3">
+                                    <div class="info-label">Quantity</div>
+                                    <h5 class="fw-bold text-dark mb-0">
+                                        {{ donation.quantity }} {{ donation.quantity_unit }}
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="p-3 bg-light rounded-3">
+                                    <div class="info-label">Expiry Date</div>
+                                    <h5 class="fw-bold text-warning mb-0">
+                                        {{ donation.expiry_at|date:"M d, Y" }}
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="p-3 bg-light rounded-3">
+                                    <div class="info-label">Status</div>
+                                    <h5 class="fw-bold text-success mb-0">
+                                        {{ donation.status }}
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 opacity-25">
+
+                        <h5 class="fw-bold text-dark mb-3">Pickup Location</h5>
+                        <div class="p-3 bg-light rounded-3">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-geo-alt-fill text-danger fs-4 me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-dark">
+                                        {{ donation.city }}{% if donation.pincode %}, {{ donation.pincode }}{% endif %}
+                                    </h6>
+                                    <p class="text-muted small mb-0">
+                                        {{ donation.pickup_address|default:"Pickup address will be confirmed upon request approval." }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Request Action Box -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm detail-card sticky-top" style="top: 2rem;">
+                    <div class="card-body p-4">
+                        {% if existing_request %}
+                            {% if existing_request.status == 'ACCEPTED' %}
+                                <div class="alert alert-success border-0 shadow-sm mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check-circle-fill fs-4 me-2 text-success"></i>
+                                        <h6 class="fw-bold mb-0">Request Approved - Ready for Pickup!</h6>
+                                    </div>
+                                    <p class="small mb-2">
+                                        Your request has been approved. Please visit the pickup address to collect the food.
+                                    </p>
+                                    <div class="p-3 bg-white rounded-2 border small mb-3">
+                                        {% if existing_request.pickup %}
+                                        <div class="mb-1">Pickup Code: <strong class="text-success fs-6">{{ existing_request.pickup.pickup_code }}</strong></div>
+                                        <div class="mb-1">Pickup Date: <strong>{{ existing_request.pickup.pickup_date }}</strong></div>
+                                        {% endif %}
+                                        <div>Address: <strong>{{ donation.pickup_address|default:donation.address }}</strong></div>
+                                    </div>
+                                    <button class="btn btn-success w-100 mb-2" onclick="handleReceiverCompletePickup({{ existing_request.id }})">
+                                        <i class="bi bi-bag-check-fill me-1"></i> Confirm Food Received
+                                    </button>
+                                </div>
+                            {% elif existing_request.status == 'COMPLETED' %}
+                                <div class="alert alert-success border-0 shadow-sm mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-check2-all fs-4 me-2 text-success"></i>
+                                        <h6 class="fw-bold mb-0">Donation Completed</h6>
+                                    </div>
+                                    <p class="small mb-0">
+                                        You have successfully received and completed this food donation.
+                                    </p>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info border-0 shadow-sm mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-info-circle-fill fs-4 me-2"></i>
+                                        <h6 class="fw-bold mb-0">Request Already Submitted</h6>
+                                    </div>
+                                    <p class="small mb-2">
+                                        You have already sent a request for this food donation.
+                                    </p>
+                                    <div class="p-2 bg-white rounded-2 border small">
+                                        <div>Status: <strong>{{ existing_request.status }}</strong></div>
+                                        <div>Requested: <strong>{{ existing_request.requested_quantity }} {{ donation.quantity_unit }}</strong></div>
+                                        <div>Date: {{ existing_request.requested_at|date:"M d, Y" }}</div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <a href="{% url 'receiver_requests' %}" class="btn btn-outline-success w-100">
+                                <i class="bi bi-list-check me-1"></i> View in My Requests
+                            </a>
+                        {% elif donation.status == 'AVAILABLE' %}
+                            <h5 class="fw-bold text-dark mb-3">Request This Food</h5>
+                            <p class="text-muted small mb-3">
+                                Send a request to the donor to claim this surplus food.
+                            </p>
+
+                            <form id="requestFoodForm" onsubmit="handleFoodRequestSubmit(event, {{ donation.id }})">
+                                <input type="hidden" name="donation" value="{{ donation.id }}">
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small text-muted text-uppercase">
+                                        Requested Quantity (Max: {{ donation.quantity }} {{ donation.quantity_unit }})
+                                    </label>
+                                    <div class="input-group">
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0.1"
+                                            max="{{ donation.quantity }}"
+                                            class="form-control"
+                                            id="requestQuantity"
+                                            name="requested_quantity"
+                                            value="{{ donation.quantity }}"
+                                            required
+                                        >
+                                        <span class="input-group-text">{{ donation.quantity_unit }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small text-muted text-uppercase">
+                                        Message to Donor (Optional)
+                                    </label>
+                                    <textarea
+                                        class="form-control"
+                                        id="requestMessage"
+                                        name="message"
+                                        rows="3"
+                                        placeholder="Add notes, expected pickup time, or requirements..."
+                                    ></textarea>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-success w-100 py-2 fw-semibold d-flex align-items-center justify-content-center"
+                                    id="submitRequestBtn"
+                                >
+                                    <i class="bi bi-send me-2"></i> Submit Request
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-secondary border-0 text-center mb-0">
+                                <i class="bi bi-exclamation-circle fs-3 text-secondary d-block mb-2"></i>
+                                <h6 class="fw-bold mb-1">Not Available</h6>
+                                <p class="small text-muted mb-0">
+                                    This food donation is currently {{ donation.status|lower }} and is not accepting requests.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
 
         </div>
-
     </div>
 
 </div>
 
 {% endblock %}
 
-
 {% block extra_js %}
-
 <script src="{% static 'js/donation.js' %}"></script>
-
 <script src="{% static 'js/request.js' %}"></script>
-
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+async function handleFoodRequestSubmit(event, donationId) {
+    event.preventDefault();
+    const btn = document.getElementById("submitRequestBtn");
+    const quantityInput = document.getElementById("requestQuantity");
+    const messageInput = document.getElementById("requestMessage");
+    const alertContainer = document.getElementById("receiverDonationMessage");
 
+    const quantity = parseFloat(quantityInput.value);
+    const message = messageInput ? messageInput.value.trim() : "";
+
+    if (!quantity || quantity <= 0) {
+        alert("Please enter a valid requested quantity.");
+        return;
+    }
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Submitting...';
+    }
+
+    try {
+        const payload = {
+            donation: donationId,
+            requested_quantity: quantity,
+            quantity: quantity,
+            message: message
+        };
+
+        const response = await apiRequest("/api/v1/requests/", {
+            method: "POST",
+            body: JSON.stringify(payload)
+        });
+
+        if (alertContainer) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>Request submitted successfully!</strong> The donor has been notified.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+
+        setTimeout(() => {
+            window.location.href = "{% url 'receiver_requests' %}";
+        }, 1200);
+
+    } catch (error) {
+        console.error("Food request error:", error);
+        if (alertContainer) {
+            alertContainer.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Failed to submit request: ${escapeHTML(error.message || "Please check details and try again.")}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send me-2"></i> Submit Request';
+        }
+    }
+}
+
+async function handleReceiverCompletePickup(requestId) {
+    if (!confirm("Confirm that you have received this food donation?")) return;
+    try {
+        await apiRequest(`/api/v1/requests/${requestId}/complete/`, {
+            method: "POST"
+        });
+        alert("Food donation marked as received! Thank you.");
+        window.location.reload();
+    } catch (e) {
+        alert(e.message || "Failed to update pickup status.");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
     if (typeof loadReceiverDonationDetail === "function") {
         loadReceiverDonationDetail();
     }
-
 });
 </script>
-
 {% endblock %}

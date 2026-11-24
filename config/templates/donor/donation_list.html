@@ -81,35 +81,35 @@
                         id="filterCategory"
                     >
 
-                        <option value="">
+                        <option value="" {% if not current_category %}selected{% endif %}>
                             All Categories
                         </option>
 
-                        <option value="prepared">
-                            Prepared Food
+                        <option value="VEG" {% if current_category|upper == 'VEG' %}selected{% endif %}>
+                            Vegetarian
                         </option>
 
-                        <option value="grains">
-                            Grains
+                        <option value="NON_VEG" {% if current_category|upper == 'NON_VEG' %}selected{% endif %}>
+                            Non-Vegetarian
                         </option>
 
-                        <option value="vegetables">
-                            Vegetables
+                        <option value="VEGAN" {% if current_category|upper == 'VEGAN' %}selected{% endif %}>
+                            Vegan
                         </option>
 
-                        <option value="fruits">
-                            Fruits
-                        </option>
-
-                        <option value="bakery">
+                        <option value="BAKERY" {% if current_category|upper == 'BAKERY' %}selected{% endif %}>
                             Bakery
                         </option>
 
-                        <option value="packaged">
+                        <option value="FRUITS" {% if current_category|upper == 'FRUITS' %}selected{% endif %}>
+                            Fruits
+                        </option>
+
+                        <option value="PACKAGED" {% if current_category|upper == 'PACKAGED' %}selected{% endif %}>
                             Packaged Food
                         </option>
 
-                        <option value="other">
+                        <option value="OTHER" {% if current_category|upper == 'OTHER' %}selected{% endif %}>
                             Other
                         </option>
 
@@ -129,27 +129,31 @@
                         id="filterStatus"
                     >
 
-                        <option value="">
+                        <option value="" {% if not current_status %}selected{% endif %}>
                             All Statuses
                         </option>
 
-                        <option value="available">
+                        <option value="available" {% if current_status|lower == 'available' %}selected{% endif %}>
                             Available
                         </option>
 
-                        <option value="requested">
+                        <option value="requested" {% if current_status|lower == 'requested' %}selected{% endif %}>
                             Requested
                         </option>
 
-                        <option value="completed">
+                        <option value="accepted" {% if current_status|lower == 'accepted' %}selected{% endif %}>
+                            Accepted
+                        </option>
+
+                        <option value="completed" {% if current_status|lower == 'completed' %}selected{% endif %}>
                             Completed
                         </option>
 
-                        <option value="expired">
+                        <option value="expired" {% if current_status|lower == 'expired' %}selected{% endif %}>
                             Expired
                         </option>
 
-                        <option value="cancelled">
+                        <option value="cancelled" {% if current_status|lower == 'cancelled' %}selected{% endif %}>
                             Cancelled
                         </option>
 
@@ -185,7 +189,7 @@
 
             <div class="table-responsive">
 
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle" id="donationsTable">
 
                     <thead>
 
@@ -206,22 +210,62 @@
 
                     <tbody id="donationTableBody">
 
-                        <tr>
-
-                            <td
-                                colspan="7"
-                                class="text-center py-5 text-muted"
-                            >
-
-                                <div
-                                    class="spinner-border spinner-border-sm text-success">
-                                </div>
-
-                                Loading donations...
-
-                            </td>
-
-                        </tr>
+                        {% if donations %}
+                            {% for donation in donations %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if donation.image %}
+                                            <img src="{{ donation.image.url }}" width="45" height="45" class="rounded object-fit-cover" alt="Food">
+                                        {% else %}
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:45px;height:45px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <strong>{{ donation.title }}</strong>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ donation.get_food_type_display|default:donation.food_type }}</span></td>
+                                <td>{{ donation.quantity }} {{ donation.get_quantity_unit_display|default:donation.quantity_unit }}</td>
+                                <td>{{ donation.expiry_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if donation.status == 'AVAILABLE' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Available</span>
+                                    {% elif donation.status == 'REQUESTED' %}
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Requested</span>
+                                    {% elif donation.status == 'ACCEPTED' %}
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle">Accepted</span>
+                                    {% elif donation.status == 'COMPLETED' %}
+                                        <span class="badge bg-success border">Completed</span>
+                                    {% elif donation.status == 'CANCELLED' %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Cancelled</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border">{{ donation.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><small class="text-muted">{{ donation.created_at|date:"M d, Y" }}</small></td>
+                                <td>
+                                    <a href="{% url 'donor_donation_detail' donation.id %}" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-eye me-1"></i>View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 text-muted d-block mb-2"></i>
+                                    No donations found.
+                                    <div class="mt-2">
+                                        <a href="{% url 'donor_create_donation' %}" class="btn btn-sm btn-success">
+                                            <i class="bi bi-plus-lg me-1"></i> New Donation
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
 
                     </tbody>
 

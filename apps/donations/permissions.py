@@ -10,7 +10,11 @@ class IsDonor(BasePermission):
 
         return (
             request.user.is_authenticated
-            and request.user.role == User.Role.DONOR
+            and (
+                request.user.role == User.Role.DONOR
+                or request.user.role == User.Role.ADMIN
+                or request.user.is_staff
+            )
         )
 
 

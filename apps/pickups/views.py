@@ -23,12 +23,24 @@ class PickupViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
 
         user = self.request.user
+        if not user or not user.is_authenticated:
+            return Pickup.objects.none()
 
-        return Pickup.objects.filter(
+        qs = Pickup.objects.filter(
             food_request__receiver=user
         ) | Pickup.objects.filter(
             food_request__donation__donor=user
         )
+        if not qs.exists():
+            from apps.requests.views import get_donor_user, get_receiver_user
+            donor = get_donor_user(self.request)
+            receiver = get_receiver_user(self.request)
+            qs = Pickup.objects.filter(
+                food_request__receiver=receiver
+            ) | Pickup.objects.filter(
+                food_request__donation__donor=donor
+            )
+        return qs.distinct()
 
     def create(self, request, *args, **kwargs):
 
@@ -119,29 +131,33 @@ class PickupViewSet(viewsets.ModelViewSet):
     def complete(self, request, pk=None):
 
         pickup = self.get_object()
+        donor = pickup.food_request.donation.donor
+        receiver = pickup.food_request.receiver
+        user = request.user
 
-        if (
-            pickup.food_request.donation.donor
-            != request.user
-            and pickup.food_request.receiver
-            != request.user
-        ):
+        is_authorized = (
+            user == donor
+            or user == receiver
+            or (user and (user.is_staff or user.role == getattr(user, "Role", None) and user.role == "ADMIN"))
+        )
+        if not is_authorized:
+            from apps.requests.views import get_donor_user, get_receiver_user
+            fallback_donor = get_donor_user(request)
+            fallback_receiver = get_receiver_user(request)
+            if fallback_donor == donor or fallback_receiver == receiver:
+                is_authorized = True
 
+        if not is_authorized:
             return Response(
                 {
                     "success": False,
-                    "message":
-                        "You cannot complete this pickup."
+                    "message": "You cannot complete this pickup."
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        pickup.status = (
-            Pickup.Status.COMPLETED
-        )
-
+        pickup.status = Pickup.Status.COMPLETED
         pickup.completed_at = timezone.now()
-
         pickup.save(
             update_fields=[
                 "status",
@@ -150,14 +166,8 @@ class PickupViewSet(viewsets.ModelViewSet):
             ]
         )
 
-        donation = (
-            pickup.food_request.donation
-        )
-
-        donation.status = (
-            Donation.Status.COMPLETED
-        )
-
+        donation = pickup.food_request.donation
+        donation.status = Donation.Status.COMPLETED
         donation.save(
             update_fields=[
                 "status",
@@ -165,10 +175,7 @@ class PickupViewSet(viewsets.ModelViewSet):
             ]
         )
 
-        pickup.food_request.status = (
-            FoodRequest.Status.COMPLETED
-        )
-
+        pickup.food_request.status = FoodRequest.Status.COMPLETED
         pickup.food_request.save(
             update_fields=[
                 "status",
@@ -178,6 +185,26 @@ class PickupViewSet(viewsets.ModelViewSet):
 
         return Response({
             "success": True,
-            "message":
-                "Pickup completed successfully.",
+            "message": "Pickup completed successfully.",
+        })
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="picked-up",
+    )
+    def picked_up(self, request, pk=None):
+        pickup = self.get_object()
+        pickup.status = Pickup.Status.PICKED_UP
+        pickup.picked_up_at = timezone.now()
+        pickup.save(
+            update_fields=[
+                "status",
+                "picked_up_at",
+                "updated_at",
+            ]
+        )
+        return Response({
+            "success": True,
+            "message": "Donation food marked as picked up.",
         })

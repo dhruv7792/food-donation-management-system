@@ -24,7 +24,7 @@ class Pickup(models.Model):
     pickup_code = models.CharField(
         max_length=20,
         unique=True,
-        default=lambda: uuid.uuid4().hex[:8].upper(),
+        default=generate_pickup_code,
     )
 
     pickup_date = models.DateField()
@@ -64,11 +64,7 @@ class Pickup(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True
     )
-    pickup_code = models.CharField(
-        max_length=20,
-        unique=True,
-        default=generate_pickup_code,
-    )
+
     def __str__(self):
 
         return (

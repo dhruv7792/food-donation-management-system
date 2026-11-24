@@ -11,7 +11,7 @@ class DonationFilter(
     )
 
     food_type = django_filters.CharFilter(
-        lookup_expr="iexact"
+        method="filter_food_type"
     )
 
     status = django_filters.CharFilter(
@@ -27,6 +27,16 @@ class DonationFilter(
         field_name="quantity",
         lookup_expr="lte",
     )
+
+    def filter_food_type(self, queryset, name, value):
+        if not value:
+            return queryset
+        val = value.strip().upper()
+        if val in ["VEGETARIAN", "VEGETABLES"]:
+            val = "VEG"
+        elif val == "NON-VEGETARIAN":
+            val = "NON_VEG"
+        return queryset.filter(food_type__iexact=val)
 
     class Meta:
 

@@ -20,7 +20,7 @@
             </h2>
 
             <p class="text-muted mb-0">
-                Welcome back, <span id="donorName">Donor</span>
+                Welcome back, <span id="donorName">{{ request.user.first_name|default:request.user.username|default:"Donor" }}</span>
             </p>
         </div>
 
@@ -33,135 +33,115 @@
     </div>
 
 
-    <!-- Statistics -->
+    <!-- Statistics Cards (Clickable) -->
 
     <div class="row g-4 mb-4">
 
+        <!-- Total Donations Card -->
         <div class="col-sm-6 col-xl-3">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-                            <p class="text-muted mb-1">
-                                Total Donations
-                            </p>
-
-                            <h3 class="fw-bold mb-0"
-                                id="totalDonations">
-                                0
-                            </h3>
+            <a href="{% url 'donor_donation_list' %}" class="text-decoration-none text-dark">
+                <div class="card border-0 shadow-sm h-100 stat-card" style="cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small fw-medium">
+                                    Total Donations
+                                </p>
+                                <h3 class="fw-bold mb-0" id="totalDonations">
+                                    {{ total_donations|default:"0" }}
+                                </h3>
+                            </div>
+                            <div class="fs-2 text-success">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
                         </div>
-
-                        <div class="fs-2 text-success">
-                            <i class="bi bi-box-seam"></i>
+                        <div class="mt-2 text-success small fw-semibold">
+                            View all donations <i class="bi bi-arrow-right"></i>
                         </div>
-
                     </div>
-
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
 
+        <!-- Available Donations Card -->
         <div class="col-sm-6 col-xl-3">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-                            <p class="text-muted mb-1">
-                                Available
-                            </p>
-
-                            <h3 class="fw-bold mb-0"
-                                id="availableDonations">
-                                0
-                            </h3>
+            <a href="{% url 'donor_donation_list' %}?status=available" class="text-decoration-none text-dark">
+                <div class="card border-0 shadow-sm h-100 stat-card" style="cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small fw-medium">
+                                    Available
+                                </p>
+                                <h3 class="fw-bold mb-0" id="availableDonations">
+                                    {{ available_donations|default:"0" }}
+                                </h3>
+                            </div>
+                            <div class="fs-2 text-primary">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
                         </div>
-
-                        <div class="fs-2 text-primary">
-                            <i class="bi bi-check-circle"></i>
+                        <div class="mt-2 text-primary small fw-semibold">
+                            Active listings <i class="bi bi-arrow-right"></i>
                         </div>
-
                     </div>
-
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
 
+        <!-- Requested Card -->
         <div class="col-sm-6 col-xl-3">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-                            <p class="text-muted mb-1">
-                                Requested
-                            </p>
-
-                            <h3 class="fw-bold mb-0"
-                                id="requestedDonations">
-                                0
-                            </h3>
+            <a href="{% url 'donor_requests' %}" class="text-decoration-none text-dark">
+                <div class="card border-0 shadow-sm h-100 stat-card" style="cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small fw-medium">
+                                    Requested
+                                </p>
+                                <h3 class="fw-bold mb-0" id="requestedDonations">
+                                    {{ requested_donations|default:"0" }}
+                                </h3>
+                            </div>
+                            <div class="fs-2 text-warning">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
                         </div>
-
-                        <div class="fs-2 text-warning">
-                            <i class="bi bi-hourglass-split"></i>
+                        <div class="mt-2 text-warning small fw-semibold">
+                            Pending requests <i class="bi bi-arrow-right"></i>
                         </div>
-
                     </div>
-
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
 
+        <!-- Completed Card -->
         <div class="col-sm-6 col-xl-3">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex justify-content-between">
-
-                        <div>
-                            <p class="text-muted mb-1">
-                                Completed
-                            </p>
-
-                            <h3 class="fw-bold mb-0"
-                                id="completedDonations">
-                                0
-                            </h3>
+            <a href="{% url 'donor_donation_list' %}?status=completed" class="text-decoration-none text-dark">
+                <div class="card border-0 shadow-sm h-100 stat-card" style="cursor:pointer; transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small fw-medium">
+                                    Completed
+                                </p>
+                                <h3 class="fw-bold mb-0" id="completedDonations">
+                                    {{ completed_donations|default:"0" }}
+                                </h3>
+                            </div>
+                            <div class="fs-2 text-success">
+                                <i class="bi bi-heart-fill"></i>
+                            </div>
                         </div>
-
-                        <div class="fs-2 text-success">
-                            <i class="bi bi-heart-fill"></i>
+                        <div class="mt-2 text-success small fw-semibold">
+                            Donated food <i class="bi bi-arrow-right"></i>
                         </div>
-
                     </div>
-
                 </div>
-
-            </div>
-
+            </a>
         </div>
 
     </div>
@@ -213,17 +193,56 @@
 
                     <tbody id="recentDonations">
 
-                        <tr>
-                            <td colspan="6"
-                                class="text-center text-muted py-5">
-
-                                <div class="spinner-border spinner-border-sm text-success">
-                                </div>
-
-                                Loading donations...
-
-                            </td>
-                        </tr>
+                        {% if recent_donations %}
+                            {% for donation in recent_donations %}
+                            <tr>
+                                <td class="fw-semibold">
+                                    <a href="{% url 'donor_donation_detail' donation.id %}" class="text-decoration-none text-dark">
+                                        {{ donation.title }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        {{ donation.get_food_type_display|default:donation.food_type }}
+                                    </span>
+                                </td>
+                                <td>{{ donation.quantity }} {{ donation.get_quantity_unit_display|default:donation.quantity_unit }}</td>
+                                <td>
+                                    {% if donation.status == 'AVAILABLE' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Available</span>
+                                    {% elif donation.status == 'REQUESTED' %}
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Requested</span>
+                                    {% elif donation.status == 'ACCEPTED' %}
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle">Accepted</span>
+                                    {% elif donation.status == 'COMPLETED' %}
+                                        <span class="badge bg-success border">Completed</span>
+                                    {% elif donation.status == 'CANCELLED' %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Cancelled</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border">{{ donation.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">{{ donation.created_at|date:"M d, Y" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'donor_donation_detail' donation.id %}" class="btn btn-sm btn-outline-success">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    <i class="bi bi-inbox fs-2 text-muted d-block mb-2"></i>
+                                    No donations created yet.
+                                    <div class="mt-2">
+                                        <a href="{% url 'donor_create_donation' %}" class="btn btn-sm btn-success">
+                                            <i class="bi bi-plus-lg me-1"></i> Create Donation
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
 
                     </tbody>
 
