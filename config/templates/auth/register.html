@@ -5,76 +5,126 @@
 
 {% block extra_css %}
 <style>
+    /* =========================================
+       REGISTER PAGE
+    ========================================= */
+
     .register-page {
         min-height: calc(100vh - 140px);
-        padding: 45px 15px;
-        background: #f5faf7;
+        padding: 55px 15px;
+        background: var(--page-bg);
     }
 
     .register-card {
         max-width: 900px;
         margin: auto;
-        border: 0;
+        border: 1px solid var(--border);
         border-radius: 20px;
-        background: #fff;
-        box-shadow: 0 15px 50px rgba(0,0,0,.08);
+        background: var(--surface);
+        color: var(--text);
+        box-shadow: var(--shadow-card);
         overflow: hidden;
     }
 
+    /* =========================================
+       HEADER
+    ========================================= */
+
     .register-header {
-        padding: 35px 40px;
+        padding: 38px 40px;
         text-align: center;
-        background: linear-gradient(135deg, #198754, #126c42);
+        background: linear-gradient(
+            135deg,
+            var(--primary),
+            var(--primary-dark)
+        );
         color: #fff;
+        border-bottom: 4px solid var(--accent-gold);
     }
 
     .register-header h1 {
         font-size: 2rem;
-        font-weight: 700;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 10px;
     }
 
     .register-header p {
         margin: 0;
-        color: rgba(255,255,255,.85);
+        color: rgba(255,255,255,.9);
+        font-size: 15px;
     }
+
+    /* =========================================
+       FORM BODY
+    ========================================= */
 
     .register-body {
         padding: 40px;
+        background: var(--surface);
+        color: var(--text);
     }
 
     .form-label {
         font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
     }
 
     .form-control,
     .form-select {
         min-height: 48px;
         border-radius: 9px;
+        background-color: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--text);
+        transition: all .2s ease;
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted);
+        opacity: .8;
     }
 
     .form-control:focus,
     .form-select:focus {
-        border-color: #198754;
-        box-shadow: 0 0 0 .2rem rgba(25,135,84,.12);
+        border-color: var(--input-focus-border);
+        box-shadow: 0 0 0 .2rem rgba(46, 125, 50, .15);
+        background-color: var(--input-bg);
+        color: var(--text);
     }
+
+    /* =========================================
+       ROLE SELECTION CARDS
+    ========================================= */
 
     .role-card {
         cursor: pointer;
-        border: 2px solid #dee2e6;
+        border: 2px solid var(--border);
         border-radius: 12px;
-        padding: 18px;
-        transition: .2s ease;
+        padding: 20px;
+        transition: all .2s ease;
         height: 100%;
+        background: var(--surface);
+        color: var(--text);
+        display: block;
     }
 
     .role-card:hover {
-        border-color: #198754;
-        background: #f5fbf7;
+        border-color: var(--primary);
+        background: var(--primary-light);
+        transform: translateY(-3px);
     }
 
     .role-card.active {
-        border-color: #198754;
-        background: #edf8f1;
+        border-color: var(--primary);
+        background: var(--primary-light);
+        box-shadow: 0 4px 14px rgba(46, 125, 50, .10);
     }
 
     .role-card input {
@@ -82,19 +132,27 @@
     }
 
     .role-icon {
-        font-size: 28px;
-        color: #198754;
-        margin-bottom: 8px;
+        font-size: 30px;
+        color: var(--primary);
+        margin-bottom: 10px;
     }
 
     .role-title {
-        font-weight: 700;
+        font-weight: 750;
+        color: var(--text);
+        font-size: 17px;
+        margin-bottom: 5px;
     }
 
     .role-description {
-        color: #6c757d;
+        color: var(--text-muted);
         font-size: .9rem;
+        line-height: 1.6;
     }
+
+    /* =========================================
+       PASSWORD FIELDS
+    ========================================= */
 
     .password-wrapper {
         position: relative;
@@ -107,57 +165,235 @@
         transform: translateY(-50%);
         border: 0;
         background: transparent;
-        color: #6c757d;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 5px;
+        font-size: 17px;
+    }
+
+    .password-toggle:hover {
+        color: var(--primary);
     }
 
     .password-strength {
-        height: 5px;
+        height: 6px;
         border-radius: 5px;
-        background: #e9ecef;
+        background: var(--border);
         overflow: hidden;
-        margin-top: 8px;
+        margin-top: 9px;
     }
 
     .password-strength-bar {
         width: 0;
         height: 100%;
-        transition: width .3s;
+        transition: width .3s ease;
+        border-radius: 5px;
     }
+
+    #passwordStrengthText {
+        display: inline-block;
+        margin-top: 6px;
+        color: var(--text-muted);
+    }
+
+    #passwordMatchMessage {
+        font-weight: 600;
+    }
+
+    /* =========================================
+       PROFILE IMAGE
+    ========================================= */
 
     .profile-preview {
         width: 90px;
         height: 90px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid #198754;
+        border: 3px solid var(--primary);
         display: none;
+        box-shadow: var(--shadow-sm);
     }
 
-    .register-button {
-        min-height: 50px;
-        border-radius: 10px;
-        font-weight: 600;
+    /* =========================================
+       TERMS AND CONDITIONS
+    ========================================= */
+
+    .form-check-input {
+        border-color: var(--input-border);
+        cursor: pointer;
     }
 
-    .login-link {
-        text-align: center;
-        margin-top: 25px;
-        color: #6c757d;
+    .form-check-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
     }
 
-    .login-link a {
-        color: #198754;
+    .form-check-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 .2rem rgba(46, 125, 50, .15);
+    }
+
+    .form-check-label {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .form-check-label a {
+        color: var(--primary);
         font-weight: 600;
         text-decoration: none;
     }
 
-    @media(max-width: 576px) {
+    .form-check-label a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    /* =========================================
+       REGISTER BUTTON
+    ========================================= */
+
+    .register-button {
+        min-height: 52px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 16px;
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+        transition: all .2s ease;
+    }
+
+    .register-button:hover,
+    .register-button:focus {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(24, 58, 43, .2);
+    }
+
+    .register-button:disabled {
+        opacity: .7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* =========================================
+       ALERTS
+    ========================================= */
+
+    #registerAlert {
+        border-radius: 10px;
+        padding: 13px 16px;
+    }
+
+    /* =========================================
+       LOGIN LINK
+    ========================================= */
+
+    .login-link {
+        text-align: center;
+        margin-top: 25px;
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .login-link a {
+        color: var(--primary);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .login-link a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    /* =========================================
+       DARK MODE
+    ========================================= */
+
+    [data-theme="dark"] .register-card,
+    body.dark .register-card {
+        border-color: var(--border);
+        background: var(--surface);
+    }
+
+    [data-theme="dark"] .register-body,
+    body.dark .register-body {
+        background: var(--surface);
+        color: var(--text);
+    }
+
+    [data-theme="dark"] .role-card:hover,
+    [data-theme="dark"] .role-card.active,
+    body.dark .role-card:hover,
+    body.dark .role-card.active {
+        background: rgba(67, 160, 71, .16);
+        border-color: var(--primary);
+    }
+
+    [data-theme="dark"] .form-check-label,
+    body.dark .form-check-label {
+        color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .password-toggle,
+    body.dark .password-toggle {
+        color: var(--text-muted);
+    }
+
+    [data-theme="dark"] .profile-preview,
+    body.dark .profile-preview {
+        border-color: var(--primary);
+    }
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @media (max-width: 768px) {
+        .register-page {
+            padding: 35px 12px;
+        }
+
+        .register-body {
+            padding: 30px;
+        }
+
+        .register-header {
+            padding: 32px 25px;
+        }
+
+        .register-header h1 {
+            font-size: 1.8rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .register-page {
+            padding: 25px 10px;
+        }
+
+        .register-card {
+            border-radius: 14px;
+        }
+
         .register-body {
             padding: 25px 20px;
         }
 
         .register-header {
             padding: 30px 20px;
+        }
+
+        .register-header h1 {
+            font-size: 1.55rem;
+        }
+
+        .role-card {
+            padding: 16px;
         }
     }
 </style>

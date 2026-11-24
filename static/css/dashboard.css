@@ -32,21 +32,23 @@
 .dashboard-sidebar {
     width: 250px;
     min-height: calc(100vh - 70px);
-    background: #212529;
-    color: #ffffff;
+    background: var(--surface);
+    color: var(--text);
     position: fixed;
     left: 0;
     top: 70px;
     bottom: 0;
     overflow-y: auto;
     z-index: 900;
+    border-right: 1px solid var(--border);
 }
 
 .sidebar-brand {
     padding: 25px 20px;
     font-size: 1.2rem;
     font-weight: 700;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
 }
 
 .sidebar-menu {
@@ -64,7 +66,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px 15px;
-    color: #ced4da;
+    color: var(--text-muted);
     border-radius: 7px;
     transition: var(--transition);
 }
@@ -105,10 +107,11 @@
     font-size: 1.8rem;
     font-weight: 700;
     margin: 0;
+    color: var(--text);
 }
 
 .dashboard-subtitle {
-    color: var(--gray);
+    color: var(--text-muted);
     margin-top: 5px;
 }
 
@@ -117,12 +120,14 @@
    ========================= */
 
 .stat-card {
-    background: #ffffff;
+    background: var(--surface);
     border-radius: 10px;
     padding: 22px;
     box-shadow: var(--shadow);
     height: 100%;
+    border: 1px solid var(--border);
     border-left: 4px solid var(--primary);
+    color: var(--text);
 }
 
 .stat-card-content {
@@ -132,7 +137,7 @@
 }
 
 .stat-title {
-    color: var(--gray);
+    color: var(--text-muted);
     font-size: 0.9rem;
     margin-bottom: 5px;
 }
@@ -140,7 +145,7 @@
 .stat-value {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--dark);
+    color: var(--text);
 }
 
 .stat-icon {
@@ -206,11 +211,13 @@
    ========================= */
 
 .dashboard-card {
-    background: #ffffff;
+    background: var(--surface);
     border-radius: 10px;
     padding: 25px;
     box-shadow: var(--shadow);
     margin-bottom: 25px;
+    border: 1px solid var(--border);
+    color: var(--text);
 }
 
 .dashboard-card-title {
@@ -219,6 +226,7 @@
     align-items: center;
     margin-bottom: 20px;
     font-weight: 700;
+    color: var(--text);
 }
 
 /* =========================
@@ -237,11 +245,13 @@
    ========================= */
 
 .filter-bar {
-    background: #ffffff;
+    background: var(--surface);
     padding: 20px;
     border-radius: 10px;
     box-shadow: var(--shadow);
     margin-bottom: 25px;
+    border: 1px solid var(--border);
+    color: var(--text);
 }
 
 .filter-bar .form-control,
@@ -277,9 +287,11 @@
     align-items: center;
     gap: 15px;
     padding: 18px;
-    background: #ffffff;
+    background: var(--surface);
     border-radius: 8px;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    color: var(--text);
     transition: var(--transition);
 }
 

@@ -3,58 +3,98 @@
 
 {% block title %}FoodShare | Share Food, Reduce Waste{% endblock %}
 
+
 {% block extra_css %}
-
 <style>
-
 /* =========================================================
-   HERO SECTION
+   FOODSHARE HOMEPAGE THEME
 ========================================================= */
 
-.hero-section {
-    min-height: 650px;
-    display: flex;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-
-    background-image:
-        linear-gradient(
-            90deg,
-            rgba(0, 77, 45, 0.95) 0%,
-            rgba(18, 108, 66, 0.82) 40%,
-            rgba(18, 108, 66, 0.42) 68%,
-            rgba(18, 108, 66, 0.12) 100%
-        ),
-        url("{% static 'images/food-donation-hero.png' %}");
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    color: white;
+:root {
+    --fs-primary: #2E7D32;
+    --fs-deep: #183A2B;
+    --fs-gold: #D4AF37;
+    --fs-light-gold: #F5E6B3;
+    --fs-cream: #FFFDF5;
+    --fs-light-green: #E8F5E9;
+    --fs-orange: #F57C00;
+    --fs-text: #263238;
+    --fs-muted: #6c757d;
+    --fs-border: #e5e7eb;
+    --fs-card: #ffffff;
 }
 
-.hero-content {
-    max-width: 680px;
+/* =========================================================
+   PAGE
+========================================================= */
+
+body {
+    background-color: var(--fs-cream);
+    color: var(--fs-text);
+}
+/* =========================================================
+   FOODSHARE HERO CAROUSEL
+========================================================= */
+
+.foodshare-carousel {
     position: relative;
+    width: 100%;
+    height: 700px;
+    overflow: hidden;
+    background: var(--fs-deep);
+}
+
+.foodshare-carousel .carousel-item {
+    height: 700px;
+    position: relative;
+}
+
+.foodshare-carousel .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.foodshare-carousel .carousel-item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        rgba(24, 58, 43, 0.96) 0%,
+        rgba(46, 125, 50, 0.78) 48%,
+        rgba(24, 58, 43, 0.20) 100%
+    );
+}
+
+.foodshare-carousel .carousel-caption {
+    position: absolute;
     z-index: 2;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: max(calc((100% - 1320px) / 2), 7%);
+    transform: translateY(-50%);
+    width: min(680px, 75%);
+    padding: 0;
+    text-align: left;
 }
 
 .hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-
     padding: 8px 16px;
     border-radius: 50px;
-
     background: rgba(255,255,255,.14);
-    border: 1px solid rgba(255,255,255,.30);
-
+    border: 1px solid var(--fs-gold);
     margin-bottom: 20px;
-
     backdrop-filter: blur(5px);
+}
+
+.hero-badge i {
+    color: var(--fs-gold);
 }
 
 .hero-title {
@@ -62,12 +102,13 @@
     line-height: 1.08;
     font-weight: 800;
     margin-bottom: 22px;
+    color: #fff;
 }
 
 .hero-text {
     font-size: 1.15rem;
     line-height: 1.7;
-    color: rgba(255,255,255,.92);
+    color: rgba(255,255,255,.95);
     margin-bottom: 30px;
     max-width: 650px;
 }
@@ -82,9 +123,130 @@
     padding: 13px 25px;
     border-radius: 10px;
     font-weight: 600;
+    transition: .25s ease;
 }
 
+.hero-buttons .btn-light {
+    background: var(--fs-gold);
+    border-color: var(--fs-gold);
+    color: var(--fs-deep);
+}
 
+.hero-buttons .btn-light:hover {
+    background: var(--fs-light-gold);
+    border-color: var(--fs-light-gold);
+    transform: translateY(-2px);
+}
+
+.hero-buttons .btn-outline-light:hover {
+    background: white;
+    color: var(--fs-deep);
+    transform: translateY(-2px);
+}
+
+/* Carousel arrows */
+
+.foodshare-carousel .carousel-control-prev,
+.foodshare-carousel .carousel-control-next {
+    z-index: 4;
+    width: 7%;
+}
+
+.foodshare-carousel .carousel-control-prev-icon,
+.foodshare-carousel .carousel-control-next-icon {
+    width: 42px;
+    height: 42px;
+    padding: 10px;
+    background-color: rgba(24, 58, 43, .75);
+    background-size: 55%;
+    border-radius: 50%;
+}
+
+/* Carousel indicators */
+
+.foodshare-carousel .carousel-indicators {
+    z-index: 5;
+    margin-bottom: 25px;
+}
+
+.foodshare-carousel .carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid white;
+    margin: 0 6px;
+}
+
+/* Tablet */
+
+@media (max-width: 991px) {
+    .foodshare-carousel,
+    .foodshare-carousel .carousel-item {
+        height: 620px;
+    }
+
+    .foodshare-carousel .carousel-caption {
+        left: 8%;
+        width: 78%;
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 7vw, 4rem);
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+    .foodshare-carousel,
+    .foodshare-carousel .carousel-item {
+        height: 650px;
+    }
+
+    .foodshare-carousel .carousel-item::after {
+        background: linear-gradient(
+            180deg,
+            rgba(24,58,43,.88),
+            rgba(46,125,50,.72)
+        );
+    }
+
+    .foodshare-carousel .carousel-caption {
+        left: 7%;
+        width: 82%;
+    }
+
+    .hero-title {
+        font-size: clamp(2.3rem, 10vw, 3.5rem);
+    }
+
+    .hero-text {
+        font-size: 1rem;
+    }
+
+    .hero-buttons {
+        width: 100%;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .foodshare-carousel,
+    .foodshare-carousel .carousel-item {
+        height: 620px;
+    }
+
+    .hero-title {
+        font-size: 2.4rem;
+    }
+
+    .hero-badge {
+        font-size: .9rem;
+    }
+}
 /* =========================================================
    STATISTICS
 ========================================================= */
@@ -96,44 +258,44 @@
 }
 
 .stat-card {
-    background: white;
+    background: var(--fs-card);
+    border: 1px solid var(--fs-border);
+    border-bottom: 3px solid var(--fs-gold);
     border-radius: 16px;
     padding: 25px;
     text-align: center;
-
     box-shadow: 0 10px 35px rgba(0,0,0,.08);
-
     height: 100%;
+    transition: .25s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(24,58,43,.12);
 }
 
 .stat-icon {
     width: 55px;
     height: 55px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     margin: auto auto 12px;
-
     border-radius: 14px;
-
-    background: #eaf7ef;
-    color: #198754;
-
+    background: var(--fs-light-green);
+    color: var(--fs-primary);
     font-size: 24px;
 }
 
 .stat-number {
     font-size: 2rem;
     font-weight: 800;
-    color: #198754;
+    color: var(--fs-primary);
 }
 
 .stat-label {
-    color: #6c757d;
+    color: var(--fs-muted);
 }
-
 
 /* =========================================================
    GENERAL SECTION
@@ -151,19 +313,23 @@
 
 .section-heading .badge {
     margin-bottom: 12px;
+    background: var(--fs-light-gold) !important;
+    color: var(--fs-deep) !important;
+    border: 1px solid var(--fs-gold);
+    padding: 8px 14px;
 }
 
 .section-heading h2 {
+    color: var(--fs-deep);
     font-weight: 800;
     font-size: 2.4rem;
     margin-bottom: 15px;
 }
 
 .section-heading p {
-    color: #6c757d;
+    color: var(--fs-muted);
     line-height: 1.7;
 }
-
 
 /* =========================================================
    FEATURES
@@ -172,59 +338,49 @@
 .feature-card {
     height: 100%;
     padding: 30px;
-
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--fs-border);
     border-radius: 18px;
-
     transition: .25s ease;
-
-    background: #fff;
+    background: var(--fs-card);
 }
 
 .feature-card:hover {
     transform: translateY(-6px);
-
     box-shadow: 0 15px 35px rgba(0,0,0,.08);
-
-    border-color: #b8dfc8;
+    border-color: var(--fs-gold);
 }
 
 .feature-icon {
     width: 65px;
     height: 65px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     border-radius: 16px;
-
-    background: #eaf7ef;
-    color: #198754;
-
+    background: var(--fs-light-green);
+    color: var(--fs-primary);
     font-size: 28px;
-
     margin-bottom: 20px;
 }
 
 .feature-card h4 {
+    color: var(--fs-deep);
     font-weight: 700;
     margin-bottom: 12px;
 }
 
 .feature-card p {
-    color: #6c757d;
+    color: var(--fs-muted);
     line-height: 1.7;
     margin-bottom: 0;
 }
-
 
 /* =========================================================
    HOW IT WORKS
 ========================================================= */
 
 .how-section {
-    background: #f5faf7;
+    background: var(--fs-light-green);
 }
 
 .step-card {
@@ -236,46 +392,41 @@
 .step-number {
     width: 60px;
     height: 60px;
-
     margin: 0 auto 20px;
-
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
-    background: #198754;
+    background: var(--fs-primary);
     color: white;
-
+    border: 3px solid var(--fs-gold);
     font-size: 20px;
     font-weight: 700;
 }
 
 .step-card h5 {
+    color: var(--fs-deep);
     font-weight: 700;
 }
 
 .step-card p {
-    color: #6c757d;
+    color: var(--fs-muted);
+    line-height: 1.7;
 }
 
-
 /* =========================================================
-   CTA
+   CALL TO ACTION
 ========================================================= */
 
 .cta-section {
     padding: 80px 0;
-
-    background:
-        linear-gradient(
-            135deg,
-            #126c42,
-            #198754
-        );
-
+    background: linear-gradient(
+        135deg,
+        var(--fs-deep),
+        var(--fs-primary)
+    );
     color: white;
+    border-top: 4px solid var(--fs-gold);
 }
 
 .cta-section h2 {
@@ -284,51 +435,103 @@
 }
 
 .cta-section p {
-    color: rgba(255,255,255,.85);
-
+    color: rgba(255,255,255,.88);
     max-width: 650px;
-
     margin: 15px auto 30px;
-
     line-height: 1.7;
 }
 
+.cta-section .btn {
+    background: var(--fs-orange);
+    border-color: var(--fs-orange);
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: .25s ease;
+}
+
+.cta-section .btn:hover {
+    background: #e56f00;
+    border-color: #e56f00;
+    transform: translateY(-3px);
+}
+
+/* =========================================================
+   DARK THEME
+========================================================= */
+
+[data-theme="dark"] {
+    --fs-cream: #121a16;
+    --fs-card: #1c2922;
+    --fs-text: #edf3ef;
+    --fs-muted: #b5c2b9;
+    --fs-border: #34483b;
+    --fs-light-green: #263b2e;
+    --fs-light-gold: #4a4022;
+}
+
+[data-theme="dark"] body {
+    background-color: var(--fs-cream);
+    color: var(--fs-text);
+}
+
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .feature-card {
+    background: var(--fs-card);
+    border-color: var(--fs-border);
+}
+
+[data-theme="dark"] .section-heading h2,
+[data-theme="dark"] .feature-card h4,
+[data-theme="dark"] .step-card h5 {
+    color: #edf3ef;
+}
+
+[data-theme="dark"] .how-section {
+    background: #1a2920;
+}
+
+[data-theme="dark"] .section-heading p,
+[data-theme="dark"] .feature-card p,
+[data-theme="dark"] .step-card p,
+[data-theme="dark"] .stat-label {
+    color: var(--fs-muted);
+}
+
+[data-theme="dark"] .section-heading .badge {
+    background: var(--fs-light-gold) !important;
+    color: var(--fs-light-gold) !important;
+}
 
 /* =========================================================
    TABLET
 ========================================================= */
 
 @media (max-width: 991px) {
-
     .hero-section {
         min-height: 620px;
-
         background-position: center;
     }
 
     .hero-title {
         font-size: clamp(2.5rem, 7vw, 4rem);
     }
-
 }
-
 
 /* =========================================================
    MOBILE
 ========================================================= */
 
 @media (max-width: 768px) {
-
     .hero-section {
         min-height: 620px;
-
         background-image:
             linear-gradient(
                 180deg,
-                rgba(0,77,45,.88),
-                rgba(18,108,66,.72)
+                rgba(24,58,43,.92),
+                rgba(46,125,50,.78)
             ),
-            url("{% static 'images/food-donation-hero.jpg' %}");
+            url("{% static 'images/food-donation-hero.png' %}");
 
         background-position: center;
     }
@@ -365,15 +568,16 @@
         font-size: 2rem;
     }
 
+    .cta-section h2 {
+        font-size: 2rem;
+    }
 }
-
 
 /* =========================================================
    SMALL MOBILE
 ========================================================= */
 
 @media (max-width: 480px) {
-
     .hero-section {
         min-height: 600px;
     }
@@ -397,13 +601,9 @@
     .stat-label {
         font-size: .9rem;
     }
-
 }
-
 </style>
-
 {% endblock %}
-
 
 {% block content %}
 
@@ -411,70 +611,188 @@
 <!-- =========================================================
      HERO
 ========================================================= -->
+<!-- =========================================================
+     FOODSHARE HERO CAROUSEL
+========================================================= -->
 
-<section class="hero-section">
+<div
+    id="foodShareHeroCarousel"
+    class="carousel slide carousel-fade foodshare-carousel"
+    data-bs-ride="carousel"
+    data-bs-interval="4500"
+    data-bs-pause="hover"
+    data-bs-touch="true"
+>
 
-    <div class="container">
+    <!-- SLIDE INDICATORS -->
+    <div class="carousel-indicators">
 
-        <div class="hero-content">
+        <button
+            type="button"
+            data-bs-target="#foodShareHeroCarousel"
+            data-bs-slide-to="0"
+            class="active"
+            aria-current="true"
+            aria-label="Slide 1">
+        </button>
 
-            <div class="hero-badge">
+        <button
+            type="button"
+            data-bs-target="#foodShareHeroCarousel"
+            data-bs-slide-to="1"
+            aria-label="Slide 2">
+        </button>
 
-                <i class="bi bi-heart-fill"></i>
+        <button
+            type="button"
+            data-bs-target="#foodShareHeroCarousel"
+            data-bs-slide-to="2"
+            aria-label="Slide 3">
+        </button>
 
-                Together Against Food Waste
+    </div>
+
+
+    <!-- SLIDES -->
+    <div class="carousel-inner">
+
+
+        <!-- SLIDE 1 -->
+        <div class="carousel-item active">
+
+            <img
+                src="{% static 'images/food-donation-hero.png' %}"
+                alt="Food donation and sharing"
+            >
+
+            <div class="carousel-caption">
+
+                <div class="hero-badge">
+                    <i class="bi bi-heart-fill"></i>
+                    Together Against Food Waste
+                </div>
+
+                <h1 class="hero-title">
+                    Share Food.
+                    <br>
+                    Reduce Waste.
+                    <br>
+                    Help People.
+                </h1>
+
+                <p class="hero-text">
+                    FoodShare connects food donors with people and
+                    organizations who need food. Turn surplus food
+                    into meaningful support for your community.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="{% url 'register' %}" class="btn btn-light">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Get Started
+                    </a>
+
+                    <a href="{% url 'about' %}" class="btn btn-outline-light">
+                        Learn More
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+
+                </div>
 
             </div>
 
-
-            <h1 class="hero-title">
-
-                Share Food.
-
-                <br>
-
-                Reduce Waste.
-
-                <br>
-
-                Help People.
-
-            </h1>
+        </div>
 
 
-            <p class="hero-text">
+        <!-- SLIDE 2 -->
+        <div class="carousel-item">
 
-                FoodShare connects food donors with people and
-                organizations who need food. Turn surplus food
-                into meaningful support for your community.
+            <img
+                src="{% static 'images/fresh-food-donation.jpg' %}"
+                alt="Fresh food ready for donation"
+            >
 
-            </p>
+            <div class="carousel-caption">
+
+                <div class="hero-badge">
+                    <i class="bi bi-basket-fill"></i>
+                    Fresh Food, Better Future
+                </div>
+
+                <h1 class="hero-title">
+                    Save Fresh Food.
+                    <br>
+                    Share Happiness.
+                </h1>
+
+                <p class="hero-text">
+                    Give good-quality surplus food a second chance.
+                    Your small contribution can make a meaningful
+                    difference to another person's life.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="{% url 'register' %}" class="btn btn-light">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Donate Food
+                    </a>
+
+                    <a href="{% url 'about' %}" class="btn btn-outline-light">
+                        Learn More
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
 
 
-            <div class="hero-buttons">
+        <!-- SLIDE 3 -->
+        <div class="carousel-item">
 
-                <a
-                    href="{% url 'register' %}"
-                    class="btn btn-light"
-                >
+            <img
+                src="{% static 'images/community-food-sharing.jpg' %}"
+                alt="Community members sharing food"
+            >
 
-                    <i class="bi bi-person-plus me-2"></i>
+            <div class="carousel-caption">
 
-                    Get Started
+                <div class="hero-badge">
+                    <i class="bi bi-people-fill"></i>
+                    Stronger Together
+                </div>
 
-                </a>
+                <h1 class="hero-title">
+                    Help Your
+                    <br>
+                    Community.
+                    <br>
+                    Spread Kindness.
+                </h1>
 
+                <p class="hero-text">
+                    Connect donors and receivers through one platform.
+                    Together, we can reduce food waste and help people
+                    access the food they need.
+                </p>
 
-                <a
-                    href="{% url 'about' %}"
-                    class="btn btn-outline-light"
-                >
+                <div class="hero-buttons">
 
-                    Learn More
+                    <a href="{% url 'register' %}" class="btn btn-light">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Join FoodShare
+                    </a>
 
-                    <i class="bi bi-arrow-right ms-2"></i>
+                    <a href="{% url 'about' %}" class="btn btn-outline-light">
+                        Learn More
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
 
-                </a>
+                </div>
 
             </div>
 
@@ -482,9 +800,33 @@
 
     </div>
 
-</section>
+
+    <!-- PREVIOUS BUTTON -->
+    <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#foodShareHeroCarousel"
+        data-bs-slide="prev"
+        aria-label="Previous slide">
+
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+
+    </button>
 
 
+    <!-- NEXT BUTTON -->
+    <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#foodShareHeroCarousel"
+        data-bs-slide="next"
+        aria-label="Next slide">
+
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+
+    </button>
+
+</div>
 
 <!-- =========================================================
      STATISTICS

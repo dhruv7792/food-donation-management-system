@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#FFFDF5">
     <title>Login | FoodShare</title>
 
     <style>
@@ -15,18 +16,37 @@
         }
 
         :root {
-            --green: #198754;
-            --dark-green: #11683f;
-            --border: #dce5df;
-            --text: #17251e;
-            --muted: #718078;
+            --green: #2E7D32;
+            --dark-green: #183A2B;
+            --light-green: #E8F5E9;
+            --cream: #FFFDF5;
+            --white: #FFFFFF;
+            --orange: #F57C00;
+            --gold: #D4AF37;
+            --light-gold: #F5E6B3;
+            --border: #E0E6E1;
+            --text: #263238;
+            --muted: #607D8B;
+            --surface: #FFFFFF;
+            --surface-soft: #F7F9F3;
+            --shadow: 0 20px 60px rgba(24, 58, 43, 0.12);
         }
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #f4fbf7, #eaf7ef);
+            background: var(--cream);
             color: var(--text);
             min-height: 100vh;
+            transition: background .3s ease, color .3s ease;
+        }
+
+        a {
+            transition: .2s ease;
+        }
+
+        button,
+        input {
+            font-family: inherit;
         }
 
         /* NAVBAR */
@@ -34,8 +54,8 @@
         .navbar {
             min-height: 86px;
             width: 100%;
-            background: rgba(255,255,255,.97);
-            border-bottom: 1px solid #edf1ee;
+            background: rgba(255, 253, 245, .97);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
         }
@@ -52,7 +72,7 @@
             text-decoration: none;
             font-size: 25px;
             font-weight: 800;
-            color: #16241d;
+            color: var(--dark-green);
         }
 
         .logo span {
@@ -66,7 +86,7 @@
         }
 
         .nav-link {
-            color: #617067;
+            color: var(--muted);
             text-decoration: none;
             font-weight: 600;
             padding: 10px 8px;
@@ -85,23 +105,41 @@
             font-weight: 700;
             cursor: pointer;
             text-decoration: none;
+            transition: .2s ease;
         }
 
         .theme-btn {
-            border: 1px solid #e0e7e2;
-            background: white;
+            border: 1px solid var(--border);
+            background: var(--white);
+            color: var(--text);
+        }
+
+        .theme-btn:hover {
+            border-color: var(--gold);
+            color: var(--dark-green);
         }
 
         .login-btn {
             border: 1px solid var(--green);
             color: var(--green);
-            background: white;
+            background: var(--white);
+        }
+
+        .login-btn:hover {
+            background: var(--light-green);
+            color: var(--dark-green);
         }
 
         .signup-btn {
             border: 1px solid var(--green);
             color: white;
             background: var(--green);
+        }
+
+        .signup-btn:hover {
+            background: var(--dark-green);
+            border-color: var(--dark-green);
+            color: white;
         }
 
         /* MAIN */
@@ -117,18 +155,23 @@
         .login-wrapper {
             width: min(1000px, 100%);
             min-height: 570px;
-            background: white;
+            background: var(--surface);
             border-radius: 22px;
             overflow: hidden;
             display: grid;
             grid-template-columns: 46% 54%;
-            box-shadow: 0 20px 60px rgba(30,75,50,.12);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(212, 175, 55, .18);
         }
 
         /* LEFT PANEL */
 
         .welcome-panel {
-            background: linear-gradient(145deg,#269a63,#117746);
+            background: linear-gradient(
+                145deg,
+                var(--green),
+                var(--dark-green)
+            );
             color: white;
             padding: 55px 50px;
             display: flex;
@@ -142,8 +185,9 @@
         .welcome-panel::after {
             content: "";
             position: absolute;
-            border: 1px solid rgba(255,255,255,.12);
+            border: 1px solid rgba(255, 255, 255, .12);
             border-radius: 50%;
+            pointer-events: none;
         }
 
         .welcome-panel::before {
@@ -164,8 +208,8 @@
             width: 70px;
             height: 70px;
             border-radius: 20px;
-            background: rgba(255,255,255,.13);
-            border: 1px solid rgba(255,255,255,.2);
+            background: rgba(255, 255, 255, .13);
+            border: 1px solid rgba(245, 230, 179, .45);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -184,7 +228,7 @@
             max-width: 330px;
             font-size: 17px;
             line-height: 1.8;
-            color: rgba(255,255,255,.91);
+            color: rgba(255, 255, 255, .91);
         }
 
         .feature {
@@ -200,7 +244,8 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            background: rgba(255,255,255,.15);
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(245, 230, 179, .25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -213,6 +258,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            background: var(--surface);
         }
 
         .form-header {
@@ -222,7 +268,7 @@
         .form-header h2 {
             font-size: 38px;
             margin-bottom: 14px;
-            color: #17221c;
+            color: var(--dark-green);
         }
 
         .form-header p {
@@ -238,8 +284,9 @@
         .message {
             padding: 12px 15px;
             border-radius: 8px;
-            background: #fff3cd;
-            color: #664d03;
+            background: var(--light-gold);
+            color: var(--dark-green);
+            border: 1px solid rgba(212, 175, 55, .35);
             font-size: 14px;
             margin-bottom: 8px;
         }
@@ -252,13 +299,15 @@
         }
 
         #loginAlert.alert-success {
-            color: #0f5132;
-            background: #d1e7dd;
+            color: #155D35;
+            background: #DFF2E4;
+            border: 1px solid #B7DEC2;
         }
 
         #loginAlert.alert-danger {
             color: #842029;
-            background: #f8d7da;
+            background: #F8D7DA;
+            border: 1px solid #F1AEB5;
         }
 
         .d-none {
@@ -279,7 +328,7 @@
         label {
             font-size: 15px;
             font-weight: 700;
-            color: #26342d;
+            color: var(--text);
         }
 
         .forgot {
@@ -287,6 +336,11 @@
             color: var(--green);
             text-decoration: none;
             font-weight: 600;
+        }
+
+        .forgot:hover {
+            color: var(--dark-green);
+            text-decoration: underline;
         }
 
         .input-wrapper {
@@ -301,17 +355,18 @@
             padding: 0 16px;
             font-size: 15px;
             outline: none;
-            color: #25332c;
-            background: white;
+            color: var(--text);
+            background: var(--white);
+            transition: .2s ease;
         }
 
         .input:focus {
             border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(25,135,84,.10);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, .12);
         }
 
         .input::placeholder {
-            color: #a2aca7;
+            color: #9AA7A0;
         }
 
         .password-input {
@@ -334,7 +389,7 @@
             align-items: center;
             gap: 9px;
             margin: 3px 0 25px;
-            color: #66736c;
+            color: var(--muted);
             font-size: 14px;
         }
 
@@ -342,6 +397,14 @@
             width: 17px;
             height: 17px;
             accent-color: var(--green);
+            cursor: pointer;
+        }
+
+        .remember-row label {
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--muted);
         }
 
         .submit-btn {
@@ -354,23 +417,26 @@
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: .2s;
+            transition: .2s ease;
         }
 
         .submit-btn:hover {
             background: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 18px rgba(24, 58, 43, .18);
         }
 
         .submit-btn:disabled {
             opacity: .7;
             cursor: not-allowed;
+            transform: none;
         }
 
         .spinner-border {
             display: inline-block;
             width: 15px;
             height: 15px;
-            border: 2px solid rgba(255,255,255,.4);
+            border: 2px solid rgba(255, 255, 255, .4);
             border-top-color: white;
             border-radius: 50%;
             animation: spin .7s linear infinite;
@@ -378,7 +444,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .divider {
@@ -386,7 +454,7 @@
             align-items: center;
             gap: 12px;
             margin: 25px 0;
-            color: #a1aaa5;
+            color: var(--muted);
             font-size: 13px;
         }
 
@@ -395,12 +463,12 @@
             content: "";
             height: 1px;
             flex: 1;
-            background: #e6ebe8;
+            background: var(--border);
         }
 
         .register-text {
             text-align: center;
-            color: #68756e;
+            color: var(--muted);
             font-size: 14px;
         }
 
@@ -410,52 +478,118 @@
             text-decoration: none;
         }
 
+        .register-text a:hover {
+            color: var(--dark-green);
+            text-decoration: underline;
+        }
+
         /* DARK MODE */
 
         body.dark {
-            background: #101815;
+            --cream: #101613;
+            --white: #17201B;
+            --surface: #17201B;
+            --surface-soft: #1E2B23;
+            --text: #FFFFFF;
+            --muted: #B0BEC5;
+            --border: #304137;
+            --green: #43A047;
+            --dark-green: #2E7D32;
+            --light-green: rgba(67, 160, 71, .18);
+            --gold: #D4AF37;
+            --light-gold: rgba(212, 175, 55, .15);
+            --shadow: 0 20px 60px rgba(0, 0, 0, .35);
+
+            background: var(--cream);
+            color: var(--text);
         }
 
         body.dark .navbar {
-            background: #17211d;
-            border-color: #27332e;
+            background: rgba(23, 32, 27, .97);
+            border-color: var(--border);
         }
 
         body.dark .logo,
         body.dark .nav-link {
-            color: #e8f0eb;
+            color: #FFFFFF;
+        }
+
+        body.dark .logo span {
+            color: #81C784;
         }
 
         body.dark .theme-btn {
-            background: #202c26;
-            border-color: #34423a;
-            color: white;
+            background: #1E2B23;
+            border-color: var(--border);
+            color: #FFFFFF;
+        }
+
+        body.dark .login-btn {
+            background: transparent;
+            color: #81C784;
+            border-color: #43A047;
+        }
+
+        body.dark .signup-btn {
+            background: #43A047;
+            border-color: #43A047;
+            color: #FFFFFF;
         }
 
         body.dark .login-wrapper,
         body.dark .form-panel {
-            background: #1b2520;
+            background: var(--surface);
+            border-color: var(--border);
         }
 
         body.dark .form-header h2,
         body.dark label {
-            color: #f1f6f3;
+            color: #FFFFFF;
         }
 
         body.dark .form-header p,
         body.dark .register-text,
-        body.dark .remember-row {
-            color: #aebbb4;
+        body.dark .remember-row,
+        body.dark .remember-row label {
+            color: #B0BEC5;
         }
 
         body.dark .input {
-            background: #202c26;
-            border-color: #39473f;
-            color: white;
+            background: #121A15;
+            border-color: var(--border);
+            color: #FFFFFF;
         }
 
         body.dark .input::placeholder {
-            color: #849189;
+            color: #90A4AE;
+        }
+
+        body.dark .message {
+            background: rgba(212, 175, 55, .15);
+            color: #F5E6B3;
+            border-color: rgba(212, 175, 55, .3);
+        }
+
+        body.dark #loginAlert.alert-success {
+            background: rgba(46, 125, 50, .2);
+            color: #A5D6A7;
+            border-color: rgba(67, 160, 71, .35);
+        }
+
+        body.dark #loginAlert.alert-danger {
+            background: rgba(211, 47, 47, .18);
+            color: #FFAB91;
+            border-color: rgba(239, 83, 80, .35);
+        }
+
+        body.dark .divider::before,
+        body.dark .divider::after {
+            background: var(--border);
+        }
+
+        body.dark .forgot,
+        body.dark .register-text a {
+            color: #81C784;
         }
 
         /* RESPONSIVE */
@@ -489,6 +623,10 @@
         @media (max-width: 650px) {
             .navbar {
                 min-height: 70px;
+            }
+
+            .nav-container {
+                width: calc(100% - 30px);
             }
 
             .logo {
@@ -728,6 +866,16 @@
 
     function applyTheme(isDark) {
         document.body.classList.toggle("dark", isDark);
+
+        document.documentElement.setAttribute(
+            "data-theme",
+            isDark ? "dark" : "light"
+        );
+
+        document.documentElement.setAttribute(
+            "data-bs-theme",
+            isDark ? "dark" : "light"
+        );
 
         themeButton.innerHTML = isDark
             ? '☀️ <span id="themeText">Light</span>'

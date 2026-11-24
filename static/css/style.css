@@ -1,79 +1,238 @@
-:root {
-    --primary: #198754;
-    --primary-dark: #146c43;
-    --light-bg: #f8f9fa;
-    --text-dark: #212529;
-}
-
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: var(--light-bg);
-    color: var(--text-dark);
-}
-
-.hero-section {
-    background: linear-gradient(135deg, #198754, #20c997);
-    color: white;
-    padding: 100px 0;
-}
-
-.card-hover {
-    transition: all 0.3s ease;
-}
-
-.card-hover:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-}
-
-.btn-success {
-    background: var(--primary);
-    border-color: var(--primary);
-}
-
-.btn-success:hover {
-    background: var(--primary-dark);
-    border-color: var(--primary-dark);
-}
-
-
 /* =========================================================
-   FOOD WASTE DONATION SYSTEM
-   Global Styles
+   FOODSHARE DESIGN SYSTEM & PALETTE
+   =========================================================
+   Design Proportions:
+   - 55% Cream & White (Body #FFFDF5, Surfaces #FFFFFF)
+   - 25% Green (Primary #2E7D32, Dark #1B5E20)
+   - 10% Gold (Accent #F9A825)
+   - 7% Light green (Accent #E8F5E9)
+   - 3% Orange (Accent #F57C00)
    ========================================================= */
 
+/* =========================================================
+   1. ROOT VARIABLES (LIGHT THEME - DEFAULT)
+   ========================================================= */
 :root {
-    --primary: #198754;
-    --primary-dark: #146c43;
-    --primary-light: #d1e7dd;
+    /* Primary Greens (25%) */
+    --primary: #2E7D32;
+    --primary-dark: #1B5E20;
+    --primary-light: #E8F5E9;
+    --primary-hover: #1B5E20;
+    --primary-green: #2E7D32;
 
-    --secondary: #0d6efd;
-    --danger: #dc3545;
-    --warning: #ffc107;
-    --success: #198754;
-    --info: #0dcaf0;
+    /* Backgrounds & Surfaces (55% Cream & White) */
+    --bg-cream: #FFFDF5;
+    --bg-white: #FFFFFF;
+    --body-bg: #FFFDF5;
+    --page-bg: #FFFDF5;
+    --surface: #FFFFFF;
+    --surface-2: #F7F9F3;
+    --surface-card: #FFFFFF;
+    --navbar-bg: rgba(255, 253, 245, 0.95);
 
-    --dark: #212529;
-    --gray-dark: #495057;
-    --gray: #6c757d;
-    --gray-light: #adb5bd;
+    /* Main Typography (Deep Charcoal / Black) */
+    --text-primary: #263238;
+    --text: #263238;
+    --text-dark: #263238;
+    --text-secondary: #455A64;
+    --text-muted: #607D8B;
 
-    --light: #f8f9fa;
-    --white: #ffffff;
-    --border: #dee2e6;
+    /* Light Green Accent (7%) */
+    --light-green: #E8F5E9;
+    --light-green-text: #1B5E20;
+    --light-green-border: rgba(46, 125, 50, 0.25);
 
-    --body-bg: #f5f7f9;
-    --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    /* Gold Accent (10%) */
+    --accent-gold: #F9A825;
+    --gold: #F9A825;
+    --gold-light: #FFFDE7;
+    --gold-border: rgba(249, 168, 37, 0.35);
 
-    --radius: 10px;
-    --transition: all 0.3s ease;
+    /* Orange Accent (3%) */
+    --accent-orange: #F57C00;
+    --orange: #F57C00;
+    --orange-light: #FFF3E0;
+    --orange-border: rgba(245, 124, 0, 0.3);
+
+    /* Supporting Semantic Colors */
+    --secondary: #37474F;
+    --success: #2E7D32;
+    --warning: #F57C00;
+    --danger: #D32F2F;
+    --info: #0288D1;
+
+    /* Borders & Inputs */
+    --border: #E0E6E1;
+    --border-color: #E0E6E1;
+    --input-bg: #FFFFFF;
+    --input-border: #CFD8D3;
+    --input-focus-border: #2E7D32;
+
+    /* Shadows */
+    --shadow: 0 4px 18px rgba(46, 125, 50, 0.06);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 12px 36px rgba(46, 125, 50, 0.1);
+    --shadow-card: 0 8px 25px rgba(0, 0, 0, 0.06);
+
+    /* Radii & Transitions */
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 18px;
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    :root {
+        /* Primary Greens */
+        --primary: #2E7D32;
+        --primary-dark: #183A2B;
+        --primary-light: #E8F5E9;
+        --primary-hover: #183A2B;
+        --primary-green: #2E7D32;
+
+        /* Backgrounds */
+        --bg-cream: #FFFDF5;
+        --bg-white: #FFFFFF;
+        --body-bg: #FFFDF5;
+        --page-bg: #FFFDF5;
+        --surface: #FFFFFF;
+        --surface-2: #F7F9F3;
+        --surface-card: #FFFFFF;
+        --navbar-bg: rgba(255, 253, 245, 0.95);
+
+        /* Typography */
+        --text-primary: #263238;
+        --text: #263238;
+        --text-dark: #263238;
+        --text-secondary: #455A64;
+        --text-muted: #607D8B;
+
+        /* Light Green */
+        --light-green: #E8F5E9;
+        --light-green-text: #183A2B;
+        --light-green-border: rgba(46, 125, 50, 0.25);
+
+        /* Soft Gold */
+        --accent-gold: #D4AF37;
+        --gold: #D4AF37;
+        --gold-light: #F5E6B3;
+        --gold-border: rgba(212, 175, 55, 0.35);
+
+        /* Orange */
+        --accent-orange: #F57C00;
+        --orange: #F57C00;
+        --orange-light: #FFF3E0;
+        --orange-border: rgba(245, 124, 0, 0.3);
+
+        /* Semantic Colors */
+        --secondary: #37474F;
+        --success: #2E7D32;
+        --warning: #F57C00;
+        --danger: #D32F2F;
+        --info: #0288D1;
+
+        /* Borders & Inputs */
+        --border: #E0E6E1;
+        --border-color: #E0E6E1;
+        --input-bg: #FFFFFF;
+        --input-border: #CFD8D3;
+        --input-focus-border: #2E7D32;
+
+        /* Shadows */
+        --shadow: 0 4px 18px rgba(46, 125, 50, 0.06);
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 12px 36px rgba(46, 125, 50, 0.1);
+        --shadow-card: 0 8px 25px rgba(0, 0, 0, 0.06);
+
+        /* Radii & Transitions */
+        --radius: 12px;
+        --radius-sm: 8px;
+        --radius-lg: 18px;
+        --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 }
 
-/* =========================
-   RESET
-   ========================= */
+/* =========================================================
+   2. DARK THEME VARIABLES
+   ========================================================= */
+[data-theme="dark"],
+body.dark,
+html[data-theme="dark"] body,
+[data-bs-theme="dark"] {
+    /* Primary Greens (Adapted for Dark Contrast) */
+    --primary: #43A047;
+    --primary-dark: #2E7D32;
+    --primary-light: rgba(46, 125, 50, 0.24);
+    --primary-hover: #4CAF50;
+    --primary-green: #43A047;
 
+    /* Backgrounds & Surfaces (Proper Deep Dark) */
+    --bg-cream: #101613;
+    --bg-white: #17201B;
+    --body-bg: #101613;
+    --page-bg: #101613;
+    --surface: #17201B;
+    --surface-2: #1E2B23;
+    --surface-card: #17201B;
+    --navbar-bg: rgba(20, 28, 23, 0.96);
+
+    /* Main Typography (Proper White) */
+    --text-primary: #FFFFFF;
+    --text: #FFFFFF;
+    --text-dark: #FFFFFF;
+    --text-secondary: #CFD8DC;
+    --text-muted: #90A4AE;
+
+    /* Light Green Accent in Dark */
+    --light-green: rgba(46, 125, 50, 0.22);
+    --light-green-text: #A5D6A7;
+    --light-green-border: rgba(67, 160, 71, 0.35);
+
+    /* Gold Accent in Dark */
+    --accent-gold: #FDD835;
+    --gold: #FDD835;
+    --gold-light: rgba(253, 216, 53, 0.16);
+    --gold-border: rgba(253, 216, 53, 0.35);
+
+    /* Orange Accent in Dark */
+    --accent-orange: #FB8C00;
+    --orange: #FB8C00;
+    --orange-light: rgba(251, 140, 0, 0.18);
+    --orange-border: rgba(251, 140, 0, 0.35);
+
+    /* Semantic in Dark */
+    --secondary: #90A4AE;
+    --success: #43A047;
+    --warning: #FB8C00;
+    --danger: #EF5350;
+    --info: #29B6F6;
+
+    /* Borders & Inputs */
+    --border: #28372E;
+    --border-color: #28372E;
+    --input-bg: #121A15;
+    --input-border: #2E4035;
+    --input-focus-border: #43A047;
+
+    /* Shadows in Dark */
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 16px 45px rgba(0, 0, 0, 0.55);
+    --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.45);
+
+    --primary: #43A047;
+    --primary-dark: #183A2B;
+
+    --accent-gold: #D4AF37;
+    --gold: #D4AF37;
+    --gold-light: rgba(212, 175, 55, 0.16);
+    --gold-border: rgba(212, 175, 55, 0.35);
+
+    --accent-orange: #FB8C00;
+    --orange: #FB8C00;
+}
+
+/* =========================================================
+   3. GLOBAL RESET & BASE STYLES
+   ========================================================= */
 * {
     margin: 0;
     padding: 0;
@@ -82,13 +241,16 @@ body {
 
 html {
     scroll-behavior: smooth;
+    background-color: var(--page-bg);
 }
 
 body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: var(--body-bg);
-    color: var(--dark);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--page-bg);
+    color: var(--text);
     line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
 }
 
 a {
@@ -113,1071 +275,491 @@ textarea {
     font-family: inherit;
 }
 
-/* =========================
-   NAVBAR
-   ========================= */
-
-.navbar {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-}
-
-.navbar-brand {
-    font-weight: 700;
-    font-size: 1.3rem;
-}
-
-.nav-link {
-    font-weight: 500;
-    transition: var(--transition);
-}
-
-.nav-link:hover {
-    color: var(--primary) !important;
-}
-
-/* =========================
-   HERO
-   ========================= */
-
-.hero-section {
-    min-height: 600px;
-    display: flex;
-    align-items: center;
-    background:
-        linear-gradient(
-            rgba(25, 135, 84, 0.88),
-            rgba(20, 108, 67, 0.88)
-        ),
-        url("../images/hero.jpg") center/cover;
-    color: var(--white);
-}
-
-.hero-content {
-    max-width: 750px;
-}
-
-.hero-title {
-    font-size: 3.2rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-}
-
-.hero-text {
-    font-size: 1.15rem;
-    margin-bottom: 30px;
-}
-
-/* =========================
-   BUTTONS
-   ========================= */
-
-.btn {
-    border-radius: 7px;
-    font-weight: 600;
-    transition: var(--transition);
-}
-
-.btn-primary {
-    background: var(--primary);
-    border-color: var(--primary);
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-    border-color: var(--primary-dark);
-    transform: translateY(-2px);
-}
-
-.btn-outline-primary:hover {
-    transform: translateY(-2px);
-}
-
-/* =========================
-   CARDS
-   ========================= */
-
-.card {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-}
-
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-}
-
-.card-header {
-    font-weight: 600;
-}
-
-/* =========================
-   FORMS
-   ========================= */
-
-.form-label {
-    font-weight: 600;
-    color: var(--gray-dark);
-}
-
-.form-control,
-.form-select {
-    min-height: 45px;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-}
-
-.form-control:focus,
-.form-select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
-}
-
-/* =========================
-   TABLE
-   ========================= */
-
-.table {
-    vertical-align: middle;
-}
-
-.table thead th {
-    background: var(--light);
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-/* =========================
-   BADGES
-   ========================= */
-
-.badge {
-    padding: 7px 10px;
-    border-radius: 20px;
-    font-weight: 600;
-}
-
-/* =========================
-   ALERTS
-   ========================= */
-
-.alert {
-    border-radius: 8px;
-}
-
-/* =========================
-   FOOTER
-   ========================= */
-
-footer {
-    background: #212529;
-    color: #ffffff;
-}
-
-footer a {
-    color: #ced4da;
-}
-
-footer a:hover {
-    color: #ffffff;
-}
-
-/* =========================
-   SECTION
-   ========================= */
-
-.section {
-    padding: 80px 0;
-}
-
-.section-title {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-}
-
-.section-subtitle {
-    color: var(--gray);
-    max-width: 700px;
-    margin: 0 auto 40px;
-}
-
-/* =========================
-   FOOD DONATION CARD
-   ========================= */
-
-.food-card {
-    overflow: hidden;
-}
-
-.food-card img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-}
-
-.food-card-body {
-    padding: 20px;
-}
-
-.food-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-}
-
-/* =========================
-   EMPTY STATE
-   ========================= */
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--gray);
-}
-
-.empty-state i {
-    font-size: 50px;
-    margin-bottom: 20px;
-}
-
-/* =========================
-   LOADING
-   ========================= */
-
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 150px;
-}
-
-/* =========================
-   SCROLL TOP
-   ========================= */
-
-#scrollTopBtn {
-    position: fixed;
-    right: 25px;
-    bottom: 25px;
-    width: 45px;
-    height: 45px;
-    border: none;
-    border-radius: 50%;
-    background: var(--primary);
-    color: white;
-    display: none;
-    z-index: 999;
-    cursor: pointer;
-}
-
-#scrollTopBtn:hover {
-    background: var(--primary-dark);
-}
-
-/* =========================
-   IMAGE PREVIEW
-   ========================= */
-
-.image-preview {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    border-radius: 8px;
-    display: none;
-    margin-top: 15px;
-}
-
-/* =========================
-   AUTH
-   ========================= */
-
-.auth-wrapper {
-    min-height: calc(100vh - 70px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 15px;
-}
-
-.auth-card {
-    width: 100%;
-    max-width: 480px;
-    background: var(--white);
-    padding: 35px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
-}
-
-.auth-logo {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.auth-logo h2 {
-    font-weight: 700;
-    color: var(--primary);
-}
-
 /* =========================================================
-   LIGHT / DARK MODE
+   4. NAVBAR STYLES
    ========================================================= */
-
-/* -------------------------
-   Theme Variables
-   ------------------------- */
-
-:root {
-    --bg-primary: #f5f8f6;
-    --bg-secondary: #ffffff;
-    --bg-card: #ffffff;
-
-    --text-primary: #17221b;
-    --text-secondary: #59655e;
-    --text-muted: #7a857f;
-
-    --border-color: #e2e8e4;
-
-    --navbar-bg: rgba(255, 255, 255, 0.92);
-
-    --input-bg: #ffffff;
-
-    --shadow-soft:
-        0 8px 30px rgba(25, 135, 84, 0.08);
-
-    --shadow-card:
-        0 10px 35px rgba(0, 0, 0, 0.08);
-}
-
-
-/* -------------------------
-   Dark Theme
-   ------------------------- */
-
-[data-theme="dark"] {
-
-    --bg-primary: #0d1511;
-    --bg-secondary: #121c17;
-    --bg-card: #17231c;
-
-    --text-primary: #f1f5f2;
-    --text-secondary: #b7c3bb;
-    --text-muted: #89968e;
-
-    --border-color: #29372f;
-
-    --navbar-bg: rgba(18, 28, 23, 0.94);
-
-    --input-bg: #121c17;
-
-    --shadow-soft:
-        0 8px 30px rgba(0, 0, 0, 0.35);
-
-    --shadow-card:
-        0 12px 40px rgba(0, 0, 0, 0.4);
-}
-
-
-/* -------------------------
-   Global Theme
-   ------------------------- */
-
-html,
-body {
-    transition:
-        background-color 0.3s ease,
-        color 0.3s ease;
-}
-
-body {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-}
-
-
-/* -------------------------
-   Navbar
-   ------------------------- */
-
 .navbar {
     background: var(--navbar-bg) !important;
-
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.04);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    z-index: 1030;
 }
-
-
-/* -------------------------
-   Brand
-   ------------------------- */
 
 .navbar-brand {
-    color: var(--text-primary) !important;
-}
-
-.brand-highlight {
-    color: var(--primary);
+    font-weight: 800;
+    font-size: 1.35rem;
+    color: var(--text) !important;
+    letter-spacing: -0.5px;
 }
 
 .brand-icon {
     width: 38px;
     height: 38px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     border-radius: 10px;
-
-    background: linear-gradient(
-        135deg,
-        var(--primary),
-        #42b883
-    );
-
-    color: white;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
 }
 
+.brand-highlight {
+    color: var(--primary);
+}
 
-/* -------------------------
-   Navigation Links
-   ------------------------- */
-
-.nav-link {
+.navbar .nav-link {
+    font-weight: 600;
+    font-size: 0.95rem;
     color: var(--text-secondary) !important;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
 }
 
-.nav-link:hover {
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
     color: var(--primary) !important;
+    background-color: var(--primary-light);
 }
 
+/* Theme Toggle Button */
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
 
-/* -------------------------
-   Cards
-   ------------------------- */
+.theme-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.2);
+}
 
+.theme-toggle i {
+    font-size: 15px;
+    transition: transform 0.4s ease;
+}
+
+.theme-toggle:hover i {
+    transform: rotate(20deg);
+}
+
+/* =========================================================
+   5. BUTTONS (25% GREEN DOMINANCE)
+   ========================================================= */
+.btn {
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 8px 18px;
+    transition: var(--transition);
+}
+
+.btn-success,
+.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(46, 125, 50, 0.25);
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--primary-dark) !important;
+    border-color: var(--primary-dark) !important;
+    color: #FFFFFF !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(27, 94, 32, 0.35);
+}
+
+.btn-outline-success,
+.btn-outline-primary {
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-success:hover,
+.btn-outline-primary:hover {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #FFFFFF !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(46, 125, 50, 0.25);
+}
+
+.btn-warning {
+    background-color: var(--accent-orange) !important;
+    border-color: var(--accent-orange) !important;
+    color: #FFFFFF !important;
+}
+
+.btn-warning:hover {
+    background-color: #E65100 !important;
+    border-color: #E65100 !important;
+    color: #FFFFFF !important;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    color: var(--text-secondary) !important;
+    border-color: var(--border) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--surface-2) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+/* =========================================================
+   6. CARDS & SURFACES (55% CREAM & WHITE)
+   ========================================================= */
 .card,
 .dashboard-card,
 .stat-card,
 .auth-card,
 .food-card {
-    background: var(--bg-card);
-    color: var(--text-primary);
-
-    border-color: var(--border-color);
-
-    box-shadow: var(--shadow-card);
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
 }
 
+.card:hover,
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
 
-/* -------------------------
-   Text
-   ------------------------- */
+.card-header {
+    background: var(--surface-2) !important;
+    color: var(--text) !important;
+    border-bottom: 1px solid var(--border) !important;
+    font-weight: 700;
+}
+
+.card-body {
+    color: var(--text);
+}
+
+/* Stat Cards */
+.stat-card {
+    border-left: 4px solid var(--primary) !important;
+}
+
+.stat-card-gold {
+    border-left: 4px solid var(--accent-gold) !important;
+}
+
+.stat-card-orange {
+    border-left: 4px solid var(--accent-orange) !important;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--light-green);
+    color: var(--primary);
+    font-size: 22px;
+}
+
+.stat-icon-gold {
+    background: var(--gold-light);
+    color: var(--accent-gold);
+}
+
+.stat-icon-orange {
+    background: var(--orange-light);
+    color: var(--accent-orange);
+}
+
+/* =========================================================
+   7. FORM INPUTS & SELECTS
+   ========================================================= */
+.form-label {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-size: 0.92rem;
+}
+
+.form-control,
+.form-select {
+    min-height: 44px;
+    border-radius: var(--radius-sm);
+    background-color: var(--input-bg) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--input-border) !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: var(--transition);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.85;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--input-bg) !important;
+    color: var(--text) !important;
+    border-color: var(--input-focus-border) !important;
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.2) !important;
+}
+
+.input-group-text {
+    background-color: var(--surface-2) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--input-border) !important;
+}
+
+/* =========================================================
+   8. TABLES
+   ========================================================= */
+.table {
+    color: var(--text) !important;
+    vertical-align: middle;
+    border-color: var(--border) !important;
+}
+
+.table thead th,
+.table-light,
+.table-light th {
+    background-color: var(--surface-2) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody td {
+    background-color: var(--surface) !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border) !important;
+}
+
+.table-hover tbody tr:hover td {
+    background-color: var(--surface-2) !important;
+    color: var(--text) !important;
+}
+
+/* =========================================================
+   9. BADGES & ALERTS (COLOR PROPORTIONS)
+   ========================================================= */
+.badge {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.78rem;
+}
+
+/* 7% Light Green Badge */
+.badge.bg-success-subtle,
+.badge-light-green {
+    background-color: var(--light-green) !important;
+    color: var(--light-green-text) !important;
+    border: 1px solid var(--light-green-border) !important;
+}
+
+/* 25% Solid Green Badge */
+.badge.bg-success {
+    background-color: var(--primary) !important;
+    color: #FFFFFF !important;
+}
+
+/* 3% Orange Badge */
+.badge.bg-warning-subtle,
+.badge-orange {
+    background-color: var(--orange-light) !important;
+    color: var(--accent-orange) !important;
+    border: 1px solid var(--orange-border) !important;
+}
+
+/* 10% Gold Badge */
+.badge.bg-gold-subtle,
+.badge-gold {
+    background-color: var(--gold-light) !important;
+    color: var(--accent-gold) !important;
+    border: 1px solid var(--gold-border) !important;
+}
+
+.badge.bg-light {
+    background-color: var(--surface-2) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.alert {
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: var(--light-green) !important;
+    color: var(--primary-dark) !important;
+    border-color: var(--light-green-border) !important;
+}
+
+.alert-warning {
+    background-color: var(--orange-light) !important;
+    color: var(--accent-orange) !important;
+    border-color: var(--orange-border) !important;
+}
+
+/* =========================================================
+   10. DROPDOWNS, MODALS, PAGINATION
+   ========================================================= */
+.dropdown-menu {
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.dropdown-item {
+    color: var(--text) !important;
+    font-weight: 500;
+    padding: 9px 18px;
+    transition: var(--transition);
+}
+
+.dropdown-item:hover {
+    background-color: var(--primary-light) !important;
+    color: var(--primary) !important;
+}
+
+.dropdown-divider {
+    border-color: var(--border) !important;
+}
+
+.modal-content {
+    background-color: var(--surface) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--border) !important;
+}
+
+.pagination .page-link {
+    background-color: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #FFFFFF;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+/* =========================================================
+   11. TEXT & UTILITY CLASSES
+   ========================================================= */
+.text-dark {
+    color: var(--text-dark) !important;
+}
 
 .text-muted {
     color: var(--text-muted) !important;
 }
 
-.text-secondary {
-    color: var(--text-secondary) !important;
+.text-success {
+    color: var(--primary) !important;
 }
 
-
-/* -------------------------
-   Forms
-   ------------------------- */
-
-.form-control,
-.form-select {
-    background-color: var(--input-bg);
-    color: var(--text-primary);
-
-    border-color: var(--border-color);
+.text-warning {
+    color: var(--accent-orange) !important;
 }
 
-.form-control::placeholder {
-    color: var(--text-muted);
+.text-gold {
+    color: var(--accent-gold) !important;
 }
 
-.form-control:focus,
-.form-select:focus {
-    background-color: var(--input-bg);
-    color: var(--text-primary);
+.bg-white {
+    background-color: var(--surface) !important;
 }
 
-
-/* -------------------------
-   Tables
-   ------------------------- */
-
-.table {
-    color: var(--text-primary);
+.bg-light {
+    background-color: var(--surface-2) !important;
 }
 
-.table thead th {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    border-color: var(--border-color);
+.border {
+    border-color: var(--border) !important;
 }
-
-.table tbody td {
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    border-color: var(--border-color);
-}
-
-
-/* -------------------------
-   Dropdown
-   ------------------------- */
-
-.dropdown-menu {
-    background: var(--bg-card);
-    border-color: var(--border-color);
-    box-shadow: var(--shadow-card);
-}
-
-.dropdown-item {
-    color: var(--text-secondary);
-}
-
-.dropdown-item:hover {
-    background: var(--primary-light);
-    color: var(--primary);
-}
-
-
-/* -------------------------
-   Theme Toggle
-   ------------------------- */
-
-.theme-toggle {
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 8px;
-
-    min-width: 92px;
-
-    padding: 9px 15px;
-
-    border: 1px solid var(--border-color);
-
-    border-radius: 50px;
-
-    background: var(--bg-card);
-
-    color: var(--text-primary);
-
-    cursor: pointer;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    transition:
-        background 0.3s ease,
-        color 0.3s ease,
-        border 0.3s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-.theme-toggle:hover {
-    transform: translateY(-2px);
-
-    border-color: var(--primary);
-
-    color: var(--primary);
-
-    box-shadow:
-        0 5px 18px rgba(25, 135, 84, 0.15);
-}
-
-.theme-toggle i {
-    font-size: 15px;
-}
-
-
-/* -------------------------
-   Dark Mode Bootstrap Fixes
-   ------------------------- */
-
-[data-theme="dark"] .bg-light {
-    background-color: var(--bg-secondary) !important;
-}
-
-[data-theme="dark"] .bg-white {
-    background-color: var(--bg-card) !important;
-}
-
-[data-theme="dark"] .text-dark {
-    color: var(--text-primary) !important;
-}
-
-[data-theme="dark"] .border {
-    border-color: var(--border-color) !important;
-}
-
-[data-theme="dark"] .modal-content {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .btn-close {
-    filter: invert(1);
-}
-
-
-/* -------------------------
-   Smooth Theme Transition
-   ------------------------- */
-
-body,
-.navbar,
-.card,
-.dashboard-card,
-.stat-card,
-.auth-card,
-.food-card,
-.form-control,
-.form-select,
-.table,
-.dropdown-menu,
-.theme-toggle {
-    transition:
-        background-color 0.3s ease,
-        color 0.3s ease,
-        border-color 0.3s ease,
-        box-shadow 0.3s ease;
-}
-
-/* =========================================================
-   FOODSHARE THEME SYSTEM
-   ========================================================= */
-
-
-/* ================================
-   LIGHT MODE
-   ================================ */
-
-:root {
-
-    --page-bg: #f6faf8;
-
-    --surface: #ffffff;
-
-    --surface-2: #f1f7f3;
-
-    --text: #17231c;
-
-    --text-secondary: #5f6d64;
-
-    --border: #dfe9e3;
-
-    --input-bg: #ffffff;
-
-    --primary-green: #198754;
-
-    --primary-dark: #146c43;
-
-    --navbar-bg: rgba(255, 255, 255, 0.94);
-
-}
-
-
-/* ================================
-   DARK MODE
-   ================================ */
-
-[data-theme="dark"] {
-
-    --page-bg: #0b120e;
-
-    --surface: #131d17;
-
-    --surface-2: #1a2820;
-
-    --text: #f2f7f4;
-
-    --text-secondary: #aab8b0;
-
-    --border: #2b3b32;
-
-    --input-bg: #111a15;
-
-    --primary-green: #38b978;
-
-    --primary-dark: #2ca968;
-
-    --navbar-bg: rgba(19, 29, 23, 0.96);
-
-}
-
-
-/* ================================
-   BODY
-   ================================ */
-
-html {
-    background: var(--page-bg);
-}
-
-body {
-
-    background-color: var(--page-bg);
-
-    color: var(--text);
-
-    transition:
-        background-color 0.3s ease,
-        color 0.3s ease;
-}
-
-
-/* ================================
-   NAVBAR
-   ================================ */
-
-.navbar {
-
-    background: var(--navbar-bg) !important;
-
-    border-bottom:
-        1px solid var(--border);
-
-    backdrop-filter: blur(16px);
-
-    -webkit-backdrop-filter: blur(16px);
-
-    transition:
-        background-color 0.3s ease,
-        border-color 0.3s ease;
-}
-
-
-/* ================================
-   NAV LINKS
-   ================================ */
-
-.navbar .nav-link {
-
-    color: var(--text-secondary) !important;
-
-    transition: color 0.25s ease;
-}
-
-.navbar .nav-link:hover {
-
-    color: var(--primary-green) !important;
-}
-
-
-/* ================================
-   BRAND
-   ================================ */
-
-.navbar-brand {
-
-    color: var(--text) !important;
-
-}
-
-.brand-highlight {
-
-    color: var(--primary-green);
-
-}
-
-
-/* ================================
-   THEME BUTTON
-   ================================ */
-
-.theme-toggle {
-
-    position: relative;
-
-    display: inline-flex;
-
+.hero-section {
+    min-height: 580px;
+    display: flex;
     align-items: center;
 
-    justify-content: center;
-
-    gap: 8px;
-
-    height: 42px;
-
-    padding: 0 16px;
-
-    border: 1px solid var(--border);
-
-    border-radius: 50px;
-
-    background: var(--surface);
-
-    color: var(--text);
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    outline: none;
-
-    transition:
-        all 0.3s ease;
-
-}
-
-
-/* Hover */
-
-.theme-toggle:hover {
-
-    border-color: var(--primary-green);
-
-    color: var(--primary-green);
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 8px 20px
-        rgba(25, 135, 84, 0.15);
-
-}
-
-
-/* Icon */
-
-.theme-toggle i {
-
-    font-size: 16px;
-
-    transition:
-        transform 0.4s ease;
-
-}
-
-
-/* Icon rotate */
-
-.theme-toggle:hover i {
-
-    transform:
-        rotate(20deg);
-
-}
-
-
-/* ================================
-   CARDS
-   ================================ */
-
-.card,
-.dashboard-card,
-.stat-card,
-.auth-card,
-.food-card {
-
     background:
-        var(--surface);
+        linear-gradient(
+            135deg,
+            rgba(46, 125, 50, 0.94),
+            rgba(24, 58, 43, 0.96)
+        ),
+        url("../images/hero.jpg") center/cover;
 
-    color:
-        var(--text);
-
-    border-color:
-        var(--border);
-
+    color: #FFFFFF;
+}
+/* Footer */
+footer {
+    background-color: #16201B !important;
+    color: #CFD8DC;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-
-/* ================================
-   FORM INPUTS
-   ================================ */
-
-.form-control,
-.form-select {
-
-    background:
-        var(--input-bg);
-
-    color:
-        var(--text);
-
-    border-color:
-        var(--border);
-
+footer a {
+    color: #B0BEC5;
 }
 
-
-.form-control::placeholder {
-
-    color:
-        var(--text-secondary);
-
+footer a:hover {
+    color: #FFFFFF;
 }
 
-
-.form-control:focus,
-.form-select:focus {
-
-    background:
-        var(--input-bg);
-
-    color:
-        var(--text);
-
-    border-color:
-        var(--primary-green);
-
-}
-
-
-/* ================================
-   TABLE
-   ================================ */
-
-.table {
-
-    color:
-        var(--text);
-
-}
-
-
-.table tbody td {
-
-    background:
-        var(--surface);
-
-    color:
-        var(--text-secondary);
-
-    border-color:
-        var(--border);
-
-}
-
-
-.table thead th {
-
-    background:
-        var(--surface-2);
-
-    color:
-        var(--text);
-
-    border-color:
-        var(--border);
-
-}
-
-
-/* ================================
-   DARK MODE TEXT FIXES
-   ================================ */
-
-[data-theme="dark"] .text-dark {
-
-    color:
-        var(--text) !important;
-
-}
-
-
-[data-theme="dark"] .text-muted {
-
-    color:
-        var(--text-secondary) !important;
-
-}
-
-
-[data-theme="dark"] .bg-white {
-
-    background:
-        var(--surface) !important;
-
-}
-
-
-[data-theme="dark"] .bg-light {
-
-    background:
-        var(--surface-2) !important;
-
-}
-
-
-/* ================================
-   DROPDOWN
-   ================================ */
-
-.dropdown-menu {
-
-    background:
-        var(--surface);
-
-    border-color:
-        var(--border);
-
-}
-
-
-.dropdown-item {
-
-    color:
-        var(--text-secondary);
-
-}
-
-
-.dropdown-item:hover {
-
-    background:
-        var(--surface-2);
-
-    color:
-        var(--primary-green);
-
-}
-
-
-/* ================================
-   MODAL
-   ================================ */
-
-.modal-content {
-
-    background:
-        var(--surface);
-
-    color:
-        var(--text);
-
-    border-color:
-        var(--border);
-
-}
-
-
-/* ================================
-   DARK MODE TRANSITION
-   ================================ */
-
-* {
-
-    transition:
-        background-color 0.25s ease,
-        border-color 0.25s ease,
-        color 0.25s ease;
-
+/* Close button in dark mode */
+[data-theme="dark"] .btn-close,
+body.dark .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 /* =====================================================
@@ -1244,11 +826,9 @@ body {
     inset: 0;
 
     background:
-        linear-gradient(
-            to top,
+        linear-gradient(to top,
             rgba(0, 0, 0, 0.55),
-            transparent 55%
-        );
+            transparent 55%);
 
     pointer-events: none;
 }
@@ -1393,13 +973,11 @@ body {
 
 /* Paragraph */
 
-.about-content > p {
+.about-content>p {
     margin: 0 0 20px;
 
-    color: var(
-        --text-secondary,
-        #65766e
-    );
+    color: var(--text-secondary,
+            #65766e);
 
     font-size: 17px;
 
@@ -1461,10 +1039,8 @@ body {
 .about-feature p {
     margin: 0;
 
-    color: var(
-        --text-secondary,
-        #65766e
-    );
+    color: var(--text-secondary,
+            #65766e);
 
     font-size: 14px;
 

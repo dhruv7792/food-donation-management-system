@@ -89,22 +89,14 @@ function initializeTheme() {
        -------------------------------- */
 
     if (savedTheme === "dark") {
-
-        document.documentElement
-            .setAttribute(
-                "data-theme",
-                "dark"
-            );
-
+        document.documentElement.setAttribute("data-theme", "dark");
+        document.documentElement.setAttribute("data-bs-theme", "dark");
+        if (document.body) document.body.classList.add("dark");
     } else {
-
-        document.documentElement
-            .removeAttribute(
-                "data-theme"
-            );
-
+        document.documentElement.setAttribute("data-theme", "light");
+        document.documentElement.setAttribute("data-bs-theme", "light");
+        if (document.body) document.body.classList.remove("dark");
     }
-
 
     updateThemeButton(savedTheme);
 
@@ -118,49 +110,37 @@ function initializeTheme() {
         function () {
 
             const currentTheme =
-                document.documentElement
-                    .getAttribute(
-                        "data-theme"
-                    );
-
+                document.documentElement.getAttribute("data-theme") || "light";
 
             if (currentTheme === "dark") {
 
                 /* LIGHT */
 
-                document.documentElement
-                    .removeAttribute(
-                        "data-theme"
-                    );
+                document.documentElement.setAttribute("data-theme", "light");
+                document.documentElement.setAttribute("data-bs-theme", "light");
+                if (document.body) document.body.classList.remove("dark");
 
                 localStorage.setItem(
                     "foodshare-theme",
                     "light"
                 );
 
-                updateThemeButton(
-                    "light"
-                );
-
+                updateThemeButton("light");
 
             } else {
 
                 /* DARK */
 
-                document.documentElement
-                    .setAttribute(
-                        "data-theme",
-                        "dark"
-                    );
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.documentElement.setAttribute("data-bs-theme", "dark");
+                if (document.body) document.body.classList.add("dark");
 
                 localStorage.setItem(
                     "foodshare-theme",
                     "dark"
                 );
 
-                updateThemeButton(
-                    "dark"
-                );
+                updateThemeButton("dark");
 
             }
 
