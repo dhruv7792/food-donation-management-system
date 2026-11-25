@@ -1,5 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as django_login
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
 from django.views import View
 
 from rest_framework import status
@@ -425,6 +430,148 @@ class LoginPageView(View):
             "auth/login.html",
             {"error": error_message, "email": email},
             status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+# ============================================================
+# API: PASSWORD RESET (Forgot Password)
+# ============================================================
+
+class PasswordResetRequestView(APIView):
+    """
+    POST { "email": "user@example.com" }
+    Always responds with the same success message (security best practice).
+    Sends a real password-reset link to the console (dev) or SMTP (prod).
+    """
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from django.contrib.auth.tokens import default_token_generator
+        from django.core.mail import send_mail
+        from django.utils.http import urlsafe_base64_encode
+        from django.utils.encoding import force_bytes
+        from django.conf import settings
+
+        email = (request.data.get("email") or "").strip().lower()
+
+        if email:
+            try:
+                user = User.objects.get(email__iexact=email)
+                uid   = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+                base  = getattr(settings, "FRONTEND_BASE_URL", "http://127.0.0.1:8000")
+                reset_link = f"{base}/reset-password/{uid}/{token}/"
+
+                subject = "FoodShare — Reset Your Password"
+                body = (
+                    f"Hi {user.first_name or user.username},\n\n"
+                    f"We received a request to reset the password for your FoodShare account "
+                    f"associated with {email}.\n\n"
+                    f"Click the link below to set a new password (valid for 24 hours):\n"
+                    f"{reset_link}\n\n"
+                    f"If you did not request this, you can safely ignore this email — "
+                    f"your password will not change.\n\n"
+                    f"— The FoodShare Team"
+                )
+                html_body = f"""
+<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:30px;border:1px solid #e0e0e0;border-radius:12px;">
+  <div style="text-align:center;margin-bottom:24px;">
+    <span style="font-size:40px;">🌿</span>
+    <h2 style="color:#2e7d32;margin:8px 0 0;">FoodShare</h2>
+  </div>
+  <h3 style="color:#333;">Reset Your Password</h3>
+  <p style="color:#555;line-height:1.6;">
+    Hi <strong>{user.first_name or user.username}</strong>,<br><br>
+    We received a request to reset the password for the FoodShare account associated with
+    <strong>{email}</strong>.
+  </p>
+  <div style="text-align:center;margin:30px 0;">
+    <a href="{reset_link}"
+       style="background:#2e7d32;color:#fff;text-decoration:none;padding:14px 32px;
+              border-radius:8px;font-weight:600;font-size:16px;display:inline-block;">
+      Reset Password
+    </a>
+  </div>
+  <p style="color:#888;font-size:13px;line-height:1.6;">
+    This link expires in <strong>24 hours</strong>. If you did not request a password reset,
+    you can safely ignore this email.
+  </p>
+  <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+  <p style="color:#aaa;font-size:12px;text-align:center;">© 2026 FoodShare · Reducing food waste together</p>
+</div>
+"""
+                send_mail(
+                    subject=subject,
+                    message=body,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    html_message=html_body,
+                    fail_silently=True,
+                )
+            except User.DoesNotExist:
+                pass   # don't reveal whether the account exists
+
+        # Always return the same response — security best practice
+        return Response(
+            {
+                "success": True,
+                "message": "If an account exists with this email, password reset instructions have been sent.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class PasswordResetConfirmView(APIView):
+    """
+    POST { "uid": "...", "token": "...", "new_password": "..." }
+    Validates the token and sets the new password.
+    """
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from django.contrib.auth.tokens import default_token_generator
+        from django.utils.http import urlsafe_base64_decode
+        from django.utils.encoding import force_str
+
+        uid       = request.data.get("uid", "")
+        token     = request.data.get("token", "")
+        password  = request.data.get("new_password", "")
+
+        if not all([uid, token, password]):
+            return Response(
+                {"success": False, "message": "uid, token and new_password are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if len(password) < 8:
+            return Response(
+                {"success": False, "message": "Password must be at least 8 characters."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user_pk = force_str(urlsafe_base64_decode(uid))
+            user    = User.objects.get(pk=user_pk)
+        except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+            return Response(
+                {"success": False, "message": "Invalid or expired reset link."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not default_token_generator.check_token(user, token):
+            return Response(
+                {"success": False, "message": "Reset link is invalid or has expired."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(password)
+        user.save()
+
+        return Response(
+            {"success": True, "message": "Password reset successfully. You can now log in."},
+            status=status.HTTP_200_OK,
         )
 
 

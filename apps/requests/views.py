@@ -117,6 +117,10 @@ class FoodRequestViewSet(
             ]
         )
 
+        # 🔔 Notify donor about the new request
+        from apps.notifications.utils import notify_donor_new_request
+        notify_donor_new_request(food_request)
+
         return Response(
             {
                 "success": True,
@@ -203,6 +207,12 @@ class FoodRequestViewSet(
             }
         )
 
+        # 🔔 Notify receiver their request was accepted
+        from apps.notifications.utils import notify_receiver_request_accepted
+        # Refresh food_request to pick up the pickup relation
+        food_request.refresh_from_db()
+        notify_receiver_request_accepted(food_request)
+
         return Response({
             "success": True,
             "message": "Food request accepted.",
@@ -266,6 +276,10 @@ class FoodRequestViewSet(
                 "updated_at",
             ]
         )
+
+        # 🔔 Notify receiver their request was rejected
+        from apps.notifications.utils import notify_receiver_request_rejected
+        notify_receiver_request_rejected(food_request)
 
         return Response({
             "success": True,
@@ -331,6 +345,10 @@ class FoodRequestViewSet(
             ]
         )
 
+        # 🔔 Notify donor the receiver cancelled
+        from apps.notifications.utils import notify_donor_request_cancelled
+        notify_donor_request_cancelled(food_request)
+
         return Response({
             "success": True,
             "message":
@@ -387,6 +405,14 @@ class FoodRequestViewSet(
                 status=Pickup.Status.COMPLETED,
                 completed_at=timezone.now(),
             )
+
+        # 🔔 Notify both donor and receiver
+        from apps.notifications.utils import (
+            notify_donor_pickup_completed,
+            notify_receiver_pickup_completed,
+        )
+        notify_donor_pickup_completed(food_request)
+        notify_receiver_pickup_completed(food_request)
 
         return Response({
             "success": True,

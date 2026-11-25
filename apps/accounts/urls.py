@@ -8,6 +8,8 @@ from .views import (
     DonorProfileView,
     ReceiverProfileView,
     UserProfileView,
+    PasswordResetRequestView,
+    PasswordResetConfirmView,
 )
 
 
@@ -53,5 +55,18 @@ urlpatterns = [
         "receiver/profile/",
         ReceiverProfileView.as_view(),
         name="receiver-profile",
+    ),
+
+    # Password Reset
+    path(
+        "password-reset/",
+        PasswordResetRequestView.as_view(),
+        name="password-reset",
+    ),
+
+    path(
+        "password-reset/confirm/",
+        PasswordResetConfirmView.as_view(),
+        name="password-reset-confirm",
     ),
 ]

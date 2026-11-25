@@ -175,3 +175,12 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+# =============================================================
+# EMAIL CONFIGURATION (Console backend for development)
+# =============================================================
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 25
+DEFAULT_FROM_EMAIL = "FoodShare <noreply@foodshare.local>"
+FRONTEND_BASE_URL = "http://127.0.0.1:8000"

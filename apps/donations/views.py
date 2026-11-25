@@ -94,9 +94,13 @@ class DonationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
 
-        serializer.save(
+        donation = serializer.save(
             donor=self.request.user
         )
+
+        # 🔔 Notify all active receivers about the new donation
+        from apps.notifications.utils import notify_receiver_new_donation_available
+        notify_receiver_new_donation_available(donation)
 
     def perform_update(self, serializer):
 
@@ -236,6 +240,14 @@ class DonationViewSet(viewsets.ModelViewSet):
                 pickup.completed_at = timezone.now()
                 pickup.save(update_fields=["status", "completed_at", "updated_at"])
 
+            # 🔔 Notify donor and receiver
+            from apps.notifications.utils import (
+                notify_donor_pickup_completed,
+                notify_receiver_pickup_completed,
+            )
+            notify_donor_pickup_completed(req)
+            notify_receiver_pickup_completed(req)
+
         return Response({
             "success": True,
             "message": "Donation marked as completed successfully.",
@@ -317,6 +329,15 @@ class DonationCreatePageView(View):
                     },
                     status=201,
                 )
+            # Also notify receivers about the new donation (browser form submit path)
+            try:
+                from apps.donations.models import Donation as _D
+                from apps.notifications.utils import notify_receiver_new_donation_available
+                latest = _D.objects.filter(donor=user).order_by("-created_at").first()
+                if latest:
+                    notify_receiver_new_donation_available(latest)
+            except Exception:
+                pass
             return redirect("donor_donation_list")
 
         if is_json:

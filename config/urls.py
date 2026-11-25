@@ -64,6 +64,12 @@ urlpatterns = [
         TemplateView.as_view(template_name="auth/forgot_password.html"),
         name="forgot_password",
     ),
+
+    path(
+        "reset-password/<str:uid>/<str:token>/",
+        TemplateView.as_view(template_name="auth/reset_password.html"),
+        name="reset_password",
+    ),
     path('api-auth/', include('rest_framework.urls')),
     # =========================
     # API

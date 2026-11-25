@@ -63,6 +63,35 @@
                 </li>
 
                 {% if request.user.is_authenticated %}
+                <!-- 🔔 Notification Bell -->
+                <li class="nav-item ms-lg-2 dropdown" id="notificationNavItem">
+                    <a class="nav-link position-relative p-2"
+                       href="#" role="button"
+                       id="notificationBell"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false"
+                       title="Notifications"
+                       style="color:var(--text);">
+                        <i class="bi bi-bell-fill fs-5"></i>
+                        <span id="notifBadge"
+                              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                              style="font-size:0.65rem;">0</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
+                        id="notifDropdown"
+                        style="min-width:340px;max-height:420px;overflow-y:auto;border-radius:12px;">
+                        <li class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+                            <span class="fw-semibold text-success" style="font-size:0.9rem;">🔔 Notifications</span>
+                            <button class="btn btn-link btn-sm text-muted p-0 text-decoration-none"
+                                    id="markAllReadBtn" style="font-size:0.78rem;">Mark all read</button>
+                        </li>
+                        <li id="notifListContainer">
+                            <div class="text-center text-muted py-4" id="notifEmptyMsg" style="font-size:0.85rem;">
+                                <i class="bi bi-bell-slash d-block fs-3 mb-2"></i>No notifications yet
+                            </div>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item ms-lg-2 dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 fw-semibold text-success"
                        href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
